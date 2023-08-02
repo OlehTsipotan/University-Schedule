@@ -1,0 +1,8 @@
+CREATE SEQUENCE users_seq START 1;
+CREATE SEQUENCE groups_seq START 1;
+CREATE SEQUENCE courses_seq START 1;
+CREATE SEQUENCE class_times_seq START 1;
+CREATE SEQUENCE buildings_seq START 1;
+CREATE SEQUENCE classrooms_seq START 1;
+CREATE SEQUENCE class_types_seq START 1;
+CREATE SEQUENCE scheduled_classes_seq START 1;

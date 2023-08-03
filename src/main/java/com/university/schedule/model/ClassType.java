@@ -2,6 +2,9 @@ package com.university.schedule.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.Hibernate;
+
+import java.util.Objects;
 
 @Setter
 @Getter
@@ -21,4 +24,17 @@ public class ClassType {
 
     @NonNull
     private String name;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        ClassType classType = (ClassType) o;
+        return getId() != null && Objects.equals(getId(), classType.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

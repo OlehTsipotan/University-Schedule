@@ -3,38 +3,33 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 
 import com.university.schedule.model.User;
-import com.university.schedule.repository.GroupRepository;
 import com.university.schedule.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
-@Transactional
-public class MyUserService implements UserService {
+@Transactional(readOnly = true)
+public class DefaultUserService implements UserService {
 
     private final UserRepository userRepository;
-
-    private final Logger logger = LoggerFactory.getLogger(MyUserService.class);
-
-    public MyUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     public List<User> findAll() {
         List<User> users = execute(() -> userRepository.findAll());
-        logger.debug("Retrieved All {} Groups", users.size());
+        log.debug("Retrieved All {} Groups", users.size());
         return users;
     }
 
     @Override
+    @Transactional
     public Long save(User user) {
         if (StringUtils.isEmpty(user.getEmail())) {
             throw new ServiceException("Email can`t be empty or null");
@@ -49,28 +44,29 @@ public class MyUserService implements UserService {
             throw new ServiceException("LastName can`t be empty or null");
         }
         execute(() -> userRepository.save(user));
-        logger.info("saved {}", user);
+        log.info("saved {}", user);
         return user.getId();
     }
 
     @Override
     public User findById(Long id) {
         User user = execute(() -> userRepository.findById(id)).orElseThrow(() -> new ServiceException("User not found"));
-        logger.debug("Retrieved {}", user);
+        log.debug("Retrieved {}", user);
         return user;
     }
 
     @Override
     public User findByEmailAndPassword(String email, String password) {
         User user = execute(() -> userRepository.findByEmailAndPassword(email, password)).orElseThrow(() -> new ServiceException("User not found"));
-        logger.debug("Retrieved {}", user);
+        log.debug("Retrieved {}", user);
         return user;
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         execute(() -> userRepository.deleteById(id));
-        logger.info("Deleted id = {}", id);
+        log.info("Deleted id = {}", id);
     }
 
     private <T> T execute(DaoSupplier<T> supplier) {

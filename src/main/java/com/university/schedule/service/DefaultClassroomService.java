@@ -4,58 +4,57 @@ import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Building;
 import com.university.schedule.model.Classroom;
 import com.university.schedule.repository.ClassroomRepository;
-import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
-@Transactional
-public class MyClassroomService implements ClassroomService {
+@Transactional(readOnly = true)
+public class DefaultClassroomService implements ClassroomService {
 
     private final ClassroomRepository classroomRepository;
 
-    private final Logger logger = LoggerFactory.getLogger(MyClassroomService.class);
-
-    public MyClassroomService(ClassroomRepository classroomRepository) {
-        this.classroomRepository = classroomRepository;
-    }
 
     @Override
+    @Transactional
     public Long save(Classroom classroom) {
         execute(() -> classroomRepository.save(classroom));
-        logger.info("saved {}", classroom);
+        log.info("saved {}", classroom);
         return classroom.getId();
     }
 
     @Override
     public Classroom findById(Long id) {
         Classroom classroom = execute(() -> classroomRepository.findById(id)).orElseThrow(() -> new ServiceException("Classroom not found"));
-        logger.debug("Retrieved {}", classroom);
+        log.debug("Retrieved {}", classroom);
         return classroom;
     }
 
     @Override
     public List<Classroom> findByBuilding(Building building) {
         List<Classroom> classrooms = execute(() -> classroomRepository.findByBuilding(building));
-        logger.debug("Retrieved All {} Classrooms", classrooms.size());
+        log.debug("Retrieved All {} Classrooms", classrooms.size());
         return classrooms;
     }
 
     @Override
     public List<Classroom> findAll() {
         List<Classroom> classrooms = execute(() -> classroomRepository.findAll());
-        logger.debug("Retrieved All {} Classrooms", classrooms.size());
+        log.debug("Retrieved All {} Classrooms", classrooms.size());
         return classrooms;
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         execute(() -> classroomRepository.deleteById(id));
-        logger.info("Deleted id = {}", id);
+        log.info("Deleted id = {}", id);
     }
 
     private <T> T execute(DaoSupplier<T> supplier) {

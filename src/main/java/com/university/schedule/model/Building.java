@@ -2,8 +2,10 @@ package com.university.schedule.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.Hibernate;
 
 import java.util.List;
+import java.util.Objects;
 
 @Setter
 @Getter
@@ -30,4 +32,17 @@ public class Building {
     @OneToMany(mappedBy = "building")
     @ToString.Exclude
     private List<Classroom> classrooms;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Building building = (Building) o;
+        return getId() != null && Objects.equals(getId(), building.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

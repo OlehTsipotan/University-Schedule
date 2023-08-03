@@ -3,22 +3,15 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ScheduleGenerationException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.*;
-import com.university.schedule.repository.ScheduledClassRepository;
 import com.university.schedule.utility.ScheduleValidator;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -37,7 +30,7 @@ public class ScheduleGeneratorTest {
     public ScheduleGenerator scheduleGenerator;
 
     @Mock
-    public MyScheduledClassService scheduledClassService;
+    public DefaultScheduledClassService scheduledClassService;
 
     @Mock
     public ScheduleValidator scheduleValidator;

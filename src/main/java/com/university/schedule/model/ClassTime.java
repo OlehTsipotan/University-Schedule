@@ -37,6 +37,16 @@ public class ClassTime {
     @Convert(converter = DurationConverter.class)
     private Duration duration;
 
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName() + "(" +
+                "id = " + id + ", " +
+                "order = " + orderNumber + ", " +
+                "startTime = " + startTime + ", " +
+                "duration = " + duration + ")";
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -48,14 +58,5 @@ public class ClassTime {
     @Override
     public int hashCode() {
         return getClass().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getSimpleName() + "(" +
-                "id = " + id + ", " +
-                "order = " + orderNumber + ", " +
-                "startTime = " + startTime + ", " +
-                "duration = " + duration + ")";
     }
 }

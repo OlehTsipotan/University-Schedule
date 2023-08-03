@@ -4,45 +4,41 @@ import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Course;
 import com.university.schedule.model.Group;
 import com.university.schedule.repository.GroupRepository;
-import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@RequiredArgsConstructor
+@Slf4j
 @Service
-@Transactional
-public class MyGroupService implements GroupService {
+@Transactional(readOnly = true)
+public class DefaultGroupService implements GroupService {
 
     private final GroupRepository groupRepository;
 
     private final CourseService courseService;
 
-    private final Logger logger = LoggerFactory.getLogger(MyGroupService.class);
-
-    public MyGroupService(GroupRepository groupRepository, CourseService courseService) {
-        this.groupRepository = groupRepository;
-        this.courseService = courseService;
-    }
-
     @Override
     public List<Group> findAll() throws ServiceException {
         List<Group> groups = execute(() -> groupRepository.findAll());
-        logger.debug("Retrieved All {} Groups", groups.size());
+        log.debug("Retrieved All {} Groups", groups.size());
         return groups;
     }
 
     @Override
+    @Transactional
     public Long save(String groupName) {
         if (StringUtils.isEmpty(groupName)) {
             throw new ServiceException("groupName can`t be empty or null");
         }
         Group group = new Group(groupName);
         execute(() -> groupRepository.save(group));
-        logger.info("saved {}", group);
+        log.info("saved {}", group);
         return group.getId();
     }
 
@@ -52,42 +48,45 @@ public class MyGroupService implements GroupService {
             throw new ServiceException("groupName can`t be empty or null");
         }
         execute(() -> groupRepository.save(group));
-        logger.info("saved {}", group);
+        log.info("saved {}", group);
         return group.getId();
     }
 
     @Override
     public Group findById(Long id) {
         Group group = execute(() -> groupRepository.findById(id)).orElseThrow(() -> new ServiceException("Group not found"));
-        logger.debug("Retrieved {}", group);
+        log.debug("Retrieved {}", group);
         return group;
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         execute(() -> groupRepository.deleteById(id));
-        logger.info("Deleted id = {}", id);
+        log.info("Deleted id = {}", id);
     }
 
     @Override
+    @Transactional
     public boolean assignToCourse(Long groupId, Long courseId) {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new ServiceException("There is no Group with id = " + groupId));
         Course course = courseService.findById(courseId);
         boolean result = group.getCourses().add(course);
 
         save(group);
-        logger.info("{} assigned to {} - {}", group, course, result);
+        log.info("{} assigned to {} - {}", group, course, result);
         return result;
     }
 
     @Override
+    @Transactional
     public boolean removeFromCourse(Long groupId, Long courseId) {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new ServiceException("There is no Group with id = " + groupId));
         Course course = courseService.findById(courseId);
         boolean result = group.getCourses().remove(course);
 
         save(group);
-        logger.info("{} removed from {} - {}", group, course, result);
+        log.info("{} removed from {} - {}", group, course, result);
         return result;
     }
 

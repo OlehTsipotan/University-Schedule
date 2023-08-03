@@ -1,61 +1,59 @@
 package com.university.schedule.service;
 
 import com.university.schedule.exception.ServiceException;
-import com.university.schedule.model.ClassTime;
 import com.university.schedule.model.ClassType;
 import com.university.schedule.repository.ClassTypeRepository;
-import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Transactional
+@Slf4j
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
-public class MyClassTypeService implements ClassTypeService{
+public class DefaultClassTypeService implements ClassTypeService{
 
     private final ClassTypeRepository classTypeRepository;
 
-    private final Logger logger = LoggerFactory.getLogger(MyClassTimeService.class);
-
-    public MyClassTypeService(ClassTypeRepository classTypeRepository) {
-        this.classTypeRepository = classTypeRepository;
-    }
 
     @Override
+    @Transactional
     public Long save(ClassType classType) {
         execute(() -> classTypeRepository.save(classType));
-        logger.info("saved {}", classType);
+        log.info("saved {}", classType);
         return classType.getId();
     }
 
     @Override
     public ClassType findById(Long id) {
         ClassType classType = execute(() -> classTypeRepository.findById(id)).orElseThrow(() -> new ServiceException("ClassType not found"));
-        logger.debug("Retrieved {}", classType);
+        log.debug("Retrieved {}", classType);
         return classType;
     }
 
     @Override
     public ClassType findByName(String name) {
         ClassType classType = execute(() -> classTypeRepository.findByName(name)).orElseThrow(() -> new ServiceException("ClassType not found"));
-        logger.debug("Retrieved {}", classType);
+        log.debug("Retrieved {}", classType);
         return classType;
     }
 
     @Override
     public List<ClassType> findAll() {
         List<ClassType> classTypes = execute(() -> classTypeRepository.findAll());
-        logger.debug("Retrieved All {} ClassTypes", classTypes.size());
+        log.debug("Retrieved All {} ClassTypes", classTypes.size());
         return classTypes;
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         execute(() -> classTypeRepository.deleteById(id));
-        logger.info("Deleted id = {}", id);
+        log.info("Deleted id = {}", id);
     }
 
     private <T> T execute(DaoSupplier<T> supplier) {

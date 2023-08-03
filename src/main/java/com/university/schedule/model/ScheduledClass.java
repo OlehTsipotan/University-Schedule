@@ -2,9 +2,11 @@ package com.university.schedule.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.Hibernate;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Setter
@@ -59,5 +61,16 @@ public class ScheduledClass {
     @ToString.Exclude
     private Set<Group> groups = new HashSet<>();
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        ScheduledClass that = (ScheduledClass) o;
+        return getId() != null && Objects.equals(getId(), that.getId());
+    }
 
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

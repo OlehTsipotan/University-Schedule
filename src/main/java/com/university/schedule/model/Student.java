@@ -11,6 +11,7 @@ import java.util.Objects;
 @Entity
 @Table(name = "students")
 @PrimaryKeyJoinColumn(name = "student_id")
+@NoArgsConstructor
 public class Student extends User {
 
     @ManyToOne

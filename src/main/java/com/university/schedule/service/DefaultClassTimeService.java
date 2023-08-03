@@ -3,58 +3,56 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.ClassTime;
 import com.university.schedule.repository.ClassTimeRepository;
-import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@RequiredArgsConstructor
+@Slf4j
 @Service
-@Transactional
-public class MyClassTimeService implements ClassTimeService {
+@Transactional(readOnly = true)
+public class DefaultClassTimeService implements ClassTimeService {
 
     private final ClassTimeRepository classTimeRepository;
 
-    private final Logger logger = LoggerFactory.getLogger(MyClassTimeService.class);
-
-    public MyClassTimeService(ClassTimeRepository classTimeRepository) {
-        this.classTimeRepository = classTimeRepository;
-    }
-
     @Override
+    @Transactional
     public Long save(ClassTime classTime) {
         execute(() -> classTimeRepository.save(classTime));
-        logger.info("saved {}", classTime);
+        log.info("saved {}", classTime);
         return classTime.getId();
     }
 
     @Override
     public ClassTime findById(Long id) {
         ClassTime classTime = execute(() -> classTimeRepository.findById(id)).orElseThrow(() -> new ServiceException("ClassTime not found"));
-        logger.debug("Retrieved {}", classTime);
+        log.debug("Retrieved {}", classTime);
         return classTime;
     }
 
     @Override
     public ClassTime findByOrderNumber(Integer order) {
         ClassTime classTime = execute(() -> classTimeRepository.findByOrderNumber(order)).orElseThrow(() -> new ServiceException("ClassTime not found"));
-        logger.debug("Retrieved {}", classTime);
+        log.debug("Retrieved {}", classTime);
         return classTime;
     }
 
     @Override
     public List<ClassTime> findAll() {
         List<ClassTime> classTimes = execute(() -> classTimeRepository.findAll());
-        logger.debug("Retrieved All {} Groups", classTimes.size());
+        log.debug("Retrieved All {} Groups", classTimes.size());
         return classTimes;
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         execute(() -> classTimeRepository.deleteById(id));
-        logger.info("Deleted id = {}", id);
+        log.info("Deleted id = {}", id);
     }
 
     private <T> T execute(DaoSupplier<T> supplier) {

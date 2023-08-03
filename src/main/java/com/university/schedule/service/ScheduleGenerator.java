@@ -39,6 +39,11 @@ public class ScheduleGenerator {
     @Autowired
     private ScheduledClassService scheduledClassService;
 
+    public ScheduleGenerator(ScheduleValidator scheduleValidator, ScheduledClassService scheduledClassService){
+        this.scheduleValidator = scheduleValidator;
+        this.scheduledClassService = scheduledClassService;
+    }
+
     /**
      * Generates and saves scheduled classes for a specified time period, based on the provided list of DayScheduleItems.
      * It checks for conflicts in the schedule using the ScheduleValidator before generating the classes.
@@ -91,7 +96,7 @@ public class ScheduleGenerator {
                     date = date.plusDays(1);
                 }
             }
-        } catch (DataAccessException e){
+        } catch (ServiceException e){
             throw new ServiceException("Can't generate schedule due to data access issues");
         }
     }

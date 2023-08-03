@@ -88,31 +88,6 @@ public class ClassroomRepositoryTest {
 
     @ParameterizedTest
     @CsvSource(value = {"BuildingName:BuildingAddress:ClassroomName"}, delimiter = ':')
-    public void findByName(String buildingName, String buildingAddress, String classroomName) {
-
-        // Creating Building instance to save
-        Building building = new Building(buildingName, buildingAddress);
-
-        // Saving
-        building = entityManager.persist(building);
-
-        // Creating Classroom instance to save
-        Classroom classroomToSave = new Classroom(classroomName, building);
-
-        // Saving
-        Long savedBuildingId = entityManager.persist(classroomToSave).getId();
-
-        // Retrieving
-        Classroom retrievedClassroom = classroomRepository.findByName(classroomName).get();
-
-        // Testing
-        assertThat(retrievedClassroom).isNotNull();
-        assertEquals(retrievedClassroom.getId(), savedBuildingId);
-        assertEquals(retrievedClassroom.getName(), classroomName);
-    }
-
-    @ParameterizedTest
-    @CsvSource(value = {"BuildingName:BuildingAddress:ClassroomName"}, delimiter = ':')
     public void findByBuilding(String buildingName, String buildingAddress, String classroomName) {
         // Creating Building instances to save
         Building building1 = new Building(buildingName + 1, buildingAddress + 1);

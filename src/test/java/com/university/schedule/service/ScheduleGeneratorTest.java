@@ -52,8 +52,8 @@ public class ScheduleGeneratorTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:GroupName:ClassroomName"}, delimiter = ':')
-    public void generate_whenScheduledClassServiceThrowsServiceException_thenThrowServiceException(String courseName, String email, String password, String firstName, String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName, String groupName, String classroomName) throws ScheduleGenerationException {
+    @CsvSource(value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:GroupName:ClassroomName:BuildingName:BuildingAddress"}, delimiter = ':')
+    public void generate_whenScheduledClassServiceThrowsServiceException_thenThrowServiceException(String courseName, String email, String password, String firstName, String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName, String groupName, String classroomName, String buildingName, String buildingAddress) throws ScheduleGenerationException {
         Mockito.doThrow(ServiceException.class).when(scheduledClassService).save(any());
         Mockito.doNothing().when(scheduleValidator).validate(any(), any(), any());
 
@@ -63,7 +63,8 @@ public class ScheduleGeneratorTest {
         ClassTime classTime = new ClassTime(orderNumber, LocalTime.of(hour, minute), Duration.ofMinutes(durationMinutes));
         DayOfWeek dayOfWeek = DayOfWeek.SUNDAY;
         ClassType classType = new ClassType(classTypeName);
-        Classroom classroom = new Classroom(classroomName);
+        Building building = new Building(buildingName, buildingAddress);
+        Classroom classroom = new Classroom(classroomName, building);
         Group group = new Group(groupName);
 
         LocalDate startDate = LocalDate.of(2000, 1, 1);

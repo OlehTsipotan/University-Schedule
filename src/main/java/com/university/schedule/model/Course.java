@@ -2,6 +2,7 @@ package com.university.schedule.model;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -26,6 +27,7 @@ public class Course {
     private Long id;
 
     @NonNull
+    @NotBlank(message = "Course name must not be blank")
     private String name;
 
     @ManyToMany(mappedBy = "courses")

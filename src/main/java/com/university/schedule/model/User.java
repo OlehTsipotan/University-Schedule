@@ -1,6 +1,9 @@
 package com.university.schedule.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 
@@ -23,16 +26,21 @@ public class User {
     private Long id;
 
     @NonNull
+    @NotBlank(message = "User email must not be blank")
     private String email;
 
     @NonNull
+    @NotBlank(message = "User password must not be blank")
+    @Size(min = 4, max = 24)
     private String password;
 
     @NonNull
     @Column(name = "first_name")
+    @NotBlank(message = "User firstName must not be blank")
     private String firstName;
 
     @NonNull
     @Column(name = "last_name")
+    @NotBlank(message = "User lastName must not be blank")
     private String lastName;
 }

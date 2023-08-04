@@ -1,6 +1,8 @@
 package com.university.schedule.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -23,16 +25,14 @@ public class Classroom {
     private Long id;
 
     @NonNull
+    @NotBlank(message = "Classroom name must not be blank")
     private String name;
 
     @ManyToOne
     @JoinColumn(name = "building_id")
+    @NonNull
+    @NotNull(message = "Classroom building must not be null")
     private Building building;
-
-    public Classroom(@NonNull String name, Building building) {
-        this.name = name;
-        this.building = building;
-    }
 
     @Override
     public boolean equals(Object o) {

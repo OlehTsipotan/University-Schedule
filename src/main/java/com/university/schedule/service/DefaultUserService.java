@@ -4,9 +4,10 @@ import com.university.schedule.exception.ServiceException;
 
 import com.university.schedule.model.User;
 import com.university.schedule.repository.UserRepository;
+import com.university.schedule.utility.EntityValidator;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,8 @@ public class DefaultUserService implements UserService {
 
     private final UserRepository userRepository;
 
+    private final EntityValidator entityValidator;
+
     @Override
     public List<User> findAll() {
         List<User> users = execute(() -> userRepository.findAll());
@@ -31,18 +34,7 @@ public class DefaultUserService implements UserService {
     @Override
     @Transactional
     public Long save(User user) {
-        if (StringUtils.isEmpty(user.getEmail())) {
-            throw new ServiceException("Email can`t be empty or null");
-        }
-        if (StringUtils.isEmpty(user.getPassword())) {
-            throw new ServiceException("Password can`t be empty or null");
-        }
-        if (StringUtils.isEmpty(user.getFirstName())) {
-            throw new ServiceException("FirstName can`t be empty or null");
-        }
-        if (StringUtils.isEmpty(user.getLastName())) {
-            throw new ServiceException("LastName can`t be empty or null");
-        }
+        entityValidator.validate(user);
         execute(() -> userRepository.save(user));
         log.info("saved {}", user);
         return user.getId();
@@ -57,7 +49,8 @@ public class DefaultUserService implements UserService {
 
     @Override
     public User findByEmailAndPassword(String email, String password) {
-        User user = execute(() -> userRepository.findByEmailAndPassword(email, password)).orElseThrow(() -> new ServiceException("User not found"));
+        User user = execute(() -> userRepository.findByEmailAndPassword(email, password)).orElseThrow(
+                () -> new ServiceException("User not found"));
         log.debug("Retrieved {}", user);
         return user;
     }

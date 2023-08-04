@@ -51,11 +51,17 @@ public class ClassroomRepositoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"ClassroomName"})
-    public void save_byClassroomObject(String name) {
+    @CsvSource(value= {"ClassroomName:BuildingName:BuildingAddress"}, delimiter = ':')
+    public void save_byClassroomObject(String classroomName, String buildingName, String buildingAddress) {
+
+        // Creating Building instance to save
+        Building building = new Building(buildingName, buildingAddress);
+
+        // Saving
+        building = entityManager.persist(building);
 
         // Creating Classroom instance to save
-        Classroom classroomToSave = new Classroom(name);
+        Classroom classroomToSave = new Classroom(classroomName, building);
 
         // Saving
         Long savedClassroomId = classroomRepository.save(classroomToSave).getId();
@@ -65,15 +71,21 @@ public class ClassroomRepositoryTest {
 
         // Testing
         assertThat(retrievedClassroom).isNotNull();
-        assertEquals(retrievedClassroom.getName(), name);
+        assertEquals(retrievedClassroom.getName(), classroomName);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"ClassroomName"})
-    public void findById(String name) {
+    @CsvSource(value= {"ClassroomName:BuildingName:BuildingAddress"}, delimiter = ':')
+    public void findById(String classroomName, String buildingName, String buildingAddress) {
+
+        // Creating Building instance to save
+        Building building = new Building(buildingName, buildingAddress);
+
+        // Saving
+        building = entityManager.persist(building);
 
         // Creating Classroom instance to save
-        Classroom classroomToSave = new Classroom(name);
+        Classroom classroomToSave = new Classroom(classroomName, building);
 
         // Saving
         Long savedClassroomId = entityManager.persist(classroomToSave).getId();
@@ -83,7 +95,7 @@ public class ClassroomRepositoryTest {
 
         // Testing
         assertThat(retrievedClassroom).isNotNull();
-        assertEquals(retrievedClassroom.getName(), name);
+        assertEquals(retrievedClassroom.getName(), classroomName);
     }
 
     @ParameterizedTest
@@ -148,10 +160,17 @@ public class ClassroomRepositoryTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"BuildingName:BuildingAddress"}, delimiter = ':')
-    public void deleteById(String name, String address){
+    @CsvSource(value = {"ClassroomName:BuildingName:BuildingAddress"}, delimiter = ':')
+    public void deleteById(String classroomName, String buildingName, String buildingAddress){
+
         // Creating Building instance to save
-        Classroom classroomToSave = new Classroom(name);
+        Building building = new Building(buildingName, buildingAddress);
+
+        // Saving
+        building = entityManager.persist(building);
+
+        // Creating Classroom instance to save
+        Classroom classroomToSave = new Classroom(classroomName, building);
 
         // Saving
         Long savedClassroomId = entityManager.persist(classroomToSave).getId();
@@ -160,7 +179,7 @@ public class ClassroomRepositoryTest {
         classroomRepository.deleteById(savedClassroomId);
 
         // Testing
-        assertEquals(entityManager.find(Building.class, savedClassroomId), null);
+        assertEquals(entityManager.find(Classroom.class, savedClassroomId), null);
     }
 
 

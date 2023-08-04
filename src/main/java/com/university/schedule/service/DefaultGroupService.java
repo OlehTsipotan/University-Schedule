@@ -4,6 +4,7 @@ import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Course;
 import com.university.schedule.model.Group;
 import com.university.schedule.repository.GroupRepository;
+import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +24,8 @@ public class DefaultGroupService implements GroupService {
 
     private final CourseService courseService;
 
+    private final EntityValidator entityValidator;
+
     @Override
     public List<Group> findAll() throws ServiceException {
         List<Group> groups = execute(() -> groupRepository.findAll());
@@ -32,21 +35,8 @@ public class DefaultGroupService implements GroupService {
 
     @Override
     @Transactional
-    public Long save(String groupName) {
-        if (StringUtils.isEmpty(groupName)) {
-            throw new ServiceException("groupName can`t be empty or null");
-        }
-        Group group = new Group(groupName);
-        execute(() -> groupRepository.save(group));
-        log.info("saved {}", group);
-        return group.getId();
-    }
-
-    @Override
     public Long save(Group group) {
-        if (StringUtils.isEmpty(group.getName())) {
-            throw new ServiceException("groupName can`t be empty or null");
-        }
+        entityValidator.validate(group);
         execute(() -> groupRepository.save(group));
         log.info("saved {}", group);
         return group.getId();
@@ -54,7 +44,8 @@ public class DefaultGroupService implements GroupService {
 
     @Override
     public Group findById(Long id) {
-        Group group = execute(() -> groupRepository.findById(id)).orElseThrow(() -> new ServiceException("Group not found"));
+        Group group = execute(() -> groupRepository.findById(id)).orElseThrow(
+                () -> new ServiceException("Group not found"));
         log.debug("Retrieved {}", group);
         return group;
     }
@@ -69,7 +60,8 @@ public class DefaultGroupService implements GroupService {
     @Override
     @Transactional
     public boolean assignToCourse(Long groupId, Long courseId) {
-        Group group = groupRepository.findById(groupId).orElseThrow(() -> new ServiceException("There is no Group with id = " + groupId));
+        Group group = groupRepository.findById(groupId).orElseThrow(
+                () -> new ServiceException("There is no Group with id = " + groupId));
         Course course = courseService.findById(courseId);
         boolean result = group.getCourses().add(course);
 
@@ -81,7 +73,8 @@ public class DefaultGroupService implements GroupService {
     @Override
     @Transactional
     public boolean removeFromCourse(Long groupId, Long courseId) {
-        Group group = groupRepository.findById(groupId).orElseThrow(() -> new ServiceException("There is no Group with id = " + groupId));
+        Group group = groupRepository.findById(groupId).orElseThrow(
+                () -> new ServiceException("There is no Group with id = " + groupId));
         Course course = courseService.findById(courseId);
         boolean result = group.getCourses().remove(course);
 

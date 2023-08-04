@@ -1,6 +1,7 @@
 package com.university.schedule.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -29,11 +30,13 @@ public class ScheduledClass {
     @ManyToOne
     @JoinColumn(name = "course_id")
     @NonNull
+    @NotNull(message = "ScheduledClass course must not be null")
     private Course course;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
     @NonNull
+    @NotNull(message = "ScheduledClass teacher must not be null")
     private Teacher teacher;
 
     @ManyToOne
@@ -43,10 +46,12 @@ public class ScheduledClass {
     @ManyToOne
     @JoinColumn(name = "class_time_id")
     @NonNull
+    @NotNull(message = "ScheduledClass classTime must not be null")
     private ClassTime classTime;
 
     @Column(name = "class_date")
     @NonNull
+    @NotNull(message = "ScheduledClass date must not be null")
     private LocalDate date;
 
     @ManyToOne

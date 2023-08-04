@@ -8,8 +8,6 @@ public interface GroupService {
 
     List<Group> findAll();
 
-    Long save(String groupName);
-
     Long save(Group group);
 
     Group findById(Long id);

@@ -1,6 +1,7 @@
 package com.university.schedule.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -23,6 +24,7 @@ public class Group {
     private Long id;
 
     @NonNull
+    @NotBlank(message = "Group name must not be blank")
     private String name;
 
     @OneToMany(mappedBy = "group")

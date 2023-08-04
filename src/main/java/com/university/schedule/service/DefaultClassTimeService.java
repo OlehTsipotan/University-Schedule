@@ -3,6 +3,7 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.ClassTime;
 import com.university.schedule.repository.ClassTimeRepository;
+import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -19,9 +20,12 @@ public class DefaultClassTimeService implements ClassTimeService {
 
     private final ClassTimeRepository classTimeRepository;
 
+    private final EntityValidator entityValidator;
+
     @Override
     @Transactional
     public Long save(ClassTime classTime) {
+        entityValidator.validate(classTime);
         execute(() -> classTimeRepository.save(classTime));
         log.info("saved {}", classTime);
         return classTime.getId();
@@ -29,14 +33,16 @@ public class DefaultClassTimeService implements ClassTimeService {
 
     @Override
     public ClassTime findById(Long id) {
-        ClassTime classTime = execute(() -> classTimeRepository.findById(id)).orElseThrow(() -> new ServiceException("ClassTime not found"));
+        ClassTime classTime = execute(() -> classTimeRepository.findById(id)).orElseThrow(
+                () -> new ServiceException("ClassTime not found"));
         log.debug("Retrieved {}", classTime);
         return classTime;
     }
 
     @Override
     public ClassTime findByOrderNumber(Integer order) {
-        ClassTime classTime = execute(() -> classTimeRepository.findByOrderNumber(order)).orElseThrow(() -> new ServiceException("ClassTime not found"));
+        ClassTime classTime = execute(() -> classTimeRepository.findByOrderNumber(order)).orElseThrow(
+                () -> new ServiceException("ClassTime not found"));
         log.debug("Retrieved {}", classTime);
         return classTime;
     }

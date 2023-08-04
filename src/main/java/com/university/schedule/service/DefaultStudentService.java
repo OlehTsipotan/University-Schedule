@@ -3,6 +3,7 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Student;
 import com.university.schedule.repository.StudentRepository;
+import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +22,8 @@ public class DefaultStudentService implements StudentService {
 
     private final StudentRepository studentRepository;
 
+    private final EntityValidator entityValidator;
+
     @Override
     public List<Student> findAll() {
         List<Student> students = execute(() -> studentRepository.findAll());
@@ -31,18 +34,7 @@ public class DefaultStudentService implements StudentService {
     @Override
     @Transactional
     public Long save(Student student) {
-        if (StringUtils.isEmpty(student.getEmail())) {
-            throw new ServiceException("Email can`t be empty or null");
-        }
-        if (StringUtils.isEmpty(student.getPassword())) {
-            throw new ServiceException("Password can`t be empty or null");
-        }
-        if (StringUtils.isEmpty(student.getFirstName())) {
-            throw new ServiceException("FirstName can`t be empty or null");
-        }
-        if (StringUtils.isEmpty(student.getLastName())) {
-            throw new ServiceException("LastName can`t be empty or null");
-        }
+        entityValidator.validate(student);
         execute(() -> studentRepository.save(student));
         log.info("saved {}", student);
         return student.getId();

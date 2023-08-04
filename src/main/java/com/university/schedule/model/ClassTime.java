@@ -2,6 +2,8 @@ package com.university.schedule.model;
 
 import com.university.schedule.converter.DurationConverter;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -25,15 +27,18 @@ public class ClassTime {
     private Long id;
 
     @Column(name = "order_number")
+    @Positive(message = "ClassTime orderNumber must be greater than zero")
     @NonNull
     private Integer orderNumber;
 
     @Column(name = "start_time")
     @NonNull
+    @NotNull(message = "ClassTime startTime must not be null")
     private LocalTime startTime;
 
     @Column(name = "duration_minutes")
     @NonNull
+    @NotNull(message = "ClassTime duration must not be null")
     @Convert(converter = DurationConverter.class)
     private Duration duration;
 

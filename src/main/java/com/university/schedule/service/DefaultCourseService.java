@@ -3,6 +3,7 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Course;
 import com.university.schedule.repository.CourseRepository;
+import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -20,12 +21,12 @@ public class DefaultCourseService implements CourseService{
 
     private final CourseRepository courseRepository;
 
+    private final EntityValidator entityValidator;
+
     @Override
     @Transactional
     public Long save(Course course) {
-        if (StringUtils.isEmpty(course.getName())) {
-            throw new ServiceException("courseName can`t be empty or null");
-        }
+        entityValidator.validate(course);
         execute(() -> courseRepository.save(course));
         log.info("saved {}", course);
         return course.getId();
@@ -33,14 +34,16 @@ public class DefaultCourseService implements CourseService{
 
     @Override
     public Course findById(Long id) {
-        Course course = execute(() -> courseRepository.findById(id)).orElseThrow(() -> new ServiceException("Course not found"));
+        Course course = execute(() -> courseRepository.findById(id)).orElseThrow(
+                () -> new ServiceException("Course not found"));
         log.debug("Retrieved {}", course);
         return course;
     }
 
     @Override
     public Course findByName(String name) {
-        Course course = execute(() -> courseRepository.findByName(name)).orElseThrow(() -> new ServiceException("Course not found"));
+        Course course = execute(() -> courseRepository.findByName(name)).orElseThrow(
+                () -> new ServiceException("Course not found"));
         log.debug("Retrieved {}", course);
         return course;
     }

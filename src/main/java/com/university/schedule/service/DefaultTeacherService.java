@@ -4,9 +4,9 @@ import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Course;
 import com.university.schedule.model.Teacher;
 import com.university.schedule.repository.TeacherRepository;
+import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +23,8 @@ public class DefaultTeacherService implements TeacherService {
 
     private final CourseService courseService;
 
+    private final EntityValidator entityValidator;
+
     @Override
     public List<Teacher> findAll() {
         List<Teacher> teachers = execute(() -> teacherRepository.findAll());
@@ -33,18 +35,7 @@ public class DefaultTeacherService implements TeacherService {
     @Override
     @Transactional
     public Long save(Teacher teacher) {
-        if (StringUtils.isEmpty(teacher.getEmail())) {
-            throw new ServiceException("Email can`t be empty or null");
-        }
-        if (StringUtils.isEmpty(teacher.getPassword())) {
-            throw new ServiceException("Password can`t be empty or null");
-        }
-        if (StringUtils.isEmpty(teacher.getFirstName())) {
-            throw new ServiceException("FirstName can`t be empty or null");
-        }
-        if (StringUtils.isEmpty(teacher.getLastName())) {
-            throw new ServiceException("LastName can`t be empty or null");
-        }
+        entityValidator.validate(teacher);
         execute(() -> teacherRepository.save(teacher));
         log.info("saved {}", teacher);
         return teacher.getId();
@@ -52,14 +43,16 @@ public class DefaultTeacherService implements TeacherService {
 
     @Override
     public Teacher findById(Long id) {
-        Teacher teacher = execute(() -> teacherRepository.findById(id)).orElseThrow(() -> new ServiceException("Teacher not found"));
+        Teacher teacher = execute(() -> teacherRepository.findById(id)).orElseThrow(
+                () -> new ServiceException("Teacher not found"));
         log.debug("Retrieved {}", teacher);
         return teacher;
     }
 
     @Override
     public Teacher findByEmailAndPassword(String email, String password) {
-        Teacher teacher = execute(() -> teacherRepository.findByEmailAndPassword(email, password)).orElseThrow(() -> new ServiceException("Teacher not found"));
+        Teacher teacher = execute(() -> teacherRepository.findByEmailAndPassword(email, password)).orElseThrow(
+                () -> new ServiceException("Teacher not found"));
         log.debug("Retrieved {}", teacher);
         return teacher;
     }
@@ -74,7 +67,8 @@ public class DefaultTeacherService implements TeacherService {
     @Override
     @Transactional
     public boolean assignToCourse(Long teacherId, Long courseId) {
-        Teacher teacher = teacherRepository.findById(teacherId).orElseThrow(() -> new ServiceException("There is no Teacher with id = " + teacherId));
+        Teacher teacher = teacherRepository.findById(teacherId).orElseThrow(
+                () -> new ServiceException("There is no Teacher with id = " + teacherId));
         Course course = courseService.findById(courseId);
         boolean result = teacher.getCourses().add(course);
 
@@ -86,7 +80,8 @@ public class DefaultTeacherService implements TeacherService {
     @Override
     @Transactional
     public boolean removeFromCourse(Long teacherId, Long courseId) {
-        Teacher teacher = teacherRepository.findById(teacherId).orElseThrow(() -> new ServiceException("There is no Teacher with id = " + teacherId));
+        Teacher teacher = teacherRepository.findById(teacherId).orElseThrow(
+                () -> new ServiceException("There is no Teacher with id = " + teacherId));
         Course course = courseService.findById(courseId);
         boolean result = teacher.getCourses().remove(course);
 

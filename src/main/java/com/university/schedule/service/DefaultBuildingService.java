@@ -3,6 +3,7 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Building;
 import com.university.schedule.repository.BuildingRepository;
+import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -19,9 +20,12 @@ public class DefaultBuildingService implements BuildingService{
 
     private final BuildingRepository buildingRepository;
 
+    private final EntityValidator entityValidator;
+
     @Override
     @Transactional
     public Long save(Building building) {
+        entityValidator.validate(entityValidator);
         execute(() -> buildingRepository.save(building));
         log.info("saved {}", building);
         return building.getId();
@@ -29,21 +33,24 @@ public class DefaultBuildingService implements BuildingService{
 
     @Override
     public Building findById(Long id) {
-        Building building = execute(() -> buildingRepository.findById(id)).orElseThrow(() -> new ServiceException("Building not found"));
+        Building building = execute(() -> buildingRepository.findById(id)).orElseThrow(
+                () -> new ServiceException("Building not found"));
         log.debug("Retrieved {}", building);
         return building;
     }
 
     @Override
     public Building findByName(String name) {
-        Building building = execute(() -> buildingRepository.findByName(name)).orElseThrow(() -> new ServiceException("Building not found"));
+        Building building = execute(() -> buildingRepository.findByName(name)).orElseThrow(
+                () -> new ServiceException("Building not found"));
         log.debug("Retrieved {}", building);
         return building;
     }
 
     @Override
     public Building findByAddress(String address) {
-        Building building = execute(() -> buildingRepository.findByName(address)).orElseThrow(() -> new ServiceException("Building not found"));
+        Building building = execute(() -> buildingRepository.findByName(address)).orElseThrow(
+                () -> new ServiceException("Building not found"));
         log.debug("Retrieved {}", building);
         return building;
     }

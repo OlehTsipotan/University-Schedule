@@ -37,7 +37,7 @@ public class ScheduleValidatorTest {
         ClassTime classTime = new ClassTime(orderNumber, LocalTime.of(hour, minute), Duration.ofMinutes(durationMinutes));
         DayOfWeek dayOfWeek = DayOfWeek.MONDAY;
         ClassType classType = new ClassType(classTypeName);
-        Classroom classroom = new Classroom(classroomName);
+        Classroom classroom = new Classroom(classroomName, new Building());
         Group group = new Group(groupName);
 
         LocalDate startDate = LocalDate.of(2023, 1, 2);
@@ -71,14 +71,21 @@ public class ScheduleValidatorTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:GroupName:ClassroomName"}, delimiter = ':')
-    public void validate_whenNoConflicts_dontThrowAnyException(String courseName, String email, String password, String firstName, String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName, String groupName, String classroomName) {
+    @CsvSource(
+            value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:GroupName:ClassroomName:BuildingName" +
+                    ":BuildingAddress"},
+            delimiter = ':')
+    public void validate_whenNoConflicts_dontThrowAnyException
+            (String courseName, String email, String password, String firstName, String lastName, Integer orderNumber,
+             int hour, int minute, int durationMinutes, String classTypeName, String groupName, String classroomName,
+             String buildingName, String buildingAddress) {
 
         Course course = new Course(courseName);
         Teacher teacher = new Teacher(email, password, firstName, lastName);
         ClassTime classTime = new ClassTime(orderNumber, LocalTime.of(hour, minute), Duration.ofMinutes(durationMinutes));
         ClassType classType = new ClassType(classTypeName);
-        Classroom classroom = new Classroom(classroomName);
+        Building building = new Building(buildingName, buildingAddress);
+        Classroom classroom = new Classroom(classroomName, building);
         Group group = new Group(groupName);
 
         LocalDate startDate = LocalDate.of(2023, 1, 2);
@@ -108,18 +115,25 @@ public class ScheduleValidatorTest {
         dayScheduleItemList.add(dayScheduleItem1);
         dayScheduleItemList.add(dayScheduleItem2);
 
-        assertDoesNotThrow(() -> scheduleValidator.validate(LocalDate.of(2000, 5, 1), LocalDate.of(2000, 5, 10), dayScheduleItemList));
+        assertDoesNotThrow(() -> scheduleValidator.validate(
+                LocalDate.of(2000, 5, 1),
+                LocalDate.of(2000, 5, 10),
+                dayScheduleItemList));
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:GroupName:ClassroomName"}, delimiter = ':')
-    public void validate_whenDateConflict_throwScheduleGenerationDateException(String courseName, String email, String password, String firstName, String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName, String groupName, String classroomName) {
+    @CsvSource(
+            value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:GroupName:ClassroomName" +
+                    ":BuildingName:BuildingAddress"},
+            delimiter = ':')
+    public void validate_whenDateConflict_throwScheduleGenerationDateException(String courseName, String email, String password, String firstName, String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName, String groupName, String classroomName, String buildingName, String buildingAddress) {
 
         Course course = new Course(courseName);
         Teacher teacher = new Teacher(email, password, firstName, lastName);
         ClassTime classTime = new ClassTime(orderNumber, LocalTime.of(hour, minute), Duration.ofMinutes(durationMinutes));
         ClassType classType = new ClassType(classTypeName);
-        Classroom classroom = new Classroom(classroomName);
+        Building building = new Building(buildingName, buildingAddress);
+        Classroom classroom = new Classroom(classroomName, building);
         Group group = new Group(groupName);
 
         LocalDate startDate = LocalDate.of(2023, 1, 2);
@@ -153,8 +167,14 @@ public class ScheduleValidatorTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"CourseName1:test1@example.co:test2@example.co:password:John:Doe:1:9:0:90:Lecture:GroupName:ClassroomName"}, delimiter = ':')
-    public void validate_whenConflictByGroupAndTeacher_throwScheduleGenerationConflictException(String courseName, String email1, String email2, String password, String firstName, String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName, String groupName, String classroomName) {
+    @CsvSource(
+            value = {"CourseName1:test1@example.co:test2@example.co:password:John:Doe:1:9:0:90:Lecture:GroupName" +
+                    ":ClassroomName:BuildingName:BuildingAddress"},
+            delimiter = ':')
+    public void validate_whenConflictByGroupAndTeacher_throwScheduleGenerationConflictException
+            (String courseName, String email1, String email2, String password, String firstName, String lastName,
+             Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName, String groupName,
+             String classroomName, String buildingName, String buildingAddress) {
 
         Course course = new Course(courseName);
         Teacher teacher1 = new Teacher(email1, password, firstName, lastName);
@@ -162,7 +182,8 @@ public class ScheduleValidatorTest {
         ClassTime classTime = new ClassTime(orderNumber, LocalTime.of(hour, minute), Duration.ofMinutes(durationMinutes));
         DayOfWeek dayOfWeek = DayOfWeek.MONDAY;
         ClassType classType = new ClassType(classTypeName);
-        Classroom classroom = new Classroom(classroomName);
+        Building building = new Building(buildingName, buildingAddress);
+        Classroom classroom = new Classroom(classroomName, building);
         Group group = new Group(groupName);
 
         LocalDate startDate = LocalDate.of(2023, 1, 2);
@@ -192,7 +213,11 @@ public class ScheduleValidatorTest {
         dayScheduleItemList.add(dayScheduleItem1);
         dayScheduleItemList.add(dayScheduleItem2);
 
-        assertThrows(ScheduleGenerationException.class, () -> scheduleValidator.validate(LocalDate.of(2000, 5, 1), LocalDate.of(2000, 5, 10), dayScheduleItemList));
+        assertThrows(ScheduleGenerationException.class,
+                () -> scheduleValidator.validate(
+                        LocalDate.of(2000, 5, 1),
+                        LocalDate.of(2000, 5, 10),
+                        dayScheduleItemList));
 
     }
 

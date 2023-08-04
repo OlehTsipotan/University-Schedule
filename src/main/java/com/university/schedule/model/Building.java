@@ -1,8 +1,11 @@
 package com.university.schedule.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
+
 
 import java.util.List;
 import java.util.Objects;
@@ -24,9 +27,11 @@ public class Building {
     private Long id;
 
     @NonNull
+    @NotBlank(message = "Building name must not be blank")
     private String name;
 
     @NonNull
+    @NotBlank(message = "Building address must not be blank")
     private String address;
 
     @OneToMany(mappedBy = "building")

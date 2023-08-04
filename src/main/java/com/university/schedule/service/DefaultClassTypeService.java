@@ -3,6 +3,7 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.ClassType;
 import com.university.schedule.repository.ClassTypeRepository;
+import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -19,10 +20,13 @@ public class DefaultClassTypeService implements ClassTypeService{
 
     private final ClassTypeRepository classTypeRepository;
 
+    private final EntityValidator entityValidator;
+
 
     @Override
     @Transactional
     public Long save(ClassType classType) {
+        entityValidator.validate(classType);
         execute(() -> classTypeRepository.save(classType));
         log.info("saved {}", classType);
         return classType.getId();
@@ -30,14 +34,16 @@ public class DefaultClassTypeService implements ClassTypeService{
 
     @Override
     public ClassType findById(Long id) {
-        ClassType classType = execute(() -> classTypeRepository.findById(id)).orElseThrow(() -> new ServiceException("ClassType not found"));
+        ClassType classType = execute(() -> classTypeRepository.findById(id)).orElseThrow(
+                () -> new ServiceException("ClassType not found"));
         log.debug("Retrieved {}", classType);
         return classType;
     }
 
     @Override
     public ClassType findByName(String name) {
-        ClassType classType = execute(() -> classTypeRepository.findByName(name)).orElseThrow(() -> new ServiceException("ClassType not found"));
+        ClassType classType = execute(() -> classTypeRepository.findByName(name)).orElseThrow(
+                () -> new ServiceException("ClassType not found"));
         log.debug("Retrieved {}", classType);
         return classType;
     }

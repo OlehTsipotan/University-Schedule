@@ -38,6 +38,12 @@ public class Group {
     @ToString.Exclude
     private List<Student> students = new ArrayList<>();
 
+    public Group(@NonNull Long id, @NonNull String name, @NonNull Discipline discipline){
+        this.id = id;
+        this.name = name;
+        this.discipline = discipline;
+    }
+
     @ManyToMany
     @JoinTable(
             name = "groups_courses",

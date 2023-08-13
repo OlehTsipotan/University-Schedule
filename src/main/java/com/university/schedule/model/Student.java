@@ -1,5 +1,6 @@
 package com.university.schedule.model;
 
+import com.university.schedule.service.TeacherService;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -20,6 +21,10 @@ public class Student extends User {
 
     public Student(String email, String password, String firstName, String lastName) {
         super(email, password, firstName, lastName);
+    }
+
+    public Student(Long id, String email, String password, String firstName, String lastName) {
+        super(id, email, password, firstName, lastName);
     }
 
     @Override

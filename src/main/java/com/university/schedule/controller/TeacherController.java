@@ -3,14 +3,18 @@ package com.university.schedule.controller;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Teacher;
 import com.university.schedule.service.TeacherService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -40,5 +44,25 @@ public class TeacherController {
         }
 
         return "teachers";
+    }
+
+    @GetMapping("/teachers/delete/{id}")
+    public String delete(Model model, @PathVariable(name = "id") Long id, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            teacherService.deleteById(id);
+        } catch (ServiceException e) {
+            log.error("Can't delete by id = " + id);
+        }
+
+        String referer = request.getHeader("Referer");
+        String redirectTo = (referer != null) ? referer : "/teachers";
+
+        try {
+            response.sendRedirect(redirectTo);
+        } catch (IOException e) {
+            log.error("Error redirecting back to page: " + redirectTo + ", error: " + e.getMessage());
+        }
+
+        return null;
     }
 }

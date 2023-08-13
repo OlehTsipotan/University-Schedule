@@ -3,6 +3,7 @@ package com.university.schedule.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -37,6 +38,11 @@ public class Course {
     @ManyToMany(mappedBy = "courses")
     @ToString.Exclude
     private Set<Group> groups = new HashSet<>();
+
+    public Course(@NotNull Long id, @NotNull String name){
+        this.id = id;
+        this.name = name;
+    }
 
     @Override
     public boolean equals(Object o) {

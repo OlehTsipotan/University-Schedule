@@ -7,6 +7,7 @@ import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +59,13 @@ public class DefaultBuildingService implements BuildingService{
     @Override
     public List<Building> findAll() {
         List<Building> buildings = execute(() -> buildingRepository.findAll());
+        log.debug("Retrieved All {} Groups", buildings.size());
+        return buildings;
+    }
+
+    @Override
+    public List<Building> findAll(Sort sort) {
+        List<Building> buildings = execute(() -> buildingRepository.findAll(sort));
         log.debug("Retrieved All {} Groups", buildings.size());
         return buildings;
     }

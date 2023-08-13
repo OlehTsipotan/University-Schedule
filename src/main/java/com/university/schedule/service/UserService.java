@@ -1,14 +1,15 @@
 package com.university.schedule.service;
 
-import com.university.schedule.model.Group;
 import com.university.schedule.model.User;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface UserService {
 
     List<User> findAll();
+
+    List<User> findAll(Sort sort);
 
     Long save(User user);
 

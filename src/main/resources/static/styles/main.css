@@ -1,0 +1,22 @@
+.feature {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 4rem;
+    width: 4rem;
+    font-size: 2rem;
+}
+
+.mt-n4 {
+    margin-top: -1.5rem !important;
+}
+
+.hoverable:hover {
+    background-color: #f2f2f2;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+.static-col {
+    width: 1%;
+    text-align: center;
+}

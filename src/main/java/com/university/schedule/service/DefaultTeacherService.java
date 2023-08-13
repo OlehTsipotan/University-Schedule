@@ -8,6 +8,7 @@ import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,13 @@ public class DefaultTeacherService implements TeacherService {
     @Override
     public List<Teacher> findAll() {
         List<Teacher> teachers = execute(() -> teacherRepository.findAll());
+        log.debug("Retrieved All {} Groups", teachers.size());
+        return teachers;
+    }
+
+    @Override
+    public List<Teacher> findAll(Sort sort) {
+        List<Teacher> teachers = execute(() -> teacherRepository.findAll(sort));
         log.debug("Retrieved All {} Groups", teachers.size());
         return teachers;
     }
@@ -88,6 +96,13 @@ public class DefaultTeacherService implements TeacherService {
         save(teacher);
         log.info("{} removed from {} - {}", teacher, course, result);
         return result;
+    }
+
+    @Override
+    public List<Teacher> findByCourses(Course course) {
+        List<Teacher> teachers = execute(() -> teacherRepository.findByCourses(course));
+        log.debug("Retrieved All {} Groups", teachers.size());
+        return teachers;
     }
 
     private <T> T execute(DaoSupplier<T> supplier) {

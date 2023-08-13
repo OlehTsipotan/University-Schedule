@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +52,13 @@ public class DefaultCourseService implements CourseService{
     @Override
     public List<Course> findAll() {
         List<Course> courses = execute(() -> courseRepository.findAll());
+        log.debug("Retrieved All {} Groups", courses.size());
+        return courses;
+    }
+
+    @Override
+    public List<Course> findAll(Sort sort) {
+        List<Course> courses = execute(() -> courseRepository.findAll(sort));
         log.debug("Retrieved All {} Groups", courses.size());
         return courses;
     }

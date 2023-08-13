@@ -1,6 +1,8 @@
 package com.university.schedule.service;
 
 import com.university.schedule.exception.ServiceException;
+import com.university.schedule.model.Course;
+import com.university.schedule.model.Group;
 import com.university.schedule.model.Student;
 import com.university.schedule.repository.StudentRepository;
 import com.university.schedule.utility.EntityValidator;
@@ -8,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +25,20 @@ public class DefaultStudentService implements StudentService {
 
     private final StudentRepository studentRepository;
 
+    private final GroupService groupService;
+
     private final EntityValidator entityValidator;
 
     @Override
     public List<Student> findAll() {
         List<Student> students = execute(() -> studentRepository.findAll());
+        log.debug("Retrieved All {} Groups", students.size());
+        return students;
+    }
+
+    @Override
+    public List<Student> findAll(Sort sort) {
+        List<Student> students = execute(() -> studentRepository.findAll(sort));
         log.debug("Retrieved All {} Groups", students.size());
         return students;
     }

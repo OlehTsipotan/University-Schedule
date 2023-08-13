@@ -1,10 +1,12 @@
 package com.university.schedule.repository;
 
+import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Group;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -52,11 +54,15 @@ public class GroupRepositoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"GroupName"})
-    public void save_byGroupObject(String name) {
+    @CsvSource(value = {"GroupName:DisciplineName"}, delimiter = ':')
+    public void save_byGroupObject(String groupName, String disciplineName) {
+
+        Discipline discipline = new Discipline(disciplineName);
+
+        discipline = entityManager.persist(discipline);
 
         // Creating Group instance to save
-        Group groupToSave = new Group(name);
+        Group groupToSave = new Group(groupName, discipline);
 
         // Saving
         Long savedGroupId = groupRepository.save(groupToSave).getId();
@@ -66,15 +72,19 @@ public class GroupRepositoryTest {
 
         // Testing
         assertThat(retrievedGroup).isNotNull();
-        assertEquals(retrievedGroup.getName(), name);
+        assertEquals(retrievedGroup.getName(), groupName);
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"GroupName"})
-    public void findById(String name) {
+    @CsvSource(value = {"GroupName:DisciplineName"}, delimiter = ':')
+    public void findById(String groupName, String disciplineName) {
+
+        Discipline discipline = new Discipline(disciplineName);
+
+        discipline = entityManager.persist(discipline);
 
         // Creating Group instance to save
-        Group groupToSave = new Group(name);
+        Group groupToSave = new Group(groupName, discipline);
 
         // Saving
         Long savedGroupId = entityManager.persist(groupToSave).getId();
@@ -84,18 +94,22 @@ public class GroupRepositoryTest {
 
         // Testing
         assertThat(retrievedGroup).isNotNull();
-        assertEquals(retrievedGroup.getName(), name);
+        assertEquals(retrievedGroup.getName(), groupName);
     }
 
     @ParameterizedTest
     @ValueSource(ints = {10})
     public void findAll(int amount) {
 
+        Discipline discipline = new Discipline("DisciplineName");
+
+        discipline = entityManager.persist(discipline);
+
         // Creating Group instances to save
         Set<Group> ownGroupSet = new HashSet<>();
         for (int i = 0; i < amount; i++) {
             String groupName = "Sample Group " + (i + 1);
-            Group group = new Group(groupName);
+            Group group = new Group(groupName, discipline);
             ownGroupSet.add(entityManager.persist(group));
         }
 
@@ -107,10 +121,15 @@ public class GroupRepositoryTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"GroupName"})
-    public void deleteById(String name) {
+    @CsvSource(value = {"GroupName:DisciplineName"}, delimiter = ':')
+    public void deleteById(String groupName, String disciplineName) {
+
+        Discipline discipline = new Discipline(disciplineName);
+
+        discipline = entityManager.persist(discipline);
+
         // Creating Group instance to save
-        Group groupToSave = new Group(name);
+        Group groupToSave = new Group(groupName, discipline);
 
         // Saving
         Long savedGroupId = entityManager.persist(groupToSave).getId();

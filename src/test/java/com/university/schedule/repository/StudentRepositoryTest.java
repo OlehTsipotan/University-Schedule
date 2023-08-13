@@ -1,5 +1,6 @@
 package com.university.schedule.repository;
 
+import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Group;
 import com.university.schedule.model.Student;
 import org.junit.jupiter.api.Test;
@@ -51,13 +52,20 @@ public class StudentRepositoryTest {
 
     @ParameterizedTest
     @CsvSource({
-            "test1@example.com, password1, John, Doe, GroupA",
-            "test2@example.com, password2, Jane, Smith, GroupB",
-            "test3@example.com, password3, Alex, Johnson, GroupC"
+            "test1@example.com, password1, John, Doe, GroupA, Math",
+            "test2@example.com, password2, Jane, Smith, GroupB, Math",
+            "test3@example.com, password3, Alex, Johnson, GroupC, Math"
     })
-    public void findByEmailAndPassword(String email, String password, String firstName, String lastName, String groupName) {
+    public void findByEmailAndPassword
+            (String email, String password, String firstName,
+             String lastName, String groupName, String disciplineName) {
+
+        Discipline discipline = new Discipline(disciplineName);
+
+        discipline = entityManager.persist(discipline);
+
         // Creating Group instance to save
-        Group groupToSave = new Group(groupName);
+        Group groupToSave = new Group(groupName, discipline);
 
         // Saving Group
         entityManager.persist(groupToSave);
@@ -80,13 +88,20 @@ public class StudentRepositoryTest {
 
     @ParameterizedTest
     @CsvSource({
-            "GroupA, test1@example.com, password1, John, Doe",
-            "GroupB, test2@example.com, password2, Jane, Smith",
-            "GroupC, test3@example.com, password3, Alex, Johnson"
+            "GroupA, test1@example.com, password1, John, Doe, Math",
+            "GroupB, test2@example.com, password2, Jane, Smith, Math",
+            "GroupC, test3@example.com, password3, Alex, Johnson, Math"
     })
-    public void findByGroupsName(String groupName, String email, String password, String firstName, String lastName) {
+    public void findByGroupsName
+            (String groupName, String email, String password,
+             String firstName, String lastName, String disciplineName) {
+
+        Discipline discipline = new Discipline(disciplineName);
+
+        discipline = entityManager.persist(discipline);
+
         // Creating Group instance to save
-        Group groupToSave = new Group(groupName);
+        Group groupToSave = new Group(groupName, discipline);
 
         // Saving Group
         entityManager.persist(groupToSave);
@@ -109,13 +124,18 @@ public class StudentRepositoryTest {
 
     @ParameterizedTest
     @CsvSource({
-            "GroupA, 3",
-            "GroupB, 2",
-            "GroupC, 1"
+            "GroupA, 3, Math",
+            "GroupB, 2, Math",
+            "GroupC, 1, Math"
     })
-    public void findAllByGroupsName(String groupName, int expectedSize) {
+    public void findAllByGroupsName(String groupName, int expectedSize, String disciplineName) {
+        Discipline discipline = new Discipline(disciplineName);
+
+        discipline = entityManager.persist(discipline);
+
+
         // Creating Group instance to save
-        Group group = new Group(groupName);
+        Group group = new Group(groupName, discipline);
         group = entityManager.persist(group);
 
         // Creating Student instances to save

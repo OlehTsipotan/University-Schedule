@@ -1,12 +1,15 @@
 package com.university.schedule.service;
 
 import com.university.schedule.model.Student;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
 public interface StudentService {
 
     List<Student> findAll();
+
+    List<Student> findAll(Sort sort);
 
     Long save(Student student);
 

@@ -7,6 +7,7 @@ import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +51,13 @@ public class DefaultClassTimeService implements ClassTimeService {
     @Override
     public List<ClassTime> findAll() {
         List<ClassTime> classTimes = execute(() -> classTimeRepository.findAll());
+        log.debug("Retrieved All {} Groups", classTimes.size());
+        return classTimes;
+    }
+
+    @Override
+    public List<ClassTime> findAll(Sort sort) {
+        List<ClassTime> classTimes = execute(() -> classTimeRepository.findAll(sort));
         log.debug("Retrieved All {} Groups", classTimes.size());
         return classTimes;
     }

@@ -2,6 +2,7 @@ package com.university.schedule.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -26,6 +27,12 @@ public class Group {
     @NonNull
     @NotBlank(message = "Group name must not be blank")
     private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "discipline_id")
+    @NonNull
+    @NotNull(message = "Group discipline must not be null")
+    private Discipline discipline;
 
     @OneToMany(mappedBy = "group")
     @ToString.Exclude

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content="University schedule web-application "/>
+    <meta name="author" content="Oleh Tsipotan"/>
+    <title>Groups Records</title>
+
+    <link th:href="@{styles/main.css}" rel="stylesheet"/>
+
+    <link th:href="@{assets/calendar-days-solid.svg}" rel="icon" type="image/x-icon"/>
+    <link th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <span class="navbar-brand">Groups</span>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item"><a class="nav-link" aria-current="page" href="/">Home</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div th:if="${entities.size() > 0}">
+    <table class="table table-hover table-bordered table-responsive-md">
+        <thead class="thead-light">
+        <tr class="sticky-top">
+            <th th:replace="~{fragments/sorting :: sorting('groups', 'id','Id')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('groups', 'name','Name')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('groups', 'disciplineName','Discipline Name')}"></th>
+            <th class="static-col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entity : ${entities}">
+            <th scope="row" th:text="${entity.getId()}"></th>
+            <td th:text="${entity.getName()}"></td>
+            <td th:text="${entity.getDiscipline().getName()}"></td>
+            <td class="static-col">
+                <a th:href="@{'/groups/delete/' + ${entity.getId()}}" id="btnDelete"
+                   title="Delete this Group" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+<div class="" th:unless="${entities.size() > 0}">
+    <span>No Groups found!</span>
+</div>
+<div th:replace="~{fragments/footer}"></div>
+</body>
+</html>

@@ -1,6 +1,7 @@
 package com.university.schedule.service;
 
 import com.university.schedule.model.*;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -34,6 +35,8 @@ public interface ScheduledClassService {
     List<ScheduledClass> findByDateBetweenAndTeacherAndCourseAndClassType(LocalDate startDate, LocalDate endDate, Teacher teacher, Course course, ClassType classType);
 
     List<ScheduledClass> findAll();
+
+    List<ScheduledClass> findAll(Sort sort);
 
     void deleteById(Long id);
 }

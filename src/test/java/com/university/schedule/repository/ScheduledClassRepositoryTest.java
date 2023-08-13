@@ -1,6 +1,7 @@
 package com.university.schedule.repository;
 
 import com.university.schedule.model.*;
+import org.checkerframework.checker.units.qual.C;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -58,20 +59,37 @@ public class ScheduledClassRepositoryTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture"}, delimiter = ':')
-    public void save(String courseName, String email, String password, String firstName, String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName) {
+    @CsvSource(
+            value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:" +
+                    "ClassroomName:BuildingName:BuildingAddress"},
+            delimiter = ':')
+    public void save(String courseName, String email, String password, String firstName,
+                     String lastName, Integer orderNumber, int hour, int minute,
+                     int durationMinutes, String classTypeName, String classroomName, String buildingName,
+                     String buildingAddress) {
+
 
         // Creating instance
+        Building building = new Building(buildingName, buildingAddress);
+        Classroom classroom = new Classroom(classroomName, building);
         Course course = new Course(courseName);
         Teacher teacher = new Teacher(email, password, firstName, lastName);
         ClassTime classTime = new ClassTime(orderNumber, LocalTime.of(hour, minute), Duration.ofMinutes(durationMinutes));
         LocalDate date = LocalDate.now();
         ClassType classType = new ClassType(classTypeName);
 
+        entityManager.persist(building);
+        entityManager.persist(classroom);
+        entityManager.persist(course);
+        entityManager.persist(teacher);
+        entityManager.persist(classType);
+        entityManager.persist(classTime);
+
+
         ScheduledClass scheduledClassToSave = ScheduledClass.builder()
                 .course(course)
                 .teacher(teacher)
-                .classroom(null) // Set classroom if needed
+                .classroom(classroom) // Set classroom if needed
                 .classTime(classTime)
                 .date(date)
                 .classType(classType)
@@ -86,26 +104,40 @@ public class ScheduledClassRepositoryTest {
         assertNotNull(retrievedScheduledClass);
         assertEquals(retrievedScheduledClass.getCourse(), course);
         assertEquals(retrievedScheduledClass.getTeacher(), teacher);
-        assertNull(retrievedScheduledClass.getClassroom());
+        assertEquals(retrievedScheduledClass.getClassroom(), classroom);
         assertEquals(retrievedScheduledClass.getClassTime(), classTime);
         assertEquals(retrievedScheduledClass.getDate(), date);
         assertEquals(retrievedScheduledClass.getClassType(), classType);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture"}, delimiter = ':')
-    public void findById(String courseName, String email, String password, String firstName, String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName) {
+    @CsvSource(value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:" +
+            "ClassroomName:BuildingName:BuildingAddress"}, delimiter = ':')
+    public void findById
+            (String courseName, String email, String password, String firstName,
+             String lastName, Integer orderNumber, int hour, int minute, int durationMinutes,
+             String classTypeName, String classroomName, String buildingName,
+             String buildingAddress) {
         // Creating instance
+        Building building = new Building(buildingName, buildingAddress);
+        Classroom classroom = new Classroom(classroomName, building);
         Course course = new Course(courseName);
         Teacher teacher = new Teacher(email, password, firstName, lastName);
         ClassTime classTime = new ClassTime(orderNumber, LocalTime.of(hour, minute), Duration.ofMinutes(durationMinutes));
         LocalDate date = LocalDate.now();
         ClassType classType = new ClassType(classTypeName);
 
+        entityManager.persist(building);
+        entityManager.persist(classroom);
+        entityManager.persist(course);
+        entityManager.persist(teacher);
+        entityManager.persist(classType);
+        entityManager.persist(classTime);
+
         ScheduledClass scheduledClassToSave = ScheduledClass.builder()
                 .course(course)
                 .teacher(teacher)
-                .classroom(null) // Set classroom if needed
+                .classroom(classroom) // Set classroom if needed
                 .classTime(classTime)
                 .date(date)
                 .classType(classType)
@@ -121,7 +153,7 @@ public class ScheduledClassRepositoryTest {
         assertNotNull(retrievedScheduledClass);
         assertEquals(retrievedScheduledClass.getCourse(), course);
         assertEquals(retrievedScheduledClass.getTeacher(), teacher);
-        assertNull(retrievedScheduledClass.getClassroom());
+        assertEquals(retrievedScheduledClass.getClassroom(), classroom);
         assertEquals(retrievedScheduledClass.getClassTime(), classTime);
         assertEquals(retrievedScheduledClass.getDate(), date);
         assertEquals(retrievedScheduledClass.getClassType(), classType);
@@ -185,9 +217,18 @@ public class ScheduledClassRepositoryTest {
 
 
     @ParameterizedTest
-    @CsvSource(value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:rightGroupName:wrongGroupName"}, delimiter = ':')
-    public void findByDateBetweenAndGroups(String courseName, String email, String password, String firstName, String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName, String rightGroupName, String wrongGroupName) {
+    @CsvSource(
+            value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:" +
+                    "Lecture:rightGroupName:wrongGroupName:DisciplineName"},
+            delimiter = ':')
+    public void findByDateBetweenAndGroups
+            (String courseName, String email, String password, String firstName,
+             String lastName, Integer orderNumber, int hour, int minute, int durationMinutes,
+             String classTypeName, String rightGroupName, String wrongGroupName, String disciplineName) {
+
+
         // Creating instances
+        Discipline discipline = new Discipline(disciplineName);
         Course course = new Course(courseName);
         Teacher teacher = new Teacher(email, password, firstName, lastName);
         ClassTime classTime1 = new ClassTime(orderNumber, LocalTime.of(hour, minute), Duration.ofMinutes(durationMinutes));
@@ -196,13 +237,14 @@ public class ScheduledClassRepositoryTest {
         LocalDate wrongDate = rightDate.plusDays(10);
         ClassType classType = new ClassType(classTypeName);
 
-        Group rightGroup = new Group(rightGroupName);
-        Group wrongGroup = new Group(wrongGroupName);
+        Group rightGroup = new Group(rightGroupName, discipline);
+        Group wrongGroup = new Group(wrongGroupName, discipline);
 
         Set<Group> rightGroups = Set.of(rightGroup, wrongGroup);
         Set<Group> wrongGroups = Set.of(wrongGroup);
 
         // Saving
+        entityManager.persist(discipline);
         entityManager.persist(course);
         entityManager.persist(teacher);
         entityManager.persist(classTime1);
@@ -257,9 +299,16 @@ public class ScheduledClassRepositoryTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"RightCourseName:WrongCourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:rightGroupName:wrongGroupName"}, delimiter = ':')
-    public void findByDateBetweenAndGroupsAndCourse(String rightCourseName, String wrongCourseName, String email, String password, String firstName, String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName, String rightGroupName, String wrongGroupName){
+    @CsvSource(
+            value = {"RightCourseName:WrongCourseName:test@example.co:password:John:" +
+                    "Doe:1:9:0:90:Lecture:rightGroupName:wrongGroupName:DisciplineName"},
+            delimiter = ':')
+    public void findByDateBetweenAndGroupsAndCourse
+            (String rightCourseName, String wrongCourseName, String email, String password, String firstName,
+             String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName,
+             String rightGroupName, String wrongGroupName, String disciplineName){
         // Creating instances
+        Discipline discipline = new Discipline(disciplineName);
         Course rightCourse = new Course(rightCourseName);
         Course wrongCourse = new Course(wrongCourseName);
         Teacher teacher = new Teacher(email, password, firstName, lastName);
@@ -269,13 +318,14 @@ public class ScheduledClassRepositoryTest {
         LocalDate wrongDate = rightDate.plusDays(10);
         ClassType classType = new ClassType(classTypeName);
 
-        Group rightGroup = new Group(rightGroupName);
-        Group wrongGroup = new Group(wrongGroupName);
+        Group rightGroup = new Group(rightGroupName, discipline);
+        Group wrongGroup = new Group(wrongGroupName, discipline);
 
         Set<Group> rightGroups = Set.of(rightGroup, wrongGroup);
         Set<Group> wrongGroups = Set.of(wrongGroup);
 
         // Saving
+        entityManager.persist(discipline);
         entityManager.persist(rightCourse);
         entityManager.persist(wrongCourse);
         entityManager.persist(teacher);

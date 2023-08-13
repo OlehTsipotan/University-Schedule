@@ -1,6 +1,7 @@
 package com.university.schedule.repository;
 
 import com.university.schedule.model.Course;
+import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Group;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Assertions;
@@ -106,8 +107,13 @@ public class CourseRepositoryTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"CourseName:GroupName"}, delimiter = ':')
-    public void findByGroupsName(String courseName, String groupName) {
+    @CsvSource(value = {"CourseName:GroupName:Math"}, delimiter = ':')
+    public void findByGroupsName(String courseName, String groupName, String disciplineName) {
+
+        Discipline discipline = new Discipline(disciplineName);
+
+        discipline = entityManager.persist(discipline);
+
         // Creating Course instances to save
         Course course1 = new Course(courseName + 1);
         Course course2 = new Course(courseName + 2);
@@ -117,11 +123,10 @@ public class CourseRepositoryTest {
         course1 = entityManager.persist(course1);
         course2 = entityManager.persist(course2);
         course3 = entityManager.persist(course3);
-
         // Crating Group instances to save
-        Group group1 = new Group(groupName + 1);
+        Group group1 = new Group(groupName + 1, discipline);
         group1.setCourses(Set.of(course1, course2));
-        Group group2 = new Group(groupName + 2);
+        Group group2 = new Group(groupName + 2, discipline);
         group2.setCourses(Set.of(course3));
 
         group1 = entityManager.persist(group1);

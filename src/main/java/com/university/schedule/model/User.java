@@ -43,4 +43,8 @@ public class User {
     @Column(name = "last_name")
     @NotBlank(message = "User lastName must not be blank")
     private String lastName;
+
+    public String getFullName(){
+        return String.format("%s %s", firstName, lastName);
+    }
 }

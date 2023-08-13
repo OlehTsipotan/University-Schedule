@@ -8,6 +8,7 @@ import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +52,13 @@ public class DefaultClassroomService implements ClassroomService {
     @Override
     public List<Classroom> findAll() {
         List<Classroom> classrooms = execute(() -> classroomRepository.findAll());
+        log.debug("Retrieved All {} Classrooms", classrooms.size());
+        return classrooms;
+    }
+
+    @Override
+    public List<Classroom> findAll(Sort sort) {
+        List<Classroom> classrooms = execute(() -> classroomRepository.findAll(sort));
         log.debug("Retrieved All {} Classrooms", classrooms.size());
         return classrooms;
     }

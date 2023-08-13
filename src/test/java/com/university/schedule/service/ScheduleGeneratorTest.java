@@ -52,12 +52,21 @@ public class ScheduleGeneratorTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:GroupName:ClassroomName:BuildingName:BuildingAddress"}, delimiter = ':')
-    public void generate_whenScheduledClassServiceThrowsServiceException_thenThrowServiceException(String courseName, String email, String password, String firstName, String lastName, Integer orderNumber, int hour, int minute, int durationMinutes, String classTypeName, String groupName, String classroomName, String buildingName, String buildingAddress) throws ScheduleGenerationException {
+    @CsvSource(
+            value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture:" +
+                    "GroupName:ClassroomName:BuildingName:BuildingAddress:DisciplineName"},
+            delimiter = ':')
+    public void generate_whenScheduledClassServiceThrowsServiceException_thenThrowServiceException
+            (String courseName, String email, String password, String firstName,
+             String lastName, Integer orderNumber, int hour, int minute, int durationMinutes,
+             String classTypeName, String groupName, String classroomName, String buildingName,
+             String buildingAddress, String disciplineName)
+            throws ScheduleGenerationException {
+
         Mockito.doThrow(ServiceException.class).when(scheduledClassService).save(any());
         Mockito.doNothing().when(scheduleValidator).validate(any(), any(), any());
 
-
+        Discipline discipline = new Discipline("DisciplineName");
         Course course = new Course(courseName);
         Teacher teacher = new Teacher(email, password, firstName, lastName);
         ClassTime classTime = new ClassTime(orderNumber, LocalTime.of(hour, minute), Duration.ofMinutes(durationMinutes));
@@ -65,7 +74,7 @@ public class ScheduleGeneratorTest {
         ClassType classType = new ClassType(classTypeName);
         Building building = new Building(buildingName, buildingAddress);
         Classroom classroom = new Classroom(classroomName, building);
-        Group group = new Group(groupName);
+        Group group = new Group(groupName, discipline);
 
         LocalDate startDate = LocalDate.of(2000, 1, 1);
         LocalDate endDate = LocalDate.of(2000, 1, 10);

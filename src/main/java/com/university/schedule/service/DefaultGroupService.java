@@ -2,13 +2,14 @@ package com.university.schedule.service;
 
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Course;
+import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Group;
 import com.university.schedule.repository.GroupRepository;
 import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +30,13 @@ public class DefaultGroupService implements GroupService {
     @Override
     public List<Group> findAll() throws ServiceException {
         List<Group> groups = execute(() -> groupRepository.findAll());
+        log.debug("Retrieved All {} Groups", groups.size());
+        return groups;
+    }
+
+    @Override
+    public List<Group> findAll(Sort sort) throws ServiceException {
+        List<Group> groups = execute(() -> groupRepository.findAll(sort));
         log.debug("Retrieved All {} Groups", groups.size());
         return groups;
     }
@@ -55,6 +63,13 @@ public class DefaultGroupService implements GroupService {
     public void deleteById(Long id) {
         execute(() -> groupRepository.deleteById(id));
         log.info("Deleted id = {}", id);
+    }
+
+    @Override
+    public List<Group> findByDiscipline(Discipline discipline) {
+        List<Group> groups = execute(() -> groupRepository.findByDiscipline(discipline));
+        log.debug("Retrieved All {} Groups", groups.size());
+        return groups;
     }
 
     @Override

@@ -9,6 +9,7 @@ import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,13 @@ public class DefaultUserService implements UserService {
     @Override
     public List<User> findAll() {
         List<User> users = execute(() -> userRepository.findAll());
+        log.debug("Retrieved All {} Groups", users.size());
+        return users;
+    }
+
+    @Override
+    public List<User> findAll(Sort sort) {
+        List<User> users = execute(() -> userRepository.findAll(sort));
         log.debug("Retrieved All {} Groups", users.size());
         return users;
     }

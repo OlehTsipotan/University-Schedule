@@ -106,8 +106,7 @@ public class ScheduledClassControllerTest {
         doThrow(new ServiceException("Delete error")).when(scheduledClassService).deleteById(scheduledClassId);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/classes/delete/{id}", scheduledClassId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/classes")); // Check if redirected back to /classes
+                .andExpect(model().attributeExists("message"));
 
         verify(scheduledClassService, times(1)).deleteById(idCaptor.capture());
         assertEquals(scheduledClassId, idCaptor.getValue());

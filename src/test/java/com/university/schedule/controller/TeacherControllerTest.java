@@ -59,8 +59,7 @@ public class TeacherControllerTest {
         doThrow(new ServiceException("Delete error")).when(teacherService).deleteById(teacherId);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/teachers/delete/{id}", teacherId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/teachers")); // Check if redirected back to /teachers
+                .andExpect(model().attributeExists("message"));
 
         verify(teacherService, times(1)).deleteById(teacherId);
     }

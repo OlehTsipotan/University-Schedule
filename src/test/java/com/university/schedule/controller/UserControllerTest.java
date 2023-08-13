@@ -12,7 +12,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,8 +67,7 @@ public class UserControllerTest {
         doThrow(new ServiceException("Delete error")).when(userService).deleteById(userId);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/users/delete/{id}", userId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/users")); // Check if redirected back to /users
+                .andExpect(model().attributeExists("message"));
 
         verify(userService, times(1)).deleteById(idCaptor.capture());
         assertEquals(userId, idCaptor.getValue());

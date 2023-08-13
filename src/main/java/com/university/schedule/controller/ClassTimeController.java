@@ -26,42 +26,33 @@ public class ClassTimeController {
 
     @GetMapping("/classtimes")
     public String getAll(Model model, @RequestParam(defaultValue = "id,asc") String[] sort) {
-        try {
-            String sortField = sort[0];
-            String sortDirection = sort[1];
 
-            Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-            Sort.Order order = new Sort.Order(direction, sortField);
+        String sortField = sort[0];
+        String sortDirection = sort[1];
 
-            List<ClassTime> classTimes = classTimeService.findAll(Sort.by(order));
+        Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort.Order order = new Sort.Order(direction, sortField);
 
-            model.addAttribute("entities", classTimes);
-            model.addAttribute("sortField", sortField);
-            model.addAttribute("sortDirection", sortDirection);
-            model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
-        } catch (ServiceException e) {
-            model.addAttribute("message", e.getMessage());
-        }
+        List<ClassTime> classTimes = classTimeService.findAll(Sort.by(order));
+
+        model.addAttribute("entities", classTimes);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDirection", sortDirection);
+        model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
 
         return "classtimes";
     }
 
     @GetMapping("/classtimes/delete/{id}")
-    public String delete(Model model, @PathVariable(name = "id") Long id, HttpServletRequest request, HttpServletResponse response) {
-        try {
-            classTimeService.deleteById(id);
-        } catch (ServiceException e) {
-            log.error("Can't delete by id = " + id);
-        }
+    public String delete(Model model, @PathVariable(name = "id") Long id,
+                         HttpServletRequest request, HttpServletResponse response) throws IOException {
+        classTimeService.deleteById(id);
 
         String referer = request.getHeader("Referer");
         String redirectTo = (referer != null) ? referer : "/classtimes";
 
-        try {
-            response.sendRedirect(redirectTo);
-        } catch (IOException e) {
-            log.error("Error redirecting back to page: " + redirectTo + ", error: " + e.getMessage());
-        }
+        response.sendRedirect(redirectTo);
+
 
         return null;
     }

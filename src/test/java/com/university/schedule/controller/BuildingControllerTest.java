@@ -56,14 +56,13 @@ public class BuildingControllerTest {
     }
 
     @Test
-    public void delete_whenBuildingServiceThrowsServiceException_thenRedirect() throws Exception {
+    public void delete_whenBuildingServiceThrowsServiceException_thenErrorPage() throws Exception {
         Long buildingId = 1L;
 
         doThrow(new ServiceException("Delete error")).when(buildingService).deleteById(buildingId);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/buildings/delete/{id}", buildingId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/buildings")); // Check if redirected back to /buildings
+                .andExpect(model().attributeExists("message"));
 
         verify(buildingService, times(1)).deleteById(buildingId);
     }

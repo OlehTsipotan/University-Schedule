@@ -69,8 +69,7 @@ public class ClassTimeControllerTest {
         doThrow(new ServiceException("Delete error")).when(classTimeService).deleteById(classTimeId);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/classtimes/delete/{id}", classTimeId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/classtimes")); // Check if redirected back to /classtimes
+                .andExpect(model().attributeExists("message"));
 
         verify(classTimeService, times(1)).deleteById(idCaptor.capture());
         assertEquals(classTimeId, idCaptor.getValue());

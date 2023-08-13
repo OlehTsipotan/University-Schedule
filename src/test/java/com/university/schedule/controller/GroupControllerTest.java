@@ -68,8 +68,7 @@ public class GroupControllerTest {
         doThrow(new ServiceException("Delete error")).when(groupService).deleteById(groupId);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/groups/delete/{id}", groupId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/groups")); // Check if redirected back to /groups
+                .andExpect(model().attributeExists("message"));
 
         verify(groupService, times(1)).deleteById(idCaptor.capture());
         assertEquals(groupId, idCaptor.getValue());

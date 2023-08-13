@@ -67,8 +67,7 @@ public class ClassTypeControllerTest {
         doThrow(new ServiceException("Delete error")).when(classTypeService).deleteById(classTypeId);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/classtypes/delete/{id}", classTypeId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/classtypes")); // Check if redirected back to /classtypes
+                .andExpect(model().attributeExists("message"));
 
         verify(classTypeService, times(1)).deleteById(idCaptor.capture());
         assertEquals(classTypeId, idCaptor.getValue());

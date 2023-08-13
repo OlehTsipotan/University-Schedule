@@ -26,42 +26,31 @@ public class UserController {
 
     @GetMapping("/users")
     public String getAll(Model model, @RequestParam(defaultValue = "id,asc") String[] sort) {
-        try {
-            String sortField = sort[0];
-            String sortDirection = sort[1];
+        String sortField = sort[0];
+        String sortDirection = sort[1];
 
-            Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-            Sort.Order order = new Sort.Order(direction, sortField);
+        Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort.Order order = new Sort.Order(direction, sortField);
 
-            List<User> users = userService.findAll(Sort.by(order));
+        List<User> users = userService.findAll(Sort.by(order));
 
-            model.addAttribute("entities", users);
-            model.addAttribute("sortField", sortField);
-            model.addAttribute("sortDirection", sortDirection);
-            model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
-        } catch (ServiceException e) {
-            model.addAttribute("message", e.getMessage());
-        }
+        model.addAttribute("entities", users);
+        model.addAttribute("sortField", sortField);
+        model.addAttribute("sortDirection", sortDirection);
+        model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
 
         return "users";
     }
 
     @GetMapping("/users/delete/{id}")
-    public String delete(Model model, @PathVariable(name = "id") Long id, HttpServletRequest request, HttpServletResponse response) {
-        try {
-            userService.deleteById(id);
-        } catch (ServiceException e) {
-            log.error("Can't delete by id = " + id);
-        }
+    public String delete(Model model, @PathVariable(name = "id") Long id,
+                         HttpServletRequest request, HttpServletResponse response) throws IOException {
+        userService.deleteById(id);
 
         String referer = request.getHeader("Referer");
         String redirectTo = (referer != null) ? referer : "/users";
 
-        try {
-            response.sendRedirect(redirectTo);
-        } catch (IOException e) {
-            log.error("Error redirecting back to page: " + redirectTo + ", error: " + e.getMessage());
-        }
+        response.sendRedirect(redirectTo);
 
         return null;
     }

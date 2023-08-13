@@ -66,8 +66,7 @@ public class DisciplineControllerTest {
         doThrow(new ServiceException("Delete error")).when(disciplineService).deleteById(disciplineId);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/disciplines/delete/{id}", disciplineId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/disciplines")); // Check if redirected back to /disciplines
+                .andExpect(model().attributeExists("message"));
 
         verify(disciplineService, times(1)).deleteById(idCaptor.capture());
         assertEquals(disciplineId, idCaptor.getValue());

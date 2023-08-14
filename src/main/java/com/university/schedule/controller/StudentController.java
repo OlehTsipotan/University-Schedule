@@ -1,5 +1,6 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.exception.RedirectionException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Student;
 import com.university.schedule.service.StudentService;
@@ -49,7 +50,11 @@ public class StudentController {
         String referer = request.getHeader("Referer");
         String redirectTo = (referer != null) ? referer : "/students";
 
-        response.sendRedirect(redirectTo);
+        try {
+            response.sendRedirect(redirectTo);
+        } catch (IOException e){
+            throw new RedirectionException("Can`t redirect to " + redirectTo, e);
+        }
 
         return null;
     }

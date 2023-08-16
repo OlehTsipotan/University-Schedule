@@ -1,7 +1,7 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.exception.RedirectionException;
-import com.university.schedule.exception.ServiceException;
+import com.university.schedule.dto.ClassTimeDTO;
+import com.university.schedule.mapper.ClassTimeMapper;
 import com.university.schedule.model.ClassTime;
 import com.university.schedule.service.ClassTimeService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.util.List;
@@ -25,6 +26,8 @@ public class ClassTimeController {
 
     private final ClassTimeService classTimeService;
 
+    private final ClassTimeMapper classTimeMapper;
+
     @GetMapping("/classtimes")
     public String getAll(Model model, @RequestParam(defaultValue = "id,asc") String[] sort) {
 
@@ -34,7 +37,8 @@ public class ClassTimeController {
         Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort.Order order = new Sort.Order(direction, sortField);
 
-        List<ClassTime> classTimes = classTimeService.findAll(Sort.by(order));
+        List<ClassTimeDTO> classTimes = classTimeService.findAll(Sort.by(order)).stream()
+                .map(classTimeMapper::convertToDto).toList();
 
         model.addAttribute("entities", classTimes);
         model.addAttribute("sortField", sortField);
@@ -45,20 +49,13 @@ public class ClassTimeController {
     }
 
     @GetMapping("/classtimes/delete/{id}")
-    public String delete(Model model, @PathVariable(name = "id") Long id,
-                         HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public RedirectView delete(@PathVariable(name = "id") Long id,
+                               HttpServletRequest request) {
         classTimeService.deleteById(id);
 
         String referer = request.getHeader("Referer");
         String redirectTo = (referer != null) ? referer : "/classtimes";
 
-        try {
-            response.sendRedirect(redirectTo);
-        } catch (IOException e){
-            throw new RedirectionException("Can`t redirect to " + redirectTo, e);
-        }
-
-
-        return null;
+        return new RedirectView(redirectTo);
     }
 }

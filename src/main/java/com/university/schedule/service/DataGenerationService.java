@@ -184,7 +184,7 @@ public class DataGenerationService {
         }
     }
 
-    public void assignCoursesToTeachers(){
+    private void assignCoursesToTeachers(){
         List<Course> courses = courseService.findAll();
         List<Teacher> teachers = teacherService.findAll();
         Set<Course> coursesToAssign;

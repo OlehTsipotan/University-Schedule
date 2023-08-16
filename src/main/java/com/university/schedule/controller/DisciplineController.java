@@ -1,7 +1,5 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.exception.RedirectionException;
-import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Discipline;
 import com.university.schedule.service.DisciplineService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,19 +44,14 @@ public class DisciplineController {
     }
 
     @GetMapping("/disciplines/delete/{id}")
-    public String delete(Model model, @PathVariable(name = "id") Long id,
-                         HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public RedirectView delete(@PathVariable(name = "id") Long id,
+                         HttpServletRequest request) {
         disciplineService.deleteById(id);
 
         String referer = request.getHeader("Referer");
         String redirectTo = (referer != null) ? referer : "/disciplines";
 
-        try {
-            response.sendRedirect(redirectTo);
-        } catch (IOException e){
-            throw new RedirectionException("Can`t redirect to " + redirectTo, e);
-        }
 
-        return null;
+        return new RedirectView(redirectTo);
     }
 }

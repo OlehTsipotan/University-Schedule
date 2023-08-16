@@ -1,7 +1,7 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.exception.RedirectionException;
-import com.university.schedule.exception.ServiceException;
+import com.university.schedule.dto.ClassroomDTO;
+import com.university.schedule.mapper.ClassroomMapper;
 import com.university.schedule.model.Classroom;
 import com.university.schedule.service.ClassroomService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,8 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
 
-import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -25,6 +25,8 @@ public class ClassroomController {
 
     private final ClassroomService classroomService;
 
+    private final ClassroomMapper classroomMapper;
+
     @GetMapping("/classrooms")
     public String getAll(Model model, @RequestParam(defaultValue = "id,asc") String[] sort) {
         String sortField = sort[0];
@@ -33,7 +35,9 @@ public class ClassroomController {
         Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort.Order order = new Sort.Order(direction, sortField);
 
-        List<Classroom> classrooms = classroomService.findAll(Sort.by(order));
+        List<ClassroomDTO> classrooms = classroomService.findAll(Sort.by(order)).stream()
+                .map(classroomMapper::convertToDto).toList();
+
 
         model.addAttribute("entities", classrooms);
         model.addAttribute("sortField", sortField);
@@ -44,19 +48,13 @@ public class ClassroomController {
     }
 
     @GetMapping("/classrooms/delete/{id}")
-    public String delete(Model model, @PathVariable(name = "id") Long id, HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request) {
         classroomService.deleteById(id);
 
         String referer = request.getHeader("Referer");
-        String redirectTo = (referer != null) ? referer : "/classrooms"; // Redirect to "classrooms" if referer is null
+        String redirectTo = (referer != null) ? referer : "/classrooms";
 
-        try {
-            response.sendRedirect(redirectTo);
-        } catch (IOException e){
-            throw new RedirectionException("Can`t redirect to " + redirectTo, e);
-        }
-
-        return null; // You can return null or some other view name if needed
+        return new RedirectView(redirectTo);
     }
 
 }

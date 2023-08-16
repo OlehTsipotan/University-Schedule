@@ -49,8 +49,8 @@
             <td th:text="${teacher.getFirstName()}"></td>
             <td th:text="${teacher.getLastName()}"></td>
             <td>
-                <span th:each="course, iterStat : ${teacher.getCourses()}"><span
-                        th:text="${course.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
+                <span th:each="courseName, iterStat : ${teacher.getCourseNames()}"><span
+                        th:text="${courseName}"></span><span th:if="${!iterStat.last}">, </span></span>
             </td>
             <td class="static-col">
                 <a th:href="@{'/teachers/delete/' + ${teacher.getId()}}" id="btnDelete"

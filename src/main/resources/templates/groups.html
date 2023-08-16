@@ -43,7 +43,7 @@
         <tr th:each="entity : ${entities}">
             <th scope="row" th:text="${entity.getId()}"></th>
             <td th:text="${entity.getName()}"></td>
-            <td th:text="${entity.getDiscipline().getName()}"></td>
+            <td th:text="${entity.getDisciplineName()}"></td>
             <td class="static-col">
                 <a th:href="@{'/groups/delete/' + ${entity.getId()}}" id="btnDelete"
                    title="Delete this Group" class="fa-regular fa-trash-can icon-dark btn-delete"></a>

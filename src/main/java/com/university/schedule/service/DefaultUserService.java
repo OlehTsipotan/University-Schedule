@@ -2,6 +2,8 @@ package com.university.schedule.service;
 
 import com.university.schedule.exception.ServiceException;
 
+import com.university.schedule.model.Student;
+import com.university.schedule.model.Teacher;
 import com.university.schedule.model.User;
 import com.university.schedule.repository.UserRepository;
 import com.university.schedule.utility.EntityValidator;
@@ -66,6 +68,11 @@ public class DefaultUserService implements UserService {
     @Override
     @Transactional
     public void deleteById(Long id) {
+        try{
+            findById(id);
+        } catch (ServiceException e){
+            throw new ServiceException("There is no User to delete with id = "+ id);
+        }
         execute(() -> userRepository.deleteById(id));
         log.info("Deleted id = {}", id);
     }

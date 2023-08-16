@@ -68,6 +68,11 @@ public class DefaultTeacherService implements TeacherService {
     @Override
     @Transactional
     public void deleteById(Long id) {
+        try{
+            findById(id);
+        } catch (ServiceException e){
+            throw new ServiceException("There is no Teacher to delete with id = "+ id);
+        }
         execute(() -> teacherRepository.deleteById(id));
         log.info("Deleted id = {}", id);
     }

@@ -66,6 +66,11 @@ public class DefaultClassroomService implements ClassroomService {
     @Override
     @Transactional
     public void deleteById(Long id) {
+        try{
+            findById(id);
+        } catch (ServiceException e){
+            throw new ServiceException("There is no Classroom to delete with id = "+ id);
+        }
         execute(() -> classroomRepository.deleteById(id));
         log.info("Deleted id = {}", id);
     }

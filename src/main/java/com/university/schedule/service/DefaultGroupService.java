@@ -61,6 +61,11 @@ public class DefaultGroupService implements GroupService {
     @Override
     @Transactional
     public void deleteById(Long id) {
+        try{
+            findById(id);
+        } catch (ServiceException e){
+            throw new ServiceException("There is no Group to delete with id = "+ id);
+        }
         execute(() -> groupRepository.deleteById(id));
         log.info("Deleted id = {}", id);
     }

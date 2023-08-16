@@ -78,6 +78,11 @@ public class DefaultStudentService implements StudentService {
     @Override
     @Transactional
     public void deleteById(Long id) {
+        try{
+            findById(id);
+        } catch (ServiceException e){
+            throw new ServiceException("There is no Student to delete with id = "+ id);
+        }
         execute(() -> studentRepository.deleteById(id));
         log.info("Deleted id = {}", id);
     }

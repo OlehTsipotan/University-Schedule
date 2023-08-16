@@ -66,6 +66,11 @@ public class DefaultCourseService implements CourseService{
     @Override
     @Transactional
     public void deleteById(Long id) {
+        try{
+            findById(id);
+        } catch (ServiceException e){
+            throw new ServiceException("There is no Course to delete with id = "+ id);
+        }
         execute(() -> courseRepository.deleteById(id));
         log.info("Deleted id = {}", id);
     }

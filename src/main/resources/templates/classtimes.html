@@ -35,7 +35,7 @@
         <tr class="sticky-top">
             <th th:replace="~{fragments/sorting :: sorting('classtimes', 'id','Id')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('classtimes', 'orderNumber','Order')}"></th>
-            <th th:replace="~{fragments/sorting :: sorting('classtimes', 'startTime','Start Time')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classtimes', 'startTime','Start Time (hh:mm)')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('classtimes', 'duration','Duration Minutes')}"></th>
             <th class="static-col">Actions</th>
         </tr>
@@ -44,8 +44,8 @@
         <tr th:each="entity : ${entities}">
             <th scope="row" th:text="${entity.getId()}"></th>
             <td th:text="${entity.getOrderNumber()}"></td>
-            <td th:text="${entity.getStartTime().toString()}"></td>
-            <td th:text="${entity.getDuration().toMinutes()}"></td>
+            <td th:text="${entity.getStartTime()}"></td>
+            <td th:text="${entity.getDurationMinutes()}"></td>
             <td class="static-col">
                 <a th:href="@{'/classtimes/delete/' + ${entity.getId()}}" id="btnDelete"
                    title="Delete this ClassTime" class="fa-regular fa-trash-can icon-dark btn-delete"></a>

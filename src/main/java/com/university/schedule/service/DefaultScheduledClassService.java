@@ -148,6 +148,11 @@ public class DefaultScheduledClassService implements ScheduledClassService {
     @Override
     @Transactional
     public void deleteById(Long id) {
+        try{
+            findById(id);
+        } catch (ServiceException e){
+            throw new ServiceException("There is no ScheduledClass to delete with id = "+ id);
+        }
         execute(() -> scheduledClassRepository.deleteById(id));
         log.info("Deleted id = {}", id);
     }

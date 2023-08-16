@@ -1,10 +1,8 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.exception.RedirectionException;
 import com.university.schedule.model.Building;
 import com.university.schedule.service.BuildingService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -13,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.util.List;
@@ -43,19 +42,13 @@ public class BuildingController {
     }
 
     @GetMapping("/buildings/delete/{id}")
-    public String delete(Model model, @PathVariable(name = "id") Long id,
-                         HttpServletRequest request, HttpServletResponse response){
+    public RedirectView delete(@PathVariable(name = "id") Long id,
+                         HttpServletRequest request) {
         buildingService.deleteById(id);
 
         String referer = request.getHeader("Referer");
         String redirectTo = (referer != null) ? referer : "/buildings";
-        try {
-            response.sendRedirect(redirectTo);
-        } catch (IOException e){
-            throw new RedirectionException("Can`t redirect to " + redirectTo, e);
-        }
 
-
-        return null;
+        return new RedirectView(redirectTo);
     }
 }

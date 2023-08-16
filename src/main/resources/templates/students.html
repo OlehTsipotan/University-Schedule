@@ -49,8 +49,8 @@
             <td th:text="${student.getPassword()}"></td>
             <td th:text="${student.getFirstName()}"></td>
             <td th:text="${student.getLastName()}"></td>
-            <td th:if="${student.getGroup() != null}" th:text="${student.getGroup().getName()}"></td>
-            <td th:unless="${student.getGroup() != null}"></td>
+            <td th:if="${student.getGroupName() != null}" th:text="${student.getGroupName()}"></td>
+            <td th:unless="${student.getGroupName() != null}"></td>
             <td class="static-col">
                 <a th:href="@{'/students/delete/' + ${student.getId()}}" id="btnDelete"
                    title="Delete this Student" class="fa-regular fa-trash-can icon-dark btn-delete"></a>

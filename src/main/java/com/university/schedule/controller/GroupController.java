@@ -1,10 +1,9 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.exception.RedirectionException;
-import com.university.schedule.model.Group;
+import com.university.schedule.dto.GroupDTO;
+import com.university.schedule.mapper.GroupMapper;
 import com.university.schedule.service.GroupService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -13,8 +12,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
 
-import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -24,6 +23,8 @@ public class GroupController {
 
     private final GroupService groupService;
 
+    private final GroupMapper groupMapper;
+
     @GetMapping("/groups")
     public String getAll(Model model, @RequestParam(defaultValue = "id,asc") String[] sort) {
         String sortField = sort[0];
@@ -32,7 +33,8 @@ public class GroupController {
         Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort.Order order = new Sort.Order(direction, sortField);
 
-        List<Group> groups = groupService.findAll(Sort.by(order));
+        List<GroupDTO> groups = groupService.findAll(Sort.by(order)).stream()
+                .map(groupMapper::convertToDto).toList();
 
         model.addAttribute("entities", groups);
         model.addAttribute("sortField", sortField);
@@ -43,19 +45,14 @@ public class GroupController {
     }
 
     @GetMapping("/groups/delete/{id}")
-    public String delete(Model model, @PathVariable(name = "id") Long id,
-                         HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public RedirectView delete(@PathVariable(name = "id") Long id,
+                         HttpServletRequest request) {
         groupService.deleteById(id);
 
         String referer = request.getHeader("Referer");
         String redirectTo = (referer != null) ? referer : "/groups";
 
-        try {
-            response.sendRedirect(redirectTo);
-        } catch (IOException e){
-            throw new RedirectionException("Can`t redirect to " + redirectTo, e);
-        }
 
-        return null;
+        return new RedirectView(redirectTo);
     }
 }

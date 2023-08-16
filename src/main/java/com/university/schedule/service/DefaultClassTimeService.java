@@ -65,6 +65,11 @@ public class DefaultClassTimeService implements ClassTimeService {
     @Override
     @Transactional
     public void deleteById(Long id) {
+        try{
+            findById(id);
+        } catch (ServiceException e){
+            throw new ServiceException("There is no ClassTime to delete with id = "+ id);
+        }
         execute(() -> classTimeRepository.deleteById(id));
         log.info("Deleted id = {}", id);
     }

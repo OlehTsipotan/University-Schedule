@@ -54,7 +54,7 @@
                 <span th:if="${entity instanceof T(com.university.schedule.model.Teacher)}">Teacher</span>
             </td>
             <td class="static-col">
-                <a th:href="@{'/teachers/delete/' + ${entity.getId()}}" id="btnDelete"
+                <a th:href="@{'/users/delete/' + ${entity.getId()}}" id="btnDelete"
                    title="Delete this User" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
             </td>
         </tr>

@@ -57,6 +57,11 @@ public class DefaultDisciplineService implements DisciplineService{
     @Override
     @Transactional
     public void deleteById(Long id) {
+        try{
+            findById(id);
+        } catch (ServiceException e){
+            throw new ServiceException("There is no Discipline to delete with id = "+ id);
+        }
         execute(() -> disciplineRepository.deleteById(id));
         log.info("Deleted id = {}", id);
     }

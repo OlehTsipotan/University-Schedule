@@ -37,7 +37,7 @@
             <th th:replace="~{fragments/sorting :: sorting('classes', 'course','Course')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('classes', 'teacher','Teacher')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('classes', 'groups','Groups')}"></th>
-            <th th:replace="~{fragments/sorting :: sorting('classes', 'date','Date')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classes', 'date','Date (yyyy-mm-dd)')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('classes', 'classTime','Order')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('classes', 'classType','Type')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('classes', 'classroom','Classroom Name')}"></th>
@@ -48,17 +48,17 @@
         <tbody>
         <tr th:each="entity : ${entities}">
             <th scope="row" th:text="${entity.getId()}"></th>
-            <td th:text="${entity.getCourse().getName()}"></td>
-            <td th:text="${entity.getTeacher().getFullName()}"></td>
+            <td th:text="${entity.getCourseName()}"></td>
+            <td th:text="${entity.getTeacherFullName()}"></td>
             <td>
-                <span th:each="group, iterStat : ${entity.getGroups()}"><span
-                        th:text="${group.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
+                <span th:each="name, iterStat : ${entity.getGroupNames()}"><span
+                        th:text="${name}"></span><span th:if="${!iterStat.last}">, </span></span>
             </td>
-            <td th:text="${entity.getDate().toString()}"></td>
-            <td th:text="${entity.getClassTime().getOrderNumber()}"></td>
-            <td th:text="${entity.getClassType().getName()}"></td>
-            <td th:text="${entity.getClassroom().getName()}"></td>
-            <td th:text="${entity.getClassroom().getBuilding().getName()}"></td>
+            <td th:text="${entity.getDate()}"></td>
+            <td th:text="${entity.getClassTimeOrderNumber()}"></td>
+            <td th:text="${entity.getClassTypeName()}"></td>
+            <td th:text="${entity.getClassroomName()}"></td>
+            <td th:text="${entity.getClassroomBuildingName()}"></td>
             <td class="static-col">
                 <a th:href="@{'/classes/delete/' + ${entity.getId()}}" id="btnDelete"
                    title="Delete this Class" class="fa-regular fa-trash-can icon-dark btn-delete"></a>

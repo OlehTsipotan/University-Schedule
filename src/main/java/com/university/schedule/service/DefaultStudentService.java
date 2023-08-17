@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +42,13 @@ public class DefaultStudentService implements StudentService {
     public List<Student> findAll(Sort sort) {
         List<Student> students = execute(() -> studentRepository.findAll(sort));
         log.debug("Retrieved All {} Groups", students.size());
+        return students;
+    }
+
+    @Override
+    public Page<Student> findAll(Pageable pageable) {
+        Page<Student> students = execute(() -> studentRepository.findAll(pageable));
+        log.debug("Retrieved All {} Groups", students.stream().count());
         return students;
     }
 

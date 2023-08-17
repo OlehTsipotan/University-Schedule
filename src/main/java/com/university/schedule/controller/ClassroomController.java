@@ -1,13 +1,16 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.ClassroomDTO;
+import com.university.schedule.dto.StudentDTO;
 import com.university.schedule.mapper.ClassroomMapper;
 import com.university.schedule.model.Classroom;
+import com.university.schedule.model.Student;
+import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.ClassroomService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,18 +31,25 @@ public class ClassroomController {
     private final ClassroomMapper classroomMapper;
 
     @GetMapping("/classrooms")
-    public String getAll(Model model, @RequestParam(defaultValue = "id,asc") String[] sort) {
+    public String getAll(Model model,
+                         @RequestParam(defaultValue = "100") int limit,
+                         @RequestParam(defaultValue = "0") int offset,
+                         @RequestParam(defaultValue = "id,asc") String[] sort) {
         String sortField = sort[0];
         String sortDirection = sort[1];
 
         Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort.Order order = new Sort.Order(direction, sortField);
 
-        List<ClassroomDTO> classrooms = classroomService.findAll(Sort.by(order)).stream()
+        Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
+        List<Classroom> classrooms = classroomService.findAll(pageable).toList();
+        List<ClassroomDTO> classroomDTOs = classrooms.stream()
                 .map(classroomMapper::convertToDto).toList();
 
 
-        model.addAttribute("entities", classrooms);
+        model.addAttribute("entities", classroomDTOs);
+        model.addAttribute("currentLimit", limit);
+        model.addAttribute("currentOffset", offset);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");

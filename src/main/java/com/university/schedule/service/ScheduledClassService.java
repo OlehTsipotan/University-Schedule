@@ -1,6 +1,8 @@
 package com.university.schedule.service;
 
 import com.university.schedule.model.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
@@ -35,6 +37,8 @@ public interface ScheduledClassService {
     List<ScheduledClass> findByDateBetweenAndTeacherAndCourseAndClassType(LocalDate startDate, LocalDate endDate, Teacher teacher, Course course, ClassType classType);
 
     List<ScheduledClass> findAll();
+
+    Page<ScheduledClass> findAll(Pageable pageable);
 
     List<ScheduledClass> findAll(Sort sort);
 

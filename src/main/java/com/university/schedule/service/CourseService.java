@@ -1,6 +1,8 @@
 package com.university.schedule.service;
 
 import com.university.schedule.model.Course;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
@@ -16,6 +18,8 @@ public interface CourseService {
     List<Course> findAll();
 
     List<Course> findAll(Sort sort);
+
+    Page<Course> findAll(Pageable pageable);
 
     void deleteById(Long id);
 

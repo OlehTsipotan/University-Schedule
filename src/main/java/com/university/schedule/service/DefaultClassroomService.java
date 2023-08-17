@@ -8,6 +8,8 @@ import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +55,13 @@ public class DefaultClassroomService implements ClassroomService {
     public List<Classroom> findAll() {
         List<Classroom> classrooms = execute(() -> classroomRepository.findAll());
         log.debug("Retrieved All {} Classrooms", classrooms.size());
+        return classrooms;
+    }
+
+    @Override
+    public Page<Classroom> findAll(Pageable pageable) {
+        Page<Classroom> classrooms = execute(() -> classroomRepository.findAll(pageable));
+        log.debug("Retrieved All {} Classrooms", classrooms.stream().count());
         return classrooms;
     }
 

@@ -3,11 +3,13 @@ package com.university.schedule.controller;
 import com.university.schedule.dto.StudentDTO;
 import com.university.schedule.mapper.StudentMapper;
 import com.university.schedule.model.Student;
+import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.StudentService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,20 +30,29 @@ public class StudentController {
     private final StudentMapper studentMapper;
 
     @GetMapping("/students")
-    public String getAll(Model model, @RequestParam(defaultValue = "id,asc") String[] sort) {
+    public String getAll(Model model,
+                         @RequestParam(defaultValue = "100") int limit,
+                         @RequestParam(defaultValue = "0") int offset,
+                         @RequestParam(defaultValue = "id,asc") String[] sort) {
+
         String sortField = sort[0];
         String sortDirection = sort[1];
 
         Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort.Order order = new Sort.Order(direction, sortField);
 
-        List<StudentDTO> students = studentService.findAll(Sort.by(order)).stream()
+        Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
+        List<Student> students = studentService.findAll(pageable).toList();
+        List<StudentDTO> studentDTOs = students.stream()
                 .map(studentMapper::convertToDto).toList();
 
-        model.addAttribute("students", students);
+        model.addAttribute("students", studentDTOs);
+        model.addAttribute("currentLimit", limit);
+        model.addAttribute("currentOffset", offset);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
+
         return "students";
     }
 

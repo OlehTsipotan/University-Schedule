@@ -11,9 +11,9 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    private static final String NO_PAGE_FOUND_MSG = "No page where found by this query.";
+    private final String NO_PAGE_FOUND_MSG = "No page where found by this query.";
 
-    @ExceptionHandler(ServiceException.class)
+    @ExceptionHandler(RuntimeException.class)
     public String handleException(RuntimeException e, Model model) {
         log.error("Error occurs, ", e);
         model.addAttribute("message", e.getMessage());

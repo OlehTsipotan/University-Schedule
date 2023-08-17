@@ -7,6 +7,8 @@ import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +62,13 @@ public class DefaultClassTypeService implements ClassTypeService{
     public List<ClassType> findAll(Sort sort) {
         List<ClassType> classTypes = execute(() -> classTypeRepository.findAll(sort));
         log.debug("Retrieved All {} ClassTypes", classTypes.size());
+        return classTypes;
+    }
+
+    @Override
+    public Page<ClassType> findAll(Pageable pageable) {
+        Page<ClassType> classTypes = execute(() -> classTypeRepository.findAll(pageable));
+        log.debug("Retrieved All {} ClassTypes", classTypes.stream().count());
         return classTypes;
     }
 

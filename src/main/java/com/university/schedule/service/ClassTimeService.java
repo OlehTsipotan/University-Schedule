@@ -1,6 +1,8 @@
 package com.university.schedule.service;
 
 import com.university.schedule.model.ClassTime;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.List;
@@ -15,6 +17,8 @@ public interface ClassTimeService {
     ClassTime findByOrderNumber(Integer order);
 
     List<ClassTime> findAll();
+
+    Page<ClassTime> findAll(Pageable pageable);
 
     List<ClassTime> findAll(Sort sort);
 

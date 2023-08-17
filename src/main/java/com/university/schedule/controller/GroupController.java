@@ -1,11 +1,16 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.dto.ClassroomDTO;
 import com.university.schedule.dto.GroupDTO;
 import com.university.schedule.mapper.GroupMapper;
+import com.university.schedule.model.Classroom;
+import com.university.schedule.model.Group;
+import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.GroupService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,17 +31,24 @@ public class GroupController {
     private final GroupMapper groupMapper;
 
     @GetMapping("/groups")
-    public String getAll(Model model, @RequestParam(defaultValue = "id,asc") String[] sort) {
+    public String getAll(Model model,
+                         @RequestParam(defaultValue = "100") int limit,
+                         @RequestParam(defaultValue = "0") int offset,
+                         @RequestParam(defaultValue = "id,asc") String[] sort) {
         String sortField = sort[0];
         String sortDirection = sort[1];
 
         Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort.Order order = new Sort.Order(direction, sortField);
 
-        List<GroupDTO> groups = groupService.findAll(Sort.by(order)).stream()
+        Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
+        List<Group> groups = groupService.findAll(pageable).toList();
+        List<GroupDTO> groupDTOs = groups.stream()
                 .map(groupMapper::convertToDto).toList();
 
-        model.addAttribute("entities", groups);
+        model.addAttribute("entities", groupDTOs);
+        model.addAttribute("currentLimit", limit);
+        model.addAttribute("currentOffset", offset);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");

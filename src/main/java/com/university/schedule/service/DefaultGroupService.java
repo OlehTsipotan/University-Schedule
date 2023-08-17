@@ -9,6 +9,8 @@ import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,13 @@ public class DefaultGroupService implements GroupService {
     public List<Group> findAll() throws ServiceException {
         List<Group> groups = execute(() -> groupRepository.findAll());
         log.debug("Retrieved All {} Groups", groups.size());
+        return groups;
+    }
+
+    @Override
+    public Page<Group> findAll(Pageable pageable) {
+        Page<Group> groups = execute(() -> groupRepository.findAll(pageable));
+        log.debug("Retrieved All {} Groups", groups.stream().count());
         return groups;
     }
 

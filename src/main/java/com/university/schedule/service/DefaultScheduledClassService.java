@@ -7,6 +7,8 @@ import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -135,6 +137,13 @@ public class DefaultScheduledClassService implements ScheduledClassService {
     public List<ScheduledClass> findAll() {
         List<ScheduledClass> scheduledClasses = execute(() -> scheduledClassRepository.findAll());
         log.debug("Retrieved All {} ScheduledClasses", scheduledClasses.size());
+        return scheduledClasses;
+    }
+
+    @Override
+    public Page<ScheduledClass> findAll(Pageable pageable) {
+        Page<ScheduledClass> scheduledClasses = execute(() -> scheduledClassRepository.findAll(pageable));
+        log.debug("Retrieved All {} ScheduledClasses", scheduledClasses.stream().count());
         return scheduledClasses;
     }
 

@@ -7,6 +7,8 @@ import com.university.schedule.utility.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +36,13 @@ public class DefaultDisciplineService implements DisciplineService{
     public List<Discipline> findAll(Sort sort) {
         List<Discipline> disciplines = execute(() -> disciplineRepository.findAll(sort));
         log.debug("Retrieved All {} Discipline", disciplines.size());
+        return disciplines;
+    }
+
+    @Override
+    public Page<Discipline> findAll(Pageable pageable) {
+        Page<Discipline> disciplines = execute(() -> disciplineRepository.findAll(pageable));
+        log.debug("Retrieved All {} Discipline", disciplines.stream().count());
         return disciplines;
     }
 

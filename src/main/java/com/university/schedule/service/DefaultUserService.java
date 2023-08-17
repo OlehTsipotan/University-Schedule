@@ -11,6 +11,8 @@ import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,13 @@ public class DefaultUserService implements UserService {
     public List<User> findAll() {
         List<User> users = execute(() -> userRepository.findAll());
         log.debug("Retrieved All {} Groups", users.size());
+        return users;
+    }
+
+    @Override
+    public Page<User> findAll(Pageable pageable) {
+        Page<User> users = execute(() -> userRepository.findAll(pageable));
+        log.debug("Retrieved All {} Groups", users.stream().count());
         return users;
     }
 

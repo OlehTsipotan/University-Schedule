@@ -1,13 +1,17 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.ClassTimeDTO;
+import com.university.schedule.dto.ClassroomDTO;
 import com.university.schedule.mapper.ClassTimeMapper;
 import com.university.schedule.model.ClassTime;
+import com.university.schedule.model.Classroom;
+import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.ClassTimeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,7 +33,10 @@ public class ClassTimeController {
     private final ClassTimeMapper classTimeMapper;
 
     @GetMapping("/classtimes")
-    public String getAll(Model model, @RequestParam(defaultValue = "id,asc") String[] sort) {
+    public String getAll(Model model,
+                         @RequestParam(defaultValue = "100") int limit,
+                         @RequestParam(defaultValue = "0") int offset,
+                         @RequestParam(defaultValue = "id,asc") String[] sort) {
 
         String sortField = sort[0];
         String sortDirection = sort[1];
@@ -37,10 +44,14 @@ public class ClassTimeController {
         Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort.Order order = new Sort.Order(direction, sortField);
 
-        List<ClassTimeDTO> classTimes = classTimeService.findAll(Sort.by(order)).stream()
+        Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
+        List<ClassTime> classTimes = classTimeService.findAll(pageable).toList();
+        List<ClassTimeDTO> classTimeDTOs = classTimes.stream()
                 .map(classTimeMapper::convertToDto).toList();
 
-        model.addAttribute("entities", classTimes);
+        model.addAttribute("entities", classTimeDTOs);
+        model.addAttribute("currentLimit", limit);
+        model.addAttribute("currentOffset", offset);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");

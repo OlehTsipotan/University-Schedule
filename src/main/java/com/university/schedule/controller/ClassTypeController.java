@@ -1,11 +1,14 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.model.Building;
 import com.university.schedule.model.ClassType;
+import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.ClassTypeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,16 +28,22 @@ public class ClassTypeController {
     private final ClassTypeService classTypeService;
 
     @GetMapping("/classtypes")
-    public String getAll(Model model, @RequestParam(defaultValue = "id,asc") String[] sort) {
+    public String getAll(Model model,
+                         @RequestParam(defaultValue = "100") int limit,
+                         @RequestParam(defaultValue = "0") int offset,
+                         @RequestParam(defaultValue = "id,asc") String[] sort) {
         String sortField = sort[0];
         String sortDirection = sort[1];
 
         Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Sort.Order order = new Sort.Order(direction, sortField);
 
-        List<ClassType> classTypes = classTypeService.findAll(Sort.by(order));
+        Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
+        List<ClassType> classTypes = classTypeService.findAll(pageable).toList();
 
         model.addAttribute("entities", classTypes);
+        model.addAttribute("currentLimit", limit);
+        model.addAttribute("currentOffset", offset);
         model.addAttribute("sortField", sortField);
         model.addAttribute("sortDirection", sortDirection);
         model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");

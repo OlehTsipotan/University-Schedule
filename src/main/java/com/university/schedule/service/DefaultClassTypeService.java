@@ -68,7 +68,7 @@ public class DefaultClassTypeService implements ClassTypeService{
     @Override
     public Page<ClassType> findAll(Pageable pageable) {
         Page<ClassType> classTypes = execute(() -> classTypeRepository.findAll(pageable));
-        log.debug("Retrieved All {} ClassTypes", classTypes.stream().count());
+        log.debug("Retrieved All {} ClassTypes", classTypes.getTotalElements());
         return classTypes;
     }
 

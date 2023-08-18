@@ -61,7 +61,7 @@ public class DefaultClassroomService implements ClassroomService {
     @Override
     public Page<Classroom> findAll(Pageable pageable) {
         Page<Classroom> classrooms = execute(() -> classroomRepository.findAll(pageable));
-        log.debug("Retrieved All {} Classrooms", classrooms.stream().count());
+        log.debug("Retrieved All {} Classrooms", classrooms.getTotalElements());
         return classrooms;
     }
 

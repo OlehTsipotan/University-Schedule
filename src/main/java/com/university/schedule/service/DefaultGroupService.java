@@ -39,7 +39,7 @@ public class DefaultGroupService implements GroupService {
     @Override
     public Page<Group> findAll(Pageable pageable) {
         Page<Group> groups = execute(() -> groupRepository.findAll(pageable));
-        log.debug("Retrieved All {} Groups", groups.stream().count());
+        log.debug("Retrieved All {} Groups", groups.getTotalElements());
         return groups;
     }
 

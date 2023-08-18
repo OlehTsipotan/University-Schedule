@@ -1,6 +1,5 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.model.Discipline;
 import com.university.schedule.model.User;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.UserService;

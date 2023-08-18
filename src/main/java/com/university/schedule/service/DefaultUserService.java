@@ -39,7 +39,7 @@ public class DefaultUserService implements UserService {
     @Override
     public Page<User> findAll(Pageable pageable) {
         Page<User> users = execute(() -> userRepository.findAll(pageable));
-        log.debug("Retrieved All {} Groups", users.stream().count());
+        log.debug("Retrieved All {} Groups", users.getTotalElements());
         return users;
     }
 

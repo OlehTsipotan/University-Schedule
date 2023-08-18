@@ -48,7 +48,7 @@ public class DefaultStudentService implements StudentService {
     @Override
     public Page<Student> findAll(Pageable pageable) {
         Page<Student> students = execute(() -> studentRepository.findAll(pageable));
-        log.debug("Retrieved All {} Groups", students.stream().count());
+        log.debug("Retrieved All {} Groups", students.getTotalElements());
         return students;
     }
 

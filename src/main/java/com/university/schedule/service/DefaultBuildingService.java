@@ -68,7 +68,7 @@ public class DefaultBuildingService implements BuildingService{
     @Override
     public Page<Building> findAll(Pageable pageable) {
         Page<Building> buildings = execute(() -> buildingRepository.findAll(pageable));
-        log.debug("Retrieved All {} Groups", buildings.stream().count());
+        log.debug("Retrieved All {} Groups", buildings.getTotalElements());
         return buildings;
     }
 

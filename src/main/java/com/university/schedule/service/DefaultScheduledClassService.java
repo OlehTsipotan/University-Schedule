@@ -143,7 +143,7 @@ public class DefaultScheduledClassService implements ScheduledClassService {
     @Override
     public Page<ScheduledClass> findAll(Pageable pageable) {
         Page<ScheduledClass> scheduledClasses = execute(() -> scheduledClassRepository.findAll(pageable));
-        log.debug("Retrieved All {} ScheduledClasses", scheduledClasses.stream().count());
+        log.debug("Retrieved All {} ScheduledClasses", scheduledClasses.getTotalElements());
         return scheduledClasses;
     }
 

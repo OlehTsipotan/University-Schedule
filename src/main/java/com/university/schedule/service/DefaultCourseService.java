@@ -68,7 +68,7 @@ public class DefaultCourseService implements CourseService{
     @Override
     public Page<Course> findAll(Pageable pageable) {
         Page<Course> courses = execute(() -> courseRepository.findAll(pageable));
-        log.debug("Retrieved All {} Groups", courses.stream().count());
+        log.debug("Retrieved All {} Groups", courses.getTotalElements());
         return courses;
     }
 

@@ -42,7 +42,7 @@ public class DefaultDisciplineService implements DisciplineService{
     @Override
     public Page<Discipline> findAll(Pageable pageable) {
         Page<Discipline> disciplines = execute(() -> disciplineRepository.findAll(pageable));
-        log.debug("Retrieved All {} Discipline", disciplines.stream().count());
+        log.debug("Retrieved All {} Discipline", disciplines.getTotalElements());
         return disciplines;
     }
 

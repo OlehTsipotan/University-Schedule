@@ -67,7 +67,7 @@ public class DefaultClassTimeService implements ClassTimeService {
     @Override
     public Page<ClassTime> findAll(Pageable pageable) {
         Page<ClassTime> classTimes = execute(() -> classTimeRepository.findAll(pageable));
-        log.debug("Retrieved All {} Groups", classTimes.stream().count());
+        log.debug("Retrieved All {} Groups", classTimes.getTotalElements());
         return classTimes;
     }
 

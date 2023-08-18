@@ -45,7 +45,7 @@ public class DefaultTeacherService implements TeacherService {
     @Override
     public Page<Teacher> findAll(Pageable pageable) {
         Page<Teacher> teachers = execute(() -> teacherRepository.findAll(pageable));
-        log.debug("Retrieved All {} Groups", teachers.stream().count());
+        log.debug("Retrieved All {} Groups", teachers.getTotalElements());
         return teachers;
     }
 

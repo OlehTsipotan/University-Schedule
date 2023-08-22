@@ -12,6 +12,9 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -41,7 +44,7 @@ public class StudentControllerTest {
         students.add(new Student(1L, "teacher1@example.com", "password", "John", "Doe"));
         students.add(new Student(1L, "teacher2@example.com", "password", "Mary", "Brown"));
 
-        when(studentService.findAll(any())).thenReturn(students);
+        when(studentService.findAll((Pageable) any())).thenReturn((Page<Student>) students);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/students"))
                 .andExpect(status().isOk())

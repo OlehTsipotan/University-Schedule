@@ -26,6 +26,8 @@ public class DefaultTeacherService implements TeacherService {
 
     private final CourseService courseService;
 
+    private final RoleService roleService;
+
     private final EntityValidator entityValidator;
 
     @Override

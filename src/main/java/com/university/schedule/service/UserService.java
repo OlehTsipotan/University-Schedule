@@ -19,7 +19,7 @@ public interface UserService {
 
     User findById(Long id);
 
-    User findByEmailAndPassword(String email, String password);
+    User findByEmail(String email);
 
     void deleteById(Long id);
 

@@ -67,8 +67,8 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public User findByEmailAndPassword(String email, String password) {
-        User user = execute(() -> userRepository.findByEmailAndPassword(email, password)).orElseThrow(
+    public User findByEmail(String email) {
+        User user = execute(() -> userRepository.findByEmail(email)).orElseThrow(
                 () -> new ServiceException("User not found"));
         log.debug("Retrieved {}", user);
         return user;

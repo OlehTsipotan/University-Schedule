@@ -9,6 +9,8 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -41,7 +43,7 @@ public class ClassTimeControllerTest {
         classTimes.add(new ClassTime(1L, 1, LocalTime.of(8, 30), Duration.ofMinutes(95)));
         classTimes.add(new ClassTime(2L, 2, LocalTime.of(10, 20), Duration.ofMinutes(95)));
 
-        when(classTimeService.findAll(any())).thenReturn(classTimes);
+        when(classTimeService.findAll((Pageable) any())).thenReturn((Page<ClassTime>) classTimes);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/classtimes"))
                 .andExpect(status().isOk())

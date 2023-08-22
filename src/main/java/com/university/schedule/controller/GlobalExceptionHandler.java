@@ -1,6 +1,5 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.exception.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;

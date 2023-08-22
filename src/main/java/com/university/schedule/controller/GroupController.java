@@ -1,9 +1,7 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.dto.ClassroomDTO;
 import com.university.schedule.dto.GroupDTO;
 import com.university.schedule.mapper.GroupMapper;
-import com.university.schedule.model.Classroom;
 import com.university.schedule.model.Group;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.GroupService;

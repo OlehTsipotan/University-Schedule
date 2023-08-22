@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public class ClassroomControllerTest {
         classrooms.add(new Classroom(1L, "Room A", building));
         classrooms.add(new Classroom(2L, "Room B", building));
 
-        when(classroomService.findAll(any())).thenReturn(classrooms);
+        when(classroomService.findAll((Sort) any())).thenReturn(classrooms);
 
         mockMvc.perform(get("/classrooms"))
                 .andExpect(status().isOk())

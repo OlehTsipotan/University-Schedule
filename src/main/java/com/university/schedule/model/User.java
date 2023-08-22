@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.Hibernate;
+
+import java.util.Objects;
 
 
 @Setter
@@ -31,7 +34,6 @@ public class User {
 
     @NonNull
     @NotBlank(message = "User password must not be blank")
-    @Size(min = 4, max = 24)
     private String password;
 
     @NonNull
@@ -44,7 +46,41 @@ public class User {
     @NotBlank(message = "User lastName must not be blank")
     private String lastName;
 
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+    @Column(name = "is_enable")
+    @Getter(AccessLevel.NONE)
+    private Boolean isEnable = true;
+
+    public Boolean isEnable(){
+        return this.isEnable;
+    }
+
+    public User(@NonNull Long id, @NonNull String email, @NonNull String password,
+                @NonNull String firstName, @NonNull String lastName){
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.firstName = firstName;
+        this.lastName = lastName;
+    }
+
     public String getFullName(){
         return String.format("%s %s", firstName, lastName);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        User user = (User) o;
+        return getId() != null && Objects.equals(getId(), user.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

@@ -9,6 +9,8 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -39,7 +41,7 @@ public class UserControllerTest {
         users.add(new User(1L, "user1@example.com", "password1", "John", "Doe"));
         users.add(new User(2L, "user2@example.com", "password2", "Jane", "Smith"));
 
-        when(userService.findAll(any())).thenReturn(users);
+        when(userService.findAll((Pageable) any())).thenReturn((Page<User>) users);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/users"))
                 .andExpect(status().isOk())

@@ -1,14 +1,11 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.dto.GroupDTO;
 import com.university.schedule.dto.ScheduledClassDTO;
 import com.university.schedule.mapper.ScheduledClassMapper;
-import com.university.schedule.model.Group;
 import com.university.schedule.model.ScheduledClass;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.ScheduledClassService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +17,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.io.IOException;
 import java.util.List;
 
 @Controller

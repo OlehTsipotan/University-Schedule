@@ -8,6 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -32,7 +35,7 @@ public class TeacherControllerTest {
         teachers.add(new Teacher(1L, "teacher1@example.com", "password", "John", "Doe"));
         teachers.add(new Teacher(2L, "teacher2@example.com", "password", "Jane", "Smith"));
 
-        when(teacherService.findAll(any())).thenReturn(teachers);
+        when(teacherService.findAll((Pageable) any())).thenReturn((Page<Teacher>) teachers);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/teachers"))
                 .andExpect(status().isOk())

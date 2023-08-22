@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -35,7 +37,7 @@ public class BuildingControllerTest {
         buildings.add(new Building("Building A", "Address A"));
         buildings.add(new Building("Building B", "Address B"));
 
-        when(buildingService.findAll(any())).thenReturn(buildings);
+        when(buildingService.findAll((Pageable) any())).thenReturn((Page<Building>) buildings);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/buildings"))
                 .andExpect(status().isOk())

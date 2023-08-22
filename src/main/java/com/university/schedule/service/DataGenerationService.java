@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -31,6 +32,9 @@ public class DataGenerationService {
     private final StudentService studentService;
     private final CourseService courseService;
     private final GroupService groupService;
+
+    private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
     private final ScheduleGenerator scheduleGenerator;
     @Value("#{'${data.disciplines.names}'.split('${config.separator}')}")
@@ -64,11 +68,16 @@ public class DataGenerationService {
     private List<String> buildingsNames;
     @Value("#{'${data.buildings.addresses}'.split('${config.separator}')}")
     private List<String> buildingsAddresses;
+    @Value("#{'${data.roles.names}'.split('${config.separator}')}")
+    private List<String> rolesNames;
 
     public void generate() {
         // firstly persist non related entities
         persistDisciplines();
         log.info("Disciplines Persisted");
+
+        persistRoles();
+        log.info("Roles Persisted");
 
         persistClassTypes();
         log.info("ClassTypes Persisted");
@@ -119,6 +128,15 @@ public class DataGenerationService {
             buildingService.save(new Building(buildingsNames.get(i), buildingsAddresses.get(i)));
         }
     }
+
+    private void persistRoles() {
+        rolesNames.forEach(name -> roleService.save(new Role(name)));
+    }
+
+    private void persistAuthorities(){
+
+    }
+
 
     private void persistClassrooms() {
         List<Building> buildings = buildingService.findAll();
@@ -177,9 +195,10 @@ public class DataGenerationService {
         for (int i = 0; i < size; i++){
             teacher = new Teacher(String.format("%s.%s.%s@%s", teachersFirstNames.get(i).toLowerCase(),
                     teachersLastNames.get(i).toLowerCase(), "teacher", emailDomain),
-                    String.format("%d%s", i, teachersFirstNames.get(i)),
+                    passwordEncoder.encode(String.format("%d%s", i, teachersFirstNames.get(i))),
                     teachersFirstNames.get(i),
                     teachersLastNames.get(i));
+            teacher.setRole(roleService.findByName("Teacher"));
             teacherService.save(teacher);
         }
     }
@@ -211,9 +230,10 @@ public class DataGenerationService {
 
             student = new Student(String.format("%s.%s%d@%s", studentsFirstNames.get(i).toLowerCase(),
                     studentsLastNames.get(i).toLowerCase(), i, emailDomain),
-                    studentsPasswords.get(i),
+                    passwordEncoder.encode(studentsPasswords.get(i)),
                     studentsFirstNames.get(i),
                     studentsLastNames.get(i));
+            student.setRole(roleService.findByName("Student"));
             student.setGroup(groups.get(i % groups.size()));
             studentService.save(student);
         }

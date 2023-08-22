@@ -9,6 +9,7 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -39,7 +40,7 @@ public class ClassTypeControllerTest {
         classTypes.add(new ClassType(1L, "Lecture"));
         classTypes.add(new ClassType(2L, "Lab"));
 
-        when(classTypeService.findAll(any())).thenReturn(classTypes);
+        when(classTypeService.findAll((Sort) any())).thenReturn(classTypes);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/classtypes"))
                 .andExpect(status().isOk())

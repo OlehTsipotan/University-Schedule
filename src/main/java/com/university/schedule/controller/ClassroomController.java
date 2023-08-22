@@ -1,10 +1,8 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.ClassroomDTO;
-import com.university.schedule.dto.StudentDTO;
 import com.university.schedule.mapper.ClassroomMapper;
 import com.university.schedule.model.Classroom;
-import com.university.schedule.model.Student;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.ClassroomService;
 import jakarta.servlet.http.HttpServletRequest;

@@ -4,7 +4,8 @@ import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Course;
 import com.university.schedule.model.Teacher;
 import com.university.schedule.repository.TeacherRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.EntityValidator;
+import com.university.schedule.validation.TeacherEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -26,9 +27,7 @@ public class DefaultTeacherService implements TeacherService {
 
     private final CourseService courseService;
 
-    private final RoleService roleService;
-
-    private final EntityValidator entityValidator;
+    private final TeacherEntityValidator teacherEntityValidator;
 
     @Override
     public List<Teacher> findAll() {
@@ -54,8 +53,10 @@ public class DefaultTeacherService implements TeacherService {
     @Override
     @Transactional
     public Long save(Teacher teacher) {
-        entityValidator.validate(teacher);
-        execute(() -> teacherRepository.save(teacher));
+        execute(() -> {
+            teacherEntityValidator.validate(teacher);
+            teacherRepository.save(teacher);
+        });
         log.info("saved {}", teacher);
         return teacher.getId();
     }
@@ -69,12 +70,13 @@ public class DefaultTeacherService implements TeacherService {
     }
 
     @Override
-    public Teacher findByEmailAndPassword(String email, String password) {
-        Teacher teacher = execute(() -> teacherRepository.findByEmailAndPassword(email, password)).orElseThrow(
+    public Teacher findByEmail(String email) {
+        Teacher teacher = execute(() -> teacherRepository.findByEmail(email)).orElseThrow(
                 () -> new ServiceException("Teacher not found"));
         log.debug("Retrieved {}", teacher);
         return teacher;
     }
+
 
     @Override
     @Transactional

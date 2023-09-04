@@ -3,7 +3,8 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.ClassType;
 import com.university.schedule.repository.ClassTypeRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.ClassTypeEntityValidator;
+import com.university.schedule.validation.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -23,14 +24,16 @@ public class DefaultClassTypeService implements ClassTypeService{
 
     private final ClassTypeRepository classTypeRepository;
 
-    private final EntityValidator entityValidator;
+    private final ClassTypeEntityValidator classTypeEntityValidator;
 
 
     @Override
     @Transactional
     public Long save(ClassType classType) {
-        entityValidator.validate(classType);
-        execute(() -> classTypeRepository.save(classType));
+        execute(() -> {
+            classTypeEntityValidator.validate(classType);
+            classTypeRepository.save(classType);
+        });
         log.info("saved {}", classType);
         return classType.getId();
     }

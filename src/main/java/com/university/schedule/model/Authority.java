@@ -15,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
+@Builder
 @Table(name = "authorities")
 public class Authority {
 
@@ -28,7 +29,12 @@ public class Authority {
     @NotBlank(message = "Authority name must not be blank")
     private String name;
 
-    @ManyToMany(mappedBy = "authorities")
+    @ManyToMany
+    @JoinTable(
+            name = "roles_authorities",
+            joinColumns = @JoinColumn(name = "authority_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     @ToString.Exclude
     private Set<Role> roles;
 

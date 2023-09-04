@@ -1,18 +1,22 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.exception.ServiceException;
+import com.university.schedule.exception.ValidationException;
+import com.university.schedule.model.Course;
 import com.university.schedule.model.Discipline;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.DisciplineService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -20,10 +24,13 @@ import java.util.List;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-public class DisciplineController {
+public class DisciplineRecordsController {
 
     private final DisciplineService disciplineService;
 
+    private static final String UPDATE_FORM_TEMPLATE = "disciplinesUpdateForm";
+
+    @Secured("VIEW_DISCIPLINES")
     @GetMapping("/disciplines")
     public String getAll(Model model,
                          @RequestParam(defaultValue = "100") int limit,
@@ -49,6 +56,7 @@ public class DisciplineController {
         return "disciplines";
     }
 
+    @Secured("EDIT_DISCIPLINES")
     @GetMapping("/disciplines/delete/{id}")
     public RedirectView delete(@PathVariable(name = "id") Long id,
                          HttpServletRequest request) {
@@ -59,5 +67,36 @@ public class DisciplineController {
 
 
         return new RedirectView(redirectTo);
+    }
+
+    @Secured("EDIT_DISCIPLINES")
+    @GetMapping("/disciplines/update/{id}")
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, Discipline discipline) {
+        Discipline disciplineToDisplay = disciplineService.findById(id);
+        model.addAttribute("entity", disciplineToDisplay);
+
+        return UPDATE_FORM_TEMPLATE;
+    }
+
+    @Secured("EDIT_DISCIPLINES")
+    @PostMapping("/disciplines/update/{id}")
+    public String update(@PathVariable Long id, @Valid @ModelAttribute Discipline discipline,
+                         BindingResult result, Model model){
+
+        if (!result.hasErrors()) {
+            try {
+                disciplineService.save(discipline);
+                return "redirect:/disciplines/update/" + id + "?success";
+            } catch (ValidationException validationException) {
+                model.addAttribute("validationServiceErrors", validationException.getViolations());
+            } catch (ServiceException serviceException) {
+                model.addAttribute("serviceError", serviceException.getMessage());
+            }
+        }
+
+        Discipline disciplineToDisplay = disciplineService.findById(id);
+        model.addAttribute("entity", disciplineToDisplay);
+
+        return UPDATE_FORM_TEMPLATE;
     }
 }

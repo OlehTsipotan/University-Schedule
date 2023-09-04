@@ -103,11 +103,11 @@ public class UserRepositoryTest {
             "test2@example.com, password2, Jane, Smith",
             "test3@example.com, password3, Alex, Johnson"
     })
-    public void findByEmailAndPassword(String email, String password, String firstName, String lastName) {
+    public void findByEmail(String email, String password, String firstName, String lastName) {
         User userToSave = new User(email, password, firstName, lastName);
         entityManager.persist(userToSave);
 
-        Optional<User> foundUser = userRepository.findByEmailAndPassword(email, password);
+        Optional<User> foundUser = userRepository.findByEmail(email);
 
         assertTrue(foundUser.isPresent());
         assertEquals(userToSave.getEmail(), foundUser.get().getEmail());

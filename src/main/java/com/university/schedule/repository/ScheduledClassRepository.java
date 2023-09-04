@@ -5,8 +5,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface ScheduledClassRepository extends JpaRepository<ScheduledClass, Long> {
+
+    Optional<ScheduledClass> findByDateAndClassTimeAndTeacher(LocalDate date, ClassTime classTime, Teacher teacher);
     List<ScheduledClass> findByDateBetweenAndGroups(LocalDate startDate, LocalDate endDate, Group group);
 
     List<ScheduledClass> findByDateBetweenAndGroupsAndCourse(LocalDate startDate, LocalDate endDate, Group group, Course course);

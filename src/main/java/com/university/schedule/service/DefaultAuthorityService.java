@@ -2,16 +2,15 @@ package com.university.schedule.service;
 
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Authority;
-import com.university.schedule.model.Building;
 import com.university.schedule.model.Role;
 import com.university.schedule.repository.AuthorityRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.AuthorityEntityValidator;
+import com.university.schedule.validation.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,13 +24,15 @@ public class DefaultAuthorityService implements AuthorityService{
 
     private final AuthorityRepository authorityRepository;
 
-    private final EntityValidator entityValidator;
+    private final AuthorityEntityValidator authorityEntityValidator;
 
     @Override
     @Transactional
     public Long save(Authority authority) {
-        entityValidator.validate(entityValidator);
-        execute(() -> authorityRepository.save(authority));
+        execute(() -> {
+            authorityEntityValidator.validate(authority);
+            authorityRepository.save(authority);
+        });
         log.info("saved {}", authority);
         return authority.getId();
     }

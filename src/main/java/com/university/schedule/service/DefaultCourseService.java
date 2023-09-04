@@ -3,10 +3,10 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Course;
 import com.university.schedule.repository.CourseRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.CourseEntityValidator;
+import com.university.schedule.validation.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,13 +24,15 @@ public class DefaultCourseService implements CourseService{
 
     private final CourseRepository courseRepository;
 
-    private final EntityValidator entityValidator;
+    private final CourseEntityValidator courseEntityValidator;
 
     @Override
     @Transactional
     public Long save(Course course) {
-        entityValidator.validate(course);
-        execute(() -> courseRepository.save(course));
+        execute(() -> {
+            courseEntityValidator.validate(course);
+            courseRepository.save(course);
+        });
         log.info("saved {}", course);
         return course.getId();
     }

@@ -5,6 +5,9 @@ import jakarta.persistence.Converter;
 
 import java.time.Duration;
 
+/**
+ * For Entity mapping
+ */
 @Converter
 public class DurationConverter implements AttributeConverter<Duration, Long> {
 

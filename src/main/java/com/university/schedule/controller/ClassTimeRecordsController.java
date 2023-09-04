@@ -1,20 +1,23 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.ClassTimeDTO;
+import com.university.schedule.exception.ServiceException;
+import com.university.schedule.exception.ValidationException;
 import com.university.schedule.mapper.ClassTimeMapper;
 import com.university.schedule.model.ClassTime;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.ClassTimeService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -22,12 +25,15 @@ import java.util.List;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-public class ClassTimeController {
+public class ClassTimeRecordsController {
 
     private final ClassTimeService classTimeService;
 
     private final ClassTimeMapper classTimeMapper;
 
+    private static final String UPDATE_FORM_TEMPLATE = "classtimesUpdateForm";
+
+    @Secured("VIEW_CLASSTIMES")
     @GetMapping("/classtimes")
     public String getAll(Model model,
                          @RequestParam(defaultValue = "100") int limit,
@@ -55,6 +61,7 @@ public class ClassTimeController {
         return "classtimes";
     }
 
+    @Secured("EDIT_CLASSTIMES")
     @GetMapping("/classtimes/delete/{id}")
     public RedirectView delete(@PathVariable(name = "id") Long id,
                                HttpServletRequest request) {
@@ -64,5 +71,36 @@ public class ClassTimeController {
         String redirectTo = (referer != null) ? referer : "/classtimes";
 
         return new RedirectView(redirectTo);
+    }
+
+    @Secured("EDIT_CLASSTIMES")
+    @GetMapping("/classtimes/update/{id}")
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, ClassTime classTime) {
+        ClassTimeDTO classTimeDTO = classTimeMapper.convertToDto(classTimeService.findById(id));
+        model.addAttribute("entity", classTimeDTO);
+
+        return UPDATE_FORM_TEMPLATE;
+    }
+
+    @Secured("EDIT_CLASSTIMES")
+    @PostMapping("/classtimes/update/{id}")
+    public String update(@PathVariable Long id, @Valid @ModelAttribute ClassTime classTime,
+                         BindingResult result, Model model){
+
+        if (!result.hasErrors()) {
+            try {
+                classTimeService.save(classTime);
+                return "redirect:/classtimes/update/" + id + "?success";
+            } catch (ValidationException validationException) {
+                model.addAttribute("validationServiceErrors", validationException.getViolations());
+            } catch (ServiceException serviceException) {
+                model.addAttribute("serviceError", serviceException.getMessage());
+            }
+        }
+
+        ClassTimeDTO classTimeDTO = classTimeMapper.convertToDto(classTimeService.findById(id));
+        model.addAttribute("entity", classTimeDTO);
+
+        return UPDATE_FORM_TEMPLATE;
     }
 }

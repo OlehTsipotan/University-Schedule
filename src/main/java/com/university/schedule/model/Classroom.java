@@ -3,6 +3,7 @@ package com.university.schedule.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -15,7 +16,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
-@Table(name = "classrooms")
+@Table(name = "classrooms", uniqueConstraints = { @UniqueConstraint(columnNames = { "name", "building_id" }) })
 public class Classroom {
 
     @Id
@@ -26,6 +27,7 @@ public class Classroom {
 
     @NonNull
     @NotBlank(message = "Classroom name must not be blank")
+    @Size(max = 255)
     private String name;
 
     @ManyToOne

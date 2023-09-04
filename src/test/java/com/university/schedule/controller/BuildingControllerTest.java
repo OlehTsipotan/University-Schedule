@@ -21,7 +21,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 
-@WebMvcTest(BuildingController.class)
+@WebMvcTest(BuildingRecordsController.class)
 public class BuildingControllerTest {
 
     @Autowired

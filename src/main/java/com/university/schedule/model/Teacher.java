@@ -32,8 +32,12 @@ public class Teacher extends User {
         super(id, email, password, firstName, lastName);
     }
 
+    public Teacher(Long id, String email, String password, String firstName, String lastName, Boolean isEnable) {
+        super(id, email, password, firstName, lastName, isEnable);
+    }
+
     public Teacher(String email, String password, String firstName, String lastName) {
-        super(email, password, firstName, lastName);
+        super(email, password, firstName, lastName, true);
     }
 
     @Override
@@ -51,11 +55,6 @@ public class Teacher extends User {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" +
-                "id = " + getId() + ", " +
-                "email = " + getEmail() + ", " +
-                "password = " + getPassword() + ", " +
-                "firstName = " + getFirstName() + ", " +
-                "lastName = " + getLastName() + ")";
+        return getClass().getSimpleName() + "(" + "id = " + getId() + ", " + "email = " + getEmail() + ", " + "firstName = " + getFirstName() + ", " + "lastName = " + getLastName() + ", " + "role = " + getRole() + ", " + "isEnable = " + isEnable() + ")";
     }
 }

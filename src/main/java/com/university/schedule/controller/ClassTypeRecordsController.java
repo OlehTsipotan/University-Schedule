@@ -1,18 +1,21 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.exception.ServiceException;
+import com.university.schedule.exception.ValidationException;
 import com.university.schedule.model.ClassType;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.ClassTypeService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -20,10 +23,13 @@ import java.util.List;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-public class ClassTypeController {
+public class ClassTypeRecordsController {
 
     private final ClassTypeService classTypeService;
 
+    private static final String UPDATE_FORM_TEMPLATE = "classtypesUpdateForm";
+
+    @Secured("VIEW_CLASSTYPES")
     @GetMapping("/classtypes")
     public String getAll(Model model,
                          @RequestParam(defaultValue = "100") int limit,
@@ -48,6 +54,7 @@ public class ClassTypeController {
         return "classtypes";
     }
 
+    @Secured("EDIT_CLASSTYPES")
     @GetMapping("/classtypes/delete/{id}")
     public RedirectView delete(@PathVariable(name = "id") Long id,
                          HttpServletRequest request) {
@@ -57,5 +64,36 @@ public class ClassTypeController {
         String redirectTo = (referer != null) ? referer : "/classtypes";
 
         return new RedirectView(redirectTo);
+    }
+
+    @Secured("EDIT_CLASSTYPES")
+    @GetMapping("/classtypes/update/{id}")
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, ClassType classType) {
+        ClassType classTypeToDisplay = classTypeService.findById(id);
+        model.addAttribute("entity", classTypeToDisplay);
+
+        return UPDATE_FORM_TEMPLATE;
+    }
+
+    @Secured("EDIT_CLASSTYPES")
+    @PostMapping("/classtypes/update/{id}")
+    public String update(@PathVariable Long id, @Valid @ModelAttribute ClassType classType,
+                         BindingResult result, Model model){
+
+        if (!result.hasErrors()) {
+            try {
+                classTypeService.save(classType);
+                return "redirect:/classtypes/update/" + id + "?success";
+            } catch (ValidationException validationException) {
+                model.addAttribute("validationServiceErrors", validationException.getViolations());
+            } catch (ServiceException serviceException) {
+                model.addAttribute("serviceError", serviceException.getMessage());
+            }
+        }
+
+        ClassType classTypeToDisplay = classTypeService.findById(id);
+        model.addAttribute("entity", classTypeToDisplay);
+
+        return UPDATE_FORM_TEMPLATE;
     }
 }

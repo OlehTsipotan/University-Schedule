@@ -1,6 +1,7 @@
 package com.university.schedule.model;
 
 import com.university.schedule.converter.DurationConverter;
+import com.university.schedule.validation.ClassDuration;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -28,6 +29,7 @@ public class ClassTime {
 
     @Column(name = "order_number")
     @Positive(message = "ClassTime orderNumber must be greater than zero")
+    @NotNull(message = "ClassTime orderNumber must not be null")
     @NonNull
     private Integer orderNumber;
 
@@ -39,6 +41,7 @@ public class ClassTime {
     @Column(name = "duration_minutes")
     @NonNull
     @NotNull(message = "ClassTime duration must not be null")
+    @ClassDuration
     @Convert(converter = DurationConverter.class)
     private Duration duration;
 

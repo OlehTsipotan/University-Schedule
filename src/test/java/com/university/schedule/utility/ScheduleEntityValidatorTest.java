@@ -22,7 +22,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
-public class ScheduleValidatorTest {
+public class ScheduleEntityValidatorTest {
 
     @Autowired
     public ScheduleValidator scheduleValidator;

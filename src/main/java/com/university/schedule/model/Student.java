@@ -20,7 +20,7 @@ public class Student extends User {
     private Group group;
 
     public Student(String email, String password, String firstName, String lastName) {
-        super(email, password, firstName, lastName);
+        super(email, password, firstName, lastName, true);
     }
 
     public Student(Long id, String email, String password, String firstName, String lastName) {
@@ -46,7 +46,6 @@ public class Student extends User {
                 "id = " + getId() + ", " +
                 "group = " + getGroup() + ", " +
                 "email = " + getEmail() + ", " +
-                "password = " + getPassword() + ", " +
                 "firstName = " + getFirstName() + ", " +
                 "lastName = " + getLastName() + ")";
     }

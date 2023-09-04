@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface DisciplineService {
 
+    Discipline findByName(String name);
+
     List<Discipline> findAll();
 
     List<Discipline> findAll(Sort sort);

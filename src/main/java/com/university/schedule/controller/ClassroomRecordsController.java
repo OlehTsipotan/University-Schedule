@@ -1,20 +1,25 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.ClassroomDTO;
+import com.university.schedule.exception.ServiceException;
+import com.university.schedule.exception.ValidationException;
 import com.university.schedule.mapper.ClassroomMapper;
+import com.university.schedule.model.Building;
 import com.university.schedule.model.Classroom;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
+import com.university.schedule.service.BuildingService;
 import com.university.schedule.service.ClassroomService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -22,12 +27,17 @@ import java.util.List;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-public class ClassroomController {
+public class ClassroomRecordsController {
 
     private final ClassroomService classroomService;
 
+    private final BuildingService buildingService;
+
     private final ClassroomMapper classroomMapper;
 
+    private static final String UPDATE_FORM_TEMPLATE = "classroomsUpdateForm";
+
+    @Secured("VIEW_CLASSROOMS")
     @GetMapping("/classrooms")
     public String getAll(Model model,
                          @RequestParam(defaultValue = "100") int limit,
@@ -55,6 +65,7 @@ public class ClassroomController {
         return "classrooms";
     }
 
+    @Secured("EDIT_CLASSROOMS")
     @GetMapping("/classrooms/delete/{id}")
     public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request) {
         classroomService.deleteById(id);
@@ -63,6 +74,41 @@ public class ClassroomController {
         String redirectTo = (referer != null) ? referer : "/classrooms";
 
         return new RedirectView(redirectTo);
+    }
+
+    @Secured("EDIT_CLASSROOMS")
+    @GetMapping("/classrooms/update/{id}")
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, Classroom classroom) {
+        Classroom classroomToDisplay = classroomService.findById(id);
+        List<Building> buildingsToSelect = buildingService.findAll();
+        model.addAttribute("entity", classroomToDisplay);
+        model.addAttribute("buildings", buildingsToSelect);
+
+        return UPDATE_FORM_TEMPLATE;
+    }
+
+    @Secured("EDIT_CLASSROOMS")
+    @PostMapping("/classrooms/update/{id}")
+    public String update(@PathVariable Long id, @Valid @ModelAttribute Classroom classroom,
+                         BindingResult result, Model model){
+
+        if (!result.hasErrors()) {
+            try {
+                classroomService.save(classroom);
+                return "redirect:/classrooms/update/" + id + "?success";
+            } catch (ValidationException validationException) {
+                model.addAttribute("validationServiceErrors", validationException.getViolations());
+            } catch (ServiceException serviceException) {
+                model.addAttribute("serviceError", serviceException.getMessage());
+            }
+        }
+
+        Classroom classroomToDisplay = classroomService.findById(id);
+        List<Building> buildingsToSelect = buildingService.findAll();
+        model.addAttribute("entity", classroomToDisplay);
+        model.addAttribute("buildings", buildingsToSelect);
+
+        return UPDATE_FORM_TEMPLATE;
     }
 
 }

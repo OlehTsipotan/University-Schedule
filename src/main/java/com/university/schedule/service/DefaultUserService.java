@@ -2,12 +2,10 @@ package com.university.schedule.service;
 
 import com.university.schedule.exception.ServiceException;
 
-import com.university.schedule.model.Student;
-import com.university.schedule.model.Teacher;
 import com.university.schedule.model.User;
 import com.university.schedule.repository.UserRepository;
-import com.university.schedule.utility.EntityValidator;
-import jakarta.validation.Validator;
+import com.university.schedule.validation.EntityValidator;
+import com.university.schedule.validation.UserEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -27,7 +25,7 @@ public class DefaultUserService implements UserService {
 
     private final UserRepository userRepository;
 
-    private final EntityValidator entityValidator;
+    private final UserEntityValidator userEntityValidator;
 
     @Override
     public List<User> findAll() {
@@ -53,8 +51,10 @@ public class DefaultUserService implements UserService {
     @Override
     @Transactional
     public Long save(User user) {
-        entityValidator.validate(user);
-        execute(() -> userRepository.save(user));
+        execute(() -> {
+            userEntityValidator.validate(user);
+            userRepository.save(user);
+        });
         log.info("saved {}", user);
         return user.getId();
     }

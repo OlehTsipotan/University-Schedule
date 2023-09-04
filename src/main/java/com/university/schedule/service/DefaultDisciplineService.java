@@ -3,7 +3,8 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Discipline;
 import com.university.schedule.repository.DisciplineRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.DisciplineEntityValidator;
+import com.university.schedule.validation.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -23,7 +24,15 @@ public class DefaultDisciplineService implements DisciplineService{
 
     private final DisciplineRepository disciplineRepository;
 
-    private final EntityValidator entityValidator;
+    private final DisciplineEntityValidator disciplineEntityValidator;
+
+    @Override
+    public Discipline findByName(String name) {
+        Discipline discipline = execute(() -> disciplineRepository.findByName(name)).orElseThrow(
+                () -> new ServiceException("Discipline not found"));
+        log.debug("Retrieved {}", discipline);
+        return discipline;
+    }
 
     @Override
     public List<Discipline> findAll() {
@@ -49,8 +58,10 @@ public class DefaultDisciplineService implements DisciplineService{
     @Override
     @Transactional
     public Long save(Discipline discipline) {
-        entityValidator.validate(discipline);
-        execute(() -> disciplineRepository.save(discipline));
+        execute(() -> {
+            disciplineEntityValidator.validate(discipline);
+            disciplineRepository.save(discipline);
+        });
         log.info("saved {}", discipline);
         return discipline.getId();
     }
@@ -62,6 +73,7 @@ public class DefaultDisciplineService implements DisciplineService{
         log.debug("Retrieved {}", discipline);
         return discipline;
     }
+
 
     @Override
     @Transactional

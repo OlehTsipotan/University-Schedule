@@ -14,6 +14,8 @@ public interface ClassroomService {
 
     Classroom findById(Long id);
 
+    Classroom findByNameAndBuilding(String name, Building building);
+
     List<Classroom> findByBuilding(Building building);
 
     List<Classroom> findAll();

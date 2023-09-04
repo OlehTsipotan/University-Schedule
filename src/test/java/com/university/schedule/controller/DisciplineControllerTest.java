@@ -21,7 +21,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(DisciplineController.class)
+@WebMvcTest(DisciplineRecordsController.class)
 public class DisciplineControllerTest {
 
     @Autowired

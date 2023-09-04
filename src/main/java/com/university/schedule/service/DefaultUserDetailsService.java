@@ -24,7 +24,6 @@ public class DefaultUserDetailsService implements UserDetailsService {
     private final UserDetailsMapper userDetailsMapper;
 
 
-
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user;
@@ -32,6 +31,9 @@ public class DefaultUserDetailsService implements UserDetailsService {
             user = userService.findByEmail(username);
         } catch (ServiceException e){
             throw new UsernameNotFoundException("No user found with email = " + username, e);
+        }
+        if (user.getRole().getName().equals("Admin")){
+            throw new UsernameNotFoundException("User has Admin role, "+ username);
         }
         return userDetailsMapper.convertToUserDetails(user);
 

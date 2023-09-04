@@ -1,6 +1,5 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.controller.TeacherController;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Teacher;
 import com.university.schedule.service.TeacherService;
@@ -10,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -20,7 +18,7 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(TeacherController.class)
+@WebMvcTest(TeacherRecordsController.class)
 public class TeacherControllerTest {
 
     @Autowired

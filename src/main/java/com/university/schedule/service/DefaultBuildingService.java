@@ -3,7 +3,7 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Building;
 import com.university.schedule.repository.BuildingRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.BuildingEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -23,13 +23,15 @@ public class DefaultBuildingService implements BuildingService{
 
     private final BuildingRepository buildingRepository;
 
-    private final EntityValidator entityValidator;
+    private final BuildingEntityValidator buildingValidationService;
 
     @Override
     @Transactional
     public Long save(Building building) {
-        entityValidator.validate(entityValidator);
-        execute(() -> buildingRepository.save(building));
+        execute(() -> {
+            buildingValidationService.validate(building);
+            buildingRepository.save(building);
+        });
         log.info("saved {}", building);
         return building.getId();
     }

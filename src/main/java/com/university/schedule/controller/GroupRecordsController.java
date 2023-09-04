@@ -1,20 +1,25 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.GroupDTO;
+import com.university.schedule.exception.ServiceException;
+import com.university.schedule.exception.ValidationException;
 import com.university.schedule.mapper.GroupMapper;
+import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Group;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
+import com.university.schedule.service.DisciplineService;
 import com.university.schedule.service.GroupService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -22,12 +27,15 @@ import java.util.List;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-public class GroupController {
+public class GroupRecordsController {
 
+    private static final String UPDATE_FORM_TEMPLATE = "groupsUpdateForm";
     private final GroupService groupService;
 
+    private final DisciplineService disciplineService;
     private final GroupMapper groupMapper;
 
+    @Secured("EDIT_GROUPS")
     @GetMapping("/groups")
     public String getAll(Model model,
                          @RequestParam(defaultValue = "100") int limit,
@@ -54,6 +62,7 @@ public class GroupController {
         return "groups";
     }
 
+    @Secured("EDIT_GROUPS")
     @GetMapping("/groups/delete/{id}")
     public RedirectView delete(@PathVariable(name = "id") Long id,
                          HttpServletRequest request) {
@@ -64,5 +73,40 @@ public class GroupController {
 
 
         return new RedirectView(redirectTo);
+    }
+
+    @Secured("EDIT_GROUPS")
+    @GetMapping("/groups/update/{id}")
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, Group group) {
+        Group groupToDisplay = groupService.findById(id);
+        List<Discipline> disciplines = disciplineService.findAll();
+        model.addAttribute("entity", groupToDisplay);
+        model.addAttribute("disciplines", disciplines);
+
+        return UPDATE_FORM_TEMPLATE;
+    }
+
+    @Secured("EDIT_GROUPS")
+    @PostMapping("/groups/update/{id}")
+    public String update(@PathVariable Long id, @Valid @ModelAttribute Group group,
+                         BindingResult result, Model model) {
+
+        if (!result.hasErrors()) {
+            try {
+                groupService.save(group);
+                return "redirect:/groups/update/" + id + "?success";
+            } catch (ValidationException validationException) {
+                model.addAttribute("validationServiceErrors", validationException.getViolations());
+            } catch (ServiceException serviceException) {
+                model.addAttribute("serviceError", serviceException.getMessage());
+            }
+        }
+
+        Group groupToDisplay = groupService.findById(id);
+        List<Discipline> disciplines = disciplineService.findAll();
+        model.addAttribute("entity", groupToDisplay);
+        model.addAttribute("disciplines", disciplines);
+
+        return UPDATE_FORM_TEMPLATE;
     }
 }

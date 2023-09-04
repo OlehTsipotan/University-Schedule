@@ -1,14 +1,12 @@
 package com.university.schedule.service;
 
 import com.university.schedule.exception.ServiceException;
-import com.university.schedule.model.Course;
-import com.university.schedule.model.Group;
 import com.university.schedule.model.Student;
 import com.university.schedule.repository.StudentRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.EntityValidator;
+import com.university.schedule.validation.StudentEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,9 +25,7 @@ public class DefaultStudentService implements StudentService {
 
     private final StudentRepository studentRepository;
 
-    private final GroupService groupService;
-
-    private final EntityValidator entityValidator;
+    private final StudentEntityValidator studentEntityValidator;
 
     @Override
     public List<Student> findAll() {
@@ -55,8 +51,10 @@ public class DefaultStudentService implements StudentService {
     @Override
     @Transactional
     public Long save(Student student) {
-        entityValidator.validate(student);
-        execute(() -> studentRepository.save(student));
+        execute(() -> {
+            studentEntityValidator.validate(student);
+            studentRepository.save(student);
+        });
         log.info("saved {}", student);
         return student.getId();
     }

@@ -3,7 +3,8 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.*;
 import com.university.schedule.repository.ScheduledClassRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.EntityValidator;
+import com.university.schedule.validation.ScheduledClassEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -25,13 +26,15 @@ public class DefaultScheduledClassService implements ScheduledClassService {
 
     private final ScheduledClassRepository scheduledClassRepository;
 
-    private final EntityValidator entityValidator;
+    private final ScheduledClassEntityValidator scheduledClassEntityValidator;
 
     @Override
     @Transactional
     public Long save(ScheduledClass scheduledClass) {
-        entityValidator.validate(scheduledClass);
-        execute(() -> scheduledClassRepository.save(scheduledClass));
+        execute(() -> {
+            scheduledClassEntityValidator.validate(scheduledClass);
+            scheduledClassRepository.save(scheduledClass);
+        });
         log.info("saved {}", scheduledClass);
         return scheduledClass.getId();
     }
@@ -39,6 +42,14 @@ public class DefaultScheduledClassService implements ScheduledClassService {
     @Override
     public ScheduledClass findById(Long id) {
         ScheduledClass scheduledClass = execute(() -> scheduledClassRepository.findById(id)).orElseThrow(
+                () -> new ServiceException("ScheduledClass not found"));
+        log.debug("Retrieved {}", scheduledClass);
+        return scheduledClass;
+    }
+
+    @Override
+    public ScheduledClass findByDateAndClassTimeAndTeacher(LocalDate date, ClassTime classTime, Teacher teacher) {
+        ScheduledClass scheduledClass = execute(() -> scheduledClassRepository.findByDateAndClassTimeAndTeacher(date, classTime, teacher)).orElseThrow(
                 () -> new ServiceException("ScheduledClass not found"));
         log.debug("Retrieved {}", scheduledClass);
         return scheduledClass;

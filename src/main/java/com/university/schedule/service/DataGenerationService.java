@@ -36,6 +36,10 @@ public class DataGenerationService {
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
 
+    private final UserService userService;
+
+    private final AuthorityService authorityService;
+
     private final ScheduleGenerator scheduleGenerator;
     @Value("#{'${data.disciplines.names}'.split('${config.separator}')}")
     private List<String> disciplinesNames;
@@ -71,6 +75,9 @@ public class DataGenerationService {
     @Value("#{'${data.roles.names}'.split('${config.separator}')}")
     private List<String> rolesNames;
 
+    @Value("#{'${data.model.names}'.split('${config.separator}')}")
+    private List<String> modelNames;
+
     public void generate() {
         // firstly persist non related entities
         persistDisciplines();
@@ -78,6 +85,9 @@ public class DataGenerationService {
 
         persistRoles();
         log.info("Roles Persisted");
+
+        persistAuthorities();
+        log.info("Authorities Persisted");
 
         persistClassTypes();
         log.info("ClassTypes Persisted");
@@ -112,6 +122,9 @@ public class DataGenerationService {
         generateScheduledClass();
         log.info("Schedule Generated");
 
+        persistUsers();
+        log.info("Users Persisted");
+
     }
 
     private void persistDisciplines() {
@@ -134,7 +147,39 @@ public class DataGenerationService {
     }
 
     private void persistAuthorities(){
+        // VIEW
+        Authority authority;
+        Role adminRole = roleService.findByName("Admin");
+        Role teacherRole = roleService.findByName("Teacher");
+        Role studentRole = roleService.findByName("Student");
 
+        Set<Role> viewRolesSet = new HashSet<>();
+        viewRolesSet.add(adminRole);
+        viewRolesSet.add(teacherRole);
+        viewRolesSet.add(studentRole);
+        for (String modelName : modelNames){
+            authority = Authority.builder()
+                    .name(String.format("VIEW_%S", modelName))
+                    .roles(viewRolesSet)
+                    .build();
+            authorityService.save(authority);
+        }
+
+        // EDIT
+        Set<Role> editRolesSet = new HashSet<>();
+        editRolesSet.add(adminRole);
+        for (String modelName : modelNames){
+            authority = Authority.builder()
+                    .name(String.format("EDIT_%S", modelName))
+                    .roles(editRolesSet)
+                    .build();
+
+            authorityService.save(authority);
+        }
+
+        authority = authorityService.findByName("EDIT_CLASSES");
+        authority.setRoles(Set.of(adminRole, teacherRole));
+        authorityService.save(authority);
     }
 
 
@@ -292,5 +337,17 @@ public class DataGenerationService {
         });
 
         scheduleGenerator.generate(LocalDate.of(2023, 9, 1), LocalDate.of(2023, 12, 20), dayScheduleItemList);
+    }
+
+    private void persistUsers(){
+        User admin = User.builder()
+                .email("admin@admin.com")
+                .password(passwordEncoder.encode("adminPassword"))
+                .firstName("Admin")
+                .lastName("Admin")
+                .role(roleService.findByName("Admin"))
+                .isEnable(true)
+                .build();
+        userService.save(admin);
     }
 }

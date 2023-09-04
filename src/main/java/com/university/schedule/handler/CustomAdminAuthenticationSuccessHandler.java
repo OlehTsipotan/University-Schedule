@@ -13,7 +13,7 @@ import java.io.IOException;
 public class CustomAdminAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        log.info("Logged admin: {}", authentication.getName());
+        log.debug("Logged as admin: {}", authentication.getName());
 
         response.sendRedirect("/admin/dashboard");
     }

@@ -20,7 +20,7 @@ public interface TeacherService {
 
     Teacher findById(Long id);
 
-    Teacher findByEmailAndPassword(String email, String password);
+    Teacher findByEmail(String email);
 
     void deleteById(Long id);
 

@@ -3,7 +3,6 @@ package com.university.schedule.controller;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.*;
 import com.university.schedule.service.ScheduledClassService;
-import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -28,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ScheduledClassController.class)
+@WebMvcTest(ScheduledClassRecordsController.class)
 public class ScheduledClassControllerTest {
 
     @Autowired

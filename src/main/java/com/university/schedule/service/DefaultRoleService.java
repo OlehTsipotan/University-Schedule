@@ -3,7 +3,8 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Role;
 import com.university.schedule.repository.RoleRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.EntityValidator;
+import com.university.schedule.validation.RoleEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -23,7 +24,7 @@ public class DefaultRoleService implements RoleService{
 
     private final RoleRepository roleRepository;
 
-    private final EntityValidator entityValidator;
+    private final RoleEntityValidator roleEntityValidator;
 
     @Override
     public List<Role> findAll() {
@@ -42,8 +43,10 @@ public class DefaultRoleService implements RoleService{
     @Override
     @Transactional
     public Long save(Role role) {
-        entityValidator.validate(role);
-        execute(() -> roleRepository.save(role));
+        execute(() -> {
+            roleEntityValidator.validate(role);
+            roleRepository.save(role);
+        });
         log.info("saved {}", role);
         return role.getId();
     }

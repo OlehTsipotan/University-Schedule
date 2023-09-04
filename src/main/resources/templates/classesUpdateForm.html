@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content="University schedule web-application "/>
+    <meta name="author" content="Oleh Tsipotan"/>
+    <title>Class update</title>
+
+    <link th:href="@{/styles/main.css}" rel="stylesheet"/>
+
+    <link th:href="@{/assets/calendar-days-solid.svg}" rel="icon" type="image/x-icon"/>
+    <link th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar('Class Update')}"></div>
+<div class="container">
+    <div class="row">
+        <!-- Alerts -->
+        <div th:if="${param.success}">
+            <div class="alert alert-success mt-3">Updated!</div>
+        </div>
+        <div th:if="${serviceError != null}">
+            <div class="alert alert-warning mt-3" th:text="${serviceError}"></div>
+        </div>
+        <div th:if="${validationServiceErrors != null}">
+            <div th:each="violation : ${validationServiceErrors}" class="alert alert-warning mt-3"
+                 th:text="${violation}"></div>
+        </div>
+
+        <form
+                method="post"
+                role="form"
+                th:action="@{'/classes/update/' + ${entity.getId()}}"
+                class="form-horizontal"
+                th:object="${scheduledClass}">
+
+            <!-- static ID Input -->
+            <div class="form-group row mb-2">
+                <label for="staticId" class="col-sm-2 col-form-label fw-bold">ID</label>
+                <div class="col-sm-10">
+                    <input type="text" readonly class="form-control-plaintext fw-bold" id="staticId"
+                           th:value="${entity.getId()}">
+                </div>
+            </div>
+
+            <!-- Course select Input -->
+            <div class="form-group row mb-2">
+                <label for="inputCourse" class="col-sm-2 col-form-label fw-bold">Course</label>
+                <div class="col-sm-10">
+                    <select name="course" id="inputCourse" required
+                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('course') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="course : ${courses}" th:value="${course.getId()}"
+                                th:text="${course.getName()}"
+                                th:selected="${course.equals(entity.getCourse())}"></option>
+                    </select>
+                    <div th:if="${param.success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('course')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher select Input -->
+            <div class="form-group row mb-2">
+                <label for="inputTeacher" class="col-sm-2 col-form-label fw-bold">Teacher</label>
+                <div class="col-sm-10">
+                    <select name="teacher" id="inputTeacher" required
+                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('teacher') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="teacher : ${teachers}" th:value="${teacher.getId()}"
+                                th:text="${teacher.getFullName()}"
+                                th:selected="${teacher.equals(entity.getTeacher())}"></option>
+                    </select>
+                    <div th:if="${param.success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('teacher')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classroom select Input-->
+            <div class="form-group row mb-2">
+                <label for="inputClassroom" class="col-sm-2 col-form-label fw-bold">Classroom</label>
+                <div class="col-sm-10">
+                    <select name="classroom" id="inputClassroom" required
+                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('classroom') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="classroom : ${classrooms}" th:value="${classroom.getId()}"
+                                th:text="${classroom.getName() + ', ' + classroom.getBuildingName()}"
+                                th:selected="${classroom.getId() == entity.getClassroom().getId()}"></option>
+                    </select>
+                    <div th:if="${param.success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('classroom')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ClassTime select Input -->
+            <div class="form-group row mb-2">
+                <label for="inputClassTime" class="col-sm-2 col-form-label fw-bold">Class Time</label>
+                <div class="col-sm-10">
+                    <select name="classTime" id="inputClassTime" required
+                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('classTime') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="classtime : ${classtimes}" th:value="${classtime.getId()}"
+                                th:text="@{${classtime.getOrderNumber()} + ', ' + ${classtime.getStartTime()} + ' for ' + ${classtime.getDurationMinutes()} + 'min.'}"
+                                th:selected="${classtime.getId() == entity.getClassTime().getId()}"></option>
+                    </select>
+                    <div th:if="${param.success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('classTime')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Input -->
+            <div class="form-group row mb-2">
+                <label for="inputDate" class="col-sm-2 col-form-label fw-bold">Date</label>
+                <div class="col-sm-10">
+                    <input type="date" name="date" id="inputDate" placeholder="Date"
+                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('date') ? 'is-invalid form-control' : 'form-control')}"
+                           th:value="${entity.getDate()}" required>
+                </div>
+                <div th:if="${param.success}" class="valid-feedback">
+                    Looks good!
+                </div>
+                <div th:each="error : ${#fields.errors('date')}"
+                     class="invalid-feedback"
+                     th:text=${error}>
+                </div>
+            </div>
+
+            <!-- ClassType select input -->
+            <div class="form-group row mb-2">
+                <label for="inputClassType" class="col-sm-2 col-form-label fw-bold">Class Type</label>
+                <div class="col-sm-10">
+                    <select name="classType" id="inputClassType" required
+                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('classType') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="classtype : ${classtypes}" th:value="${classtype.getId()}"
+                                th:text="${classtype.getName()}"
+                                th:selected="${classtype.equals(entity.getClassType())}"></option>
+                    </select>
+                    <div th:if="${param.success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('classType')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groups select input -->
+            <div class="form-group row mb-2">
+                <label for="inputClassType" class="col-sm-2 col-form-label fw-bold">Groups</label>
+                <div class="col-sm-10">
+                    <select multiple name="groups" id="inputGroups" required
+                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('groups') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="group : ${groups}" th:value="${group.getId()}"
+                                th:text="${group.getName()}"
+                                th:selected="${entity.getGroups().contains(group)}"></option>
+                    </select>
+                    <div th:if="${param.success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('groups')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

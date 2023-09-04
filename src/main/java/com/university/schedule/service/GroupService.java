@@ -24,6 +24,8 @@ public interface GroupService {
 
     List<Group> findByDiscipline(Discipline discipline);
 
+    Group findByName(String name);
+
     boolean assignToCourse(Long groupId, Long courseId);
 
     boolean removeFromCourse(Long groupId, Long courseId);

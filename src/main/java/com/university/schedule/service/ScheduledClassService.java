@@ -15,6 +15,8 @@ public interface ScheduledClassService {
 
     ScheduledClass findById(Long id);
 
+    ScheduledClass findByDateAndClassTimeAndTeacher(LocalDate date, ClassTime classTime, Teacher teacher);
+
     List<ScheduledClass> findByDateBetweenAndGroup(LocalDate startDate, LocalDate endDate, Group group);
 
     List<ScheduledClass> findByDateBetweenAndGroupAndCourse(LocalDate startDate, LocalDate endDate, Group group, Course course);

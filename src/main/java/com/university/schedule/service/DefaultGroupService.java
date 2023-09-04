@@ -5,7 +5,8 @@ import com.university.schedule.model.Course;
 import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Group;
 import com.university.schedule.repository.GroupRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.EntityValidator;
+import com.university.schedule.validation.GroupEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -27,7 +28,7 @@ public class DefaultGroupService implements GroupService {
 
     private final CourseService courseService;
 
-    private final EntityValidator entityValidator;
+    private final GroupEntityValidator groupEntityValidator;
 
     @Override
     public List<Group> findAll() throws ServiceException {
@@ -53,8 +54,10 @@ public class DefaultGroupService implements GroupService {
     @Override
     @Transactional
     public Long save(Group group) {
-        entityValidator.validate(group);
-        execute(() -> groupRepository.save(group));
+        execute(() -> {
+            groupEntityValidator.validate(group);
+            groupRepository.save(group);
+        });
         log.info("saved {}", group);
         return group.getId();
     }
@@ -84,6 +87,14 @@ public class DefaultGroupService implements GroupService {
         List<Group> groups = execute(() -> groupRepository.findByDiscipline(discipline));
         log.debug("Retrieved All {} Groups", groups.size());
         return groups;
+    }
+
+    @Override
+    public Group findByName(String name) {
+        Group group = execute(() -> groupRepository.findByName(name)).orElseThrow(
+                () -> new ServiceException("Group not found"));
+        log.debug("Retrieved {}", group);
+        return group;
     }
 
     @Override

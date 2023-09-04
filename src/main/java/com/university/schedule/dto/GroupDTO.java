@@ -2,6 +2,8 @@ package com.university.schedule.dto;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
@@ -15,4 +17,6 @@ public class GroupDTO {
     private String name;
 
     private String disciplineName;
+
+    private List<String> courseNames;
 }

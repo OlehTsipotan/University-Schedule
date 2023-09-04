@@ -23,4 +23,11 @@ public class TeacherDTO {
     private String lastName;
 
     private List<String> courseNames;
+
+    @Getter(AccessLevel.NONE)
+    private Boolean isEnable;
+
+    public Boolean isEnable(){
+        return this.isEnable;
+    }
 }

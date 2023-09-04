@@ -3,6 +3,7 @@ package com.university.schedule.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -17,6 +18,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Entity
+@Builder
 @Table(name = "buildings")
 public class Building {
 
@@ -28,15 +30,18 @@ public class Building {
 
     @NonNull
     @NotBlank(message = "Building name must not be blank")
+    @Size(max = 255)
     private String name;
 
     @NonNull
     @NotBlank(message = "Building address must not be blank")
+    @Size(max = 255)
     private String address;
 
     @OneToMany(mappedBy = "building")
     @ToString.Exclude
     private List<Classroom> classrooms;
+
 
     @Override
     public boolean equals(Object o) {

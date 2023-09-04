@@ -4,7 +4,7 @@ import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Building;
 import com.university.schedule.model.Classroom;
 import com.university.schedule.repository.ClassroomRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.ClassroomEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -24,14 +24,16 @@ public class DefaultClassroomService implements ClassroomService {
 
     private final ClassroomRepository classroomRepository;
 
-    private final EntityValidator entityValidator;
+    private final ClassroomEntityValidator classroomValidationService;
 
 
     @Override
     @Transactional
     public Long save(Classroom classroom) {
-        entityValidator.validate(classroom);
-        execute(() -> classroomRepository.save(classroom));
+        execute(() -> {
+            classroomValidationService.validate(classroom);
+            classroomRepository.save(classroom);
+        });
         log.info("saved {}", classroom);
         return classroom.getId();
     }
@@ -39,6 +41,14 @@ public class DefaultClassroomService implements ClassroomService {
     @Override
     public Classroom findById(Long id) {
         Classroom classroom = execute(() -> classroomRepository.findById(id)).orElseThrow(
+                () -> new ServiceException("Classroom not found"));
+        log.debug("Retrieved {}", classroom);
+        return classroom;
+    }
+
+    @Override
+    public Classroom findByNameAndBuilding(String name, Building building) {
+        Classroom classroom = execute(() -> classroomRepository.findByNameAndBuilding(name, building)).orElseThrow(
                 () -> new ServiceException("Classroom not found"));
         log.debug("Retrieved {}", classroom);
         return classroom;
@@ -75,10 +85,10 @@ public class DefaultClassroomService implements ClassroomService {
     @Override
     @Transactional
     public void deleteById(Long id) {
-        try{
+        try {
             findById(id);
-        } catch (ServiceException e){
-            throw new ServiceException("There is no Classroom to delete with id = "+ id);
+        } catch (ServiceException e) {
+            throw new ServiceException("There is no Classroom to delete with id = " + id);
         }
         execute(() -> classroomRepository.deleteById(id));
         log.info("Deleted id = {}", id);

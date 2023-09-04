@@ -21,4 +21,11 @@ public class StudentDTO {
     private String lastName;
 
     private String groupName;
+
+    @Getter(AccessLevel.NONE)
+    private Boolean isEnable;
+
+    public Boolean isEnable(){
+        return this.isEnable;
+    }
 }

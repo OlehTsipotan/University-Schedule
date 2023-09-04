@@ -1,18 +1,22 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.exception.ServiceException;
+import com.university.schedule.exception.ValidationException;
+import com.university.schedule.model.ClassType;
 import com.university.schedule.model.Course;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.CourseService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -20,9 +24,11 @@ import java.util.List;
 @Controller
 @Slf4j
 @RequiredArgsConstructor
-public class CourseController {
+public class CourseRecordsController {
 
     private final CourseService courseService;
+
+    private static final String UPDATE_FORM_TEMPLATE = "coursesUpdateForm";
 
     @GetMapping("/courses")
     public String getAll(Model model,
@@ -57,5 +63,36 @@ public class CourseController {
         String redirectTo = (referer != null) ? referer : "/courses";
 
         return new RedirectView(redirectTo);
+    }
+
+    @Secured("EDIT_COURSES")
+    @GetMapping("/courses/update/{id}")
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, Course course) {
+        Course courseToDisplay = courseService.findById(id);
+        model.addAttribute("entity", courseToDisplay);
+
+        return UPDATE_FORM_TEMPLATE;
+    }
+
+    @Secured("EDIT_COURSES")
+    @PostMapping("/courses/update/{id}")
+    public String update(@PathVariable Long id, @Valid @ModelAttribute Course course,
+                         BindingResult result, Model model){
+
+        if (!result.hasErrors()) {
+            try {
+                courseService.save(course);
+                return "redirect:/courses/update/" + id + "?success";
+            } catch (ValidationException validationException) {
+                model.addAttribute("validationServiceErrors", validationException.getViolations());
+            } catch (ServiceException serviceException) {
+                model.addAttribute("serviceError", serviceException.getMessage());
+            }
+        }
+
+        Course courseToDisplay = courseService.findById(id);
+        model.addAttribute("entity", courseToDisplay);
+
+        return UPDATE_FORM_TEMPLATE;
     }
 }

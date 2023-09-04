@@ -4,9 +4,11 @@ import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.model.ScheduledClass;
 import com.university.schedule.repository.ScheduledClassRepository;
+import com.university.schedule.service.CourseService;
 import com.university.schedule.service.ScheduledClassService;
 import jakarta.validation.Validator;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +19,13 @@ public class ScheduledClassEntityValidator extends EntityValidator<ScheduledClas
 
     private final ScheduledClassRepository scheduledClassRepository;
 
-    public ScheduledClassEntityValidator(ScheduledClassRepository scheduledClassRepository, Validator validator) {
+    private final CourseService courseService;
+
+
+    public ScheduledClassEntityValidator(ScheduledClassRepository scheduledClassRepository, CourseService courseService, Validator validator) {
         super(validator);
         this.scheduledClassRepository = scheduledClassRepository;
+        this.courseService = courseService;
     }
 
     @Override
@@ -38,12 +44,12 @@ public class ScheduledClassEntityValidator extends EntityValidator<ScheduledClas
                     scheduledClass.getDate(), scheduledClass.getClassTime()));
         }
         // Teacher and Course
-        if (!scheduledClass.getTeacher().getCourses().contains(scheduledClass.getCourse())) {
+        if (!courseService.findByTeacher(scheduledClass.getTeacher()).contains(scheduledClass.getCourse())) {
             violations.add(String.format("%s can`t be assigned to class with %s", scheduledClass.getTeacher(),
                     scheduledClass.getCourse()));
         }
         // Groups and Course
-        if (!scheduledClass.getGroups().stream().allMatch(group -> group.getCourses().contains(
+        if (!scheduledClass.getGroups().stream().allMatch(group -> courseService.findByGroup(group).contains(
                 scheduledClass.getCourse()))) {
             violations.add(String.format("%s can`t be assigned to class with %s", scheduledClass.getGroups(),
                     scheduledClass.getCourse()));

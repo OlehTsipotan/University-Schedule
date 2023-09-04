@@ -2,6 +2,8 @@ package com.university.schedule.service;
 
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Course;
+import com.university.schedule.model.Group;
+import com.university.schedule.model.Teacher;
 import com.university.schedule.repository.CourseRepository;
 import com.university.schedule.validation.CourseEntityValidator;
 import com.university.schedule.validation.EntityValidator;
@@ -56,21 +58,35 @@ public class DefaultCourseService implements CourseService{
     @Override
     public List<Course> findAll() {
         List<Course> courses = execute(() -> courseRepository.findAll());
-        log.debug("Retrieved All {} Groups", courses.size());
+        log.debug("Retrieved All {} Courses", courses.size());
+        return courses;
+    }
+
+    @Override
+    public List<Course> findByTeacher(Teacher teacher) {
+        List<Course> courses = execute(() -> courseRepository.findByTeachers(teacher));
+        log.debug("Retrieved All {} Courses", courses.size());
+        return courses;
+    }
+
+    @Override
+    public List<Course> findByGroup(Group group) {
+        List<Course> courses = execute(() -> courseRepository.findByGroups(group));
+        log.debug("Retrieved All {} Courses", courses.size());
         return courses;
     }
 
     @Override
     public List<Course> findAll(Sort sort) {
         List<Course> courses = execute(() -> courseRepository.findAll(sort));
-        log.debug("Retrieved All {} Groups", courses.size());
+        log.debug("Retrieved All {} Courses", courses.size());
         return courses;
     }
 
     @Override
     public Page<Course> findAll(Pageable pageable) {
         Page<Course> courses = execute(() -> courseRepository.findAll(pageable));
-        log.debug("Retrieved All {} Groups", courses.getTotalElements());
+        log.debug("Retrieved All {} Courses", courses.getTotalElements());
         return courses;
     }
 
@@ -89,7 +105,7 @@ public class DefaultCourseService implements CourseService{
     @Override
     public List<Course> findByGroupsName(String groupName) {
         List<Course> courses = execute(() -> courseRepository.findByGroupsName(groupName));
-        log.debug("Retrieved All {} Groups", courses.size());
+        log.debug("Retrieved All {} Courses", courses.size());
         return courses;
     }
 

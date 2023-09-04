@@ -1,6 +1,8 @@
 package com.university.schedule.service;
 
 import com.university.schedule.model.Course;
+import com.university.schedule.model.Group;
+import com.university.schedule.model.Teacher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,6 +18,10 @@ public interface CourseService {
     Course findByName(String name);
 
     List<Course> findAll();
+
+    List<Course> findByTeacher(Teacher teacher);
+
+    List<Course> findByGroup(Group group);
 
     List<Course> findAll(Sort sort);
 

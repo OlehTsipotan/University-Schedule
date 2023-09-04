@@ -6,7 +6,7 @@ import com.university.schedule.exception.ScheduleGenerationException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.DayScheduleItem;
 import com.university.schedule.model.ScheduledClass;
-import com.university.schedule.utility.ScheduleValidator;
+import com.university.schedule.validation.ScheduleValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

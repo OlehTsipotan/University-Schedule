@@ -3,7 +3,7 @@ package com.university.schedule.service;
 import com.university.schedule.exception.ScheduleGenerationException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.*;
-import com.university.schedule.utility.ScheduleValidator;
+import com.university.schedule.validation.ScheduleValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

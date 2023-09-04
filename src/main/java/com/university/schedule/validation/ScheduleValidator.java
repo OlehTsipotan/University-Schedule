@@ -1,4 +1,4 @@
-package com.university.schedule.utility;
+package com.university.schedule.validation;
 
 import com.university.schedule.exception.ScheduleGenerationConflictException;
 import com.university.schedule.exception.ScheduleGenerationDateException;

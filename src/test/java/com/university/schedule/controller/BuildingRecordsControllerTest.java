@@ -39,7 +39,7 @@ public class BuildingRecordsControllerTest {
 
     @Test
     @WithMockUser(username = "username", authorities = {"ROLE_ADMIN", "VIEW_BUILDINGS"})
-    public void getAll() throws Exception {
+    public void getAll_whenAllIsOk_processPage() throws Exception {
         List<Building> buildingList = new ArrayList<>();
         buildingList.add(new Building("Building A", "Address A"));
         buildingList.add(new Building("Building B", "Address B"));

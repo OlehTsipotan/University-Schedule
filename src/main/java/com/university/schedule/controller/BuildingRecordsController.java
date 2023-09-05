@@ -66,9 +66,7 @@ public class BuildingRecordsController {
 
     @Secured("EDIT_BUILDINGS")
     @GetMapping("/buildings/update/{id}")
-    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, Building building,
-                                @RequestParam(name = "success", required = false) Boolean success,
-                                HttpSession session) {
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, Building building) {
         Building buildingToDisplay = buildingService.findById(id);
 
         model.addAttribute("entity", buildingToDisplay);
@@ -79,7 +77,7 @@ public class BuildingRecordsController {
     @Secured("EDIT_BUILDINGS")
     @PostMapping("/buildings/update/{id}")
     public String update(@PathVariable Long id, @Valid @ModelAttribute Building building,
-                         BindingResult result, Model model, HttpSession session) {
+                         BindingResult result, Model model) {
 
         if (!result.hasErrors()) {
             try {

@@ -1,10 +1,8 @@
 package com.university.schedule.validation;
 
-import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.model.ClassType;
 import com.university.schedule.repository.ClassTypeRepository;
-import com.university.schedule.service.ClassTypeService;
 import jakarta.validation.Validator;
 import org.springframework.stereotype.Component;
 

@@ -39,7 +39,7 @@ public class Course {
     @ToString.Exclude
     private Set<Group> groups = new HashSet<>();
 
-    public Course(@NotNull Long id, @NotNull String name){
+    public Course(@NonNull Long id, @NonNull String name){
         this.id = id;
         this.name = name;
     }

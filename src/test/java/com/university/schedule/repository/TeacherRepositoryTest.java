@@ -90,11 +90,11 @@ public class TeacherRepositoryTest {
 
     @ParameterizedTest
     @CsvSource(value = {"test@example.com:password:FirstName:LastName"}, delimiter = ':')
-    public void findByEmailAndPassword(String email, String password, String firstName, String lastName) {
+    public void findByEmail(String email, String password, String firstName, String lastName) {
         Teacher teacherToSave = new Teacher(email, password, firstName, lastName);
         entityManager.persist(teacherToSave);
 
-        Optional<Teacher> foundTeacher = teacherRepository.findByEmailAndPassword(email, password);
+        Optional<Teacher> foundTeacher = teacherRepository.findByEmail(email);
 
         assertTrue(foundTeacher.isPresent());
         assertEquals(teacherToSave, foundTeacher.get());

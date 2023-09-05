@@ -3,6 +3,7 @@ package com.university.schedule.controller;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Building;
 import com.university.schedule.service.BuildingService;
+import com.university.schedule.service.UserService;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,9 @@ public class BuildingControllerTest {
 
     @MockBean
     private BuildingService buildingService;
+
+    @MockBean
+    private UserService userService;
 
 
     @Test

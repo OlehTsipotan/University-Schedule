@@ -32,7 +32,6 @@ public class ClassTypeEntityValidator extends EntityValidator<ClassType> {
         }
 
         Optional<ClassType> classTypeToCheck = classTypeRepository.findByName(classType.getName());
-
         if (classTypeToCheck.isPresent() && !classType.equals(classTypeToCheck.get())) {
             violations.add(String.format("ClassType with name = %s, already exists.", classType.getName()));
         }

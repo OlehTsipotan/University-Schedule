@@ -1,9 +1,8 @@
-package com.university.schedule.utility;
+package com.university.schedule.validation;
 
 import com.university.schedule.exception.ScheduleGenerationDateException;
 import com.university.schedule.exception.ScheduleGenerationException;
 import com.university.schedule.model.*;
-import com.university.schedule.validation.ScheduleValidator;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

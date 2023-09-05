@@ -66,6 +66,11 @@ public class User {
         this(id, email, password, firstName, lastName, true);
     }
 
+    public User(@NonNull String email, @NonNull String password,
+                @NonNull String firstName, @NonNull String lastName){
+        this(email, password, firstName, lastName, true);
+    }
+
     public User(@NonNull Long id, @NonNull String email, @NonNull String password,
                 @NonNull String firstName, @NonNull String lastName, @NonNull Boolean isEnable){
         this.id = id;

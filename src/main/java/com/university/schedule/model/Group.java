@@ -3,6 +3,7 @@ package com.university.schedule.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -26,6 +27,7 @@ public class Group {
 
     @NonNull
     @NotBlank(message = "Group name must not be blank")
+    @Size(max = 255)
     private String name;
 
     @ManyToOne

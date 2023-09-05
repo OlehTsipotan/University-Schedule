@@ -2,6 +2,7 @@ package com.university.schedule.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -27,6 +28,7 @@ public class Role {
 
     @NonNull
     @NotBlank(message = "Role name must not be blank")
+    @Size(max = 255)
     private String name;
 
     @OneToMany(mappedBy = "role")

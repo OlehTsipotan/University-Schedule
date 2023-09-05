@@ -96,8 +96,8 @@ public class TeacherRecordsController {
     @Secured("EDIT_TEACHERS")
     @PostMapping("/teachers/update/{id}")
     public String update(@PathVariable Long id, @Validated(UpdateValidation.class) @ModelAttribute Teacher teacher,
-                         @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable,
-                         BindingResult result, Model model){
+                         BindingResult result,
+                         @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable, Model model){
 
         if (!result.hasErrors()) {
             try {

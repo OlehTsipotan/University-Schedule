@@ -88,8 +88,13 @@ public class UserRecordsController {
     @Secured("EDIT_USERS")
     @PostMapping("/users/update/{id}")
     public String update(@PathVariable Long id, @Validated(UpdateValidation.class) @ModelAttribute User user,
-                         @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable,
-                         BindingResult result, Model model){
+                         BindingResult result,
+                         @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable, Model model){
+        /*
+         TODO: create UserAdminUpdateDTO ( and for all extended classes too ), DTO class without password field
+         UserAdminUpdateDTO because in perspective there will be UserUpdateDTO with password field, for user changing
+         data by himself.
+         */
 
         if (!result.hasErrors()) {
             try {

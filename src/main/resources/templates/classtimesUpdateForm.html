@@ -35,7 +35,7 @@
                 role="form"
                 th:action="@{'/classtimes/update/' + ${entity.getId()}}"
                 class="form-horizontal"
-                th:object="${classTime}">
+                th:object="${classTimeUpdateDTO}">
             <!-- static ID input -->
             <div class="form-group row mb-2">
                 <label for="staticId" class="col-sm-2 col-form-label fw-bold">ID</label>
@@ -80,15 +80,15 @@
             </div>
             <!-- Duration input -->
             <div class="form-group row mb-2">
-                <label for="inputDuration" class="col-sm-2 col-form-label fw-bold">Duration (Minutes)</label>
+                <label for="inputDurationMinutes" class="col-sm-2 col-form-label fw-bold">Duration (Minutes)</label>
                 <div class="col-sm-10">
-                    <input type="number" name="duration" id="inputDuration" placeholder="Duration"
-                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('duration') ? 'is-invalid form-control' : 'form-control')}"
+                    <input type="number" name="durationMinutes" id="inputDurationMinutes" placeholder="Duration"
+                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('durationMinutes') ? 'is-invalid form-control' : 'form-control')}"
                            th:value="${entity.getDurationMinutes()}" required>
                     <div th:if="${param.success}" class="valid-feedback">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('duration')}"
+                    <div th:each="error : ${#fields.errors('durationMinutes')}"
                          class="invalid-feedback"
                          th:text=${error}>
                     </div>

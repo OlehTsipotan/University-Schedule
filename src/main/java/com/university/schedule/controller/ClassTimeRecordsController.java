@@ -1,6 +1,7 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.ClassTimeDTO;
+import com.university.schedule.dto.ClassTimeUpdateDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.converter.ClassTimeEntityToClassTimeDTOConverter;
@@ -8,6 +9,7 @@ import com.university.schedule.model.ClassTime;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.ClassTimeDTOService;
 import com.university.schedule.service.ClassTimeService;
+import com.university.schedule.service.ClassTimeUpdateDTOService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,8 @@ public class ClassTimeRecordsController {
     private final ClassTimeDTOService classTimeDTOService;
 
     private final ClassTimeService classTimeService;
+
+    private final ClassTimeUpdateDTOService classTimeUpdateDTOService;
 
     private final ClassTimeEntityToClassTimeDTOConverter classTimeEntityToClassTimeDTOConverter;
 
@@ -76,21 +80,21 @@ public class ClassTimeRecordsController {
 
     @Secured("EDIT_CLASSTIMES")
     @GetMapping("/classtimes/update/{id}")
-    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, ClassTime classTime) {
-        ClassTimeDTO classTimeDTO = classTimeEntityToClassTimeDTOConverter.convert(classTimeService.findById(id));
-        model.addAttribute("entity", classTimeDTO);
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, ClassTimeUpdateDTO classTimeUpdateDTO) {
+        classTimeUpdateDTO = classTimeUpdateDTOService.findById(id);
+        model.addAttribute("entity", classTimeUpdateDTO);
 
         return UPDATE_FORM_TEMPLATE;
     }
 
     @Secured("EDIT_CLASSTIMES")
     @PostMapping("/classtimes/update/{id}")
-    public String update(@PathVariable Long id, @Valid @ModelAttribute ClassTime classTime,
+    public String update(@PathVariable Long id, @Valid @ModelAttribute ClassTimeUpdateDTO classTimeUpdateDTO,
                          BindingResult result, Model model){
 
         if (!result.hasErrors()) {
             try {
-                classTimeService.save(classTime);
+                classTimeUpdateDTOService.save(classTimeUpdateDTO);
                 return "redirect:/classtimes/update/" + id + "?success";
             } catch (ValidationException validationException) {
                 model.addAttribute("validationServiceErrors", validationException.getViolations());

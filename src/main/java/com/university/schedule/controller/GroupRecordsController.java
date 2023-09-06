@@ -3,11 +3,12 @@ package com.university.schedule.controller;
 import com.university.schedule.dto.GroupDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.mapper.GroupMapper;
+import com.university.schedule.converter.GroupEntityToGroupDTOConverter;
 import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Group;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.DisciplineService;
+import com.university.schedule.service.GroupDTOService;
 import com.university.schedule.service.GroupService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -32,8 +33,10 @@ public class GroupRecordsController {
     private static final String UPDATE_FORM_TEMPLATE = "groupsUpdateForm";
     private final GroupService groupService;
 
+    private final GroupDTOService groupDTOService;
+
     private final DisciplineService disciplineService;
-    private final GroupMapper groupMapper;
+    private final GroupEntityToGroupDTOConverter groupEntityToGroupDTOConverter;
 
     @Secured("EDIT_GROUPS")
     @GetMapping("/groups")
@@ -48,9 +51,7 @@ public class GroupRecordsController {
         Sort.Order order = new Sort.Order(direction, sortField);
 
         Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<Group> groups = groupService.findAll(pageable).toList();
-        List<GroupDTO> groupDTOs = groups.stream()
-                .map(groupMapper::convertToDto).toList();
+        List<GroupDTO> groupDTOs = groupDTOService.findAll(pageable);
 
         model.addAttribute("entities", groupDTOs);
         model.addAttribute("currentLimit", limit);

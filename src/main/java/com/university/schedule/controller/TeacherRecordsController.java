@@ -3,15 +3,14 @@ package com.university.schedule.controller;
 import com.university.schedule.dto.TeacherDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.mapper.TeacherMapper;
 import com.university.schedule.model.*;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.CourseService;
 import com.university.schedule.service.RoleService;
+import com.university.schedule.service.TeacherDTOService;
 import com.university.schedule.service.TeacherService;
 import com.university.schedule.validation.UpdateValidation;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -35,11 +34,12 @@ public class TeacherRecordsController {
 
     private final TeacherService teacherService;
 
+    private final TeacherDTOService teacherDTOService;
+
     private final RoleService roleService;
 
     private final CourseService courseService;
 
-    private final TeacherMapper teacherMapper;
 
     @Secured("VIEW_TEACHERS")
     @GetMapping("/teachers")
@@ -54,9 +54,7 @@ public class TeacherRecordsController {
         Sort.Order order = new Sort.Order(direction, sortField);
 
         Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<Teacher> teachers = teacherService.findAll(pageable).toList();
-        List<TeacherDTO> teacherDTOs = teachers.stream()
-                .map(teacherMapper::convertToDto).toList();
+        List<TeacherDTO> teacherDTOs = teacherDTOService.findAll(pageable);
 
         model.addAttribute("teachers", teacherDTOs);
         model.addAttribute("currentLimit", limit);

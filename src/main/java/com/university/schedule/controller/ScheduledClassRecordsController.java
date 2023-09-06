@@ -5,9 +5,9 @@ import com.university.schedule.dto.ClassroomDTO;
 import com.university.schedule.dto.ScheduledClassDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.mapper.ClassTimeMapper;
-import com.university.schedule.mapper.ClassroomMapper;
-import com.university.schedule.mapper.ScheduledClassMapper;
+import com.university.schedule.converter.ClassTimeEntityToClassTimeDTOConverter;
+import com.university.schedule.converter.ClassroomEntityToClassroomDTOConverter;
+import com.university.schedule.converter.ScheduledClassEntityToScheduledClassDTOConverter;
 import com.university.schedule.model.*;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.*;
@@ -31,20 +31,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ScheduledClassRecordsController {
     private static final String UPDATE_FORM_TEMPLATE = "classesUpdateForm";
-
     private final ScheduledClassService scheduledClassService;
-
+    private final ScheduledClassDTOService scheduledClassDTOService;
+    private final ClassroomDTOService classroomDTOService;
+    private final ClassTimeDTOService classTimeDTOService;
     private final CourseService courseService;
     private final TeacherService teacherService;
-    private final ClassroomService classroomService;
-    private final ClassTimeService classTimeService;
     private final ClassTypeService classTypeService;
-
-    private final ScheduledClassMapper scheduledClassMapper;
-    private final ClassroomMapper classroomMapper;
-
-    private final ClassTimeMapper classTimeMapper;
-
     private final GroupService groupService;
 
     @Secured("VIEW_CLASSES")
@@ -59,8 +52,7 @@ public class ScheduledClassRecordsController {
         Sort.Order order = new Sort.Order(direction, sortField);
 
         Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<ScheduledClass> scheduledClasses = scheduledClassService.findAll(pageable).toList();
-        List<ScheduledClassDTO> scheduledClassDTOs = scheduledClasses.stream().map(scheduledClassMapper::convertToDto).toList();
+        List<ScheduledClassDTO> scheduledClassDTOs = scheduledClassDTOService.findAll(pageable);
 
         model.addAttribute("entities", scheduledClassDTOs);
         model.addAttribute("currentLimit", limit);
@@ -90,16 +82,16 @@ public class ScheduledClassRecordsController {
 
         List<Course> courses = courseService.findAll();
         List<Teacher> teachers = teacherService.findAll();
-        List<ClassroomDTO> classroomDTOS = classroomService.findAll().stream().map(classroomMapper::convertToDto).toList();
-        List<ClassTimeDTO> classTimeDTOS = classTimeService.findAll().stream().map(classTimeMapper::convertToDto).toList();
+        List<ClassroomDTO> classroomDTOs = classroomDTOService.findAll();
+        List<ClassTimeDTO> classTimeDTOs = classTimeDTOService.findAll();
         List<ClassType> classTypes = classTypeService.findAll();
         List<Group> groups = groupService.findAll();
 
         model.addAttribute("entity", scheduledClassToDisplay);
         model.addAttribute("courses", courses);
         model.addAttribute("teachers", teachers);
-        model.addAttribute("classrooms", classroomDTOS);
-        model.addAttribute("classtimes", classTimeDTOS);
+        model.addAttribute("classrooms", classroomDTOs);
+        model.addAttribute("classtimes", classTimeDTOs);
         model.addAttribute("classtypes", classTypes);
         model.addAttribute("groups", groups);
 
@@ -127,16 +119,16 @@ public class ScheduledClassRecordsController {
 
         List<Course> courses = courseService.findAll();
         List<Teacher> teachers = teacherService.findAll();
-        List<ClassroomDTO> classroomDTOS = classroomService.findAll().stream().map(classroomMapper::convertToDto).toList();
-        List<ClassTimeDTO> classTimeDTOS = classTimeService.findAll().stream().map(classTimeMapper::convertToDto).toList();
+        List<ClassroomDTO> classroomDTOs = classroomDTOService.findAll();
+        List<ClassTimeDTO> classTimeDTOs = classTimeDTOService.findAll();
         List<ClassType> classTypes = classTypeService.findAll();
         List<Group> groups = groupService.findAll();
 
         model.addAttribute("entity", scheduledClassToDisplay);
         model.addAttribute("courses", courses);
         model.addAttribute("teachers", teachers);
-        model.addAttribute("classrooms", classroomDTOS);
-        model.addAttribute("classtimes", classTimeDTOS);
+        model.addAttribute("classrooms", classroomDTOs);
+        model.addAttribute("classtimes", classTimeDTOs);
         model.addAttribute("classtypes", classTypes);
         model.addAttribute("groups", groups);
 

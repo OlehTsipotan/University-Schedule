@@ -1,10 +1,11 @@
-package com.university.schedule.mapper;
+package com.university.schedule.converter;
 
 import com.university.schedule.dto.ScheduledClassDTO;
 import com.university.schedule.model.Group;
 import com.university.schedule.model.ScheduledClass;
-import org.modelmapper.Converter;
+import lombok.NonNull;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -12,22 +13,23 @@ import java.util.Set;
 
 
 @Component
-public class ScheduledClassMapper {
+public class ScheduledClassEntityToScheduledClassDTOConverter implements Converter<ScheduledClass, ScheduledClassDTO> {
 
     private final ModelMapper modelMapper;
 
 
-    public ScheduledClassMapper() {
+    public ScheduledClassEntityToScheduledClassDTOConverter() {
         this.modelMapper = new ModelMapper();
 
-        Converter<Set<Group>, List<String>> converter = c -> c.getSource().stream().map(Group::getName).toList();
+        org.modelmapper.Converter<Set<Group>, List<String>> converter = c -> c.getSource().stream().map(Group::getName).toList();
         modelMapper.typeMap(ScheduledClass.class, ScheduledClassDTO.class).addMappings(
                 modelMapper -> modelMapper.using(converter)
                         .map(ScheduledClass::getGroups, ScheduledClassDTO::setGroupNames));
     }
 
-    public ScheduledClassDTO convertToDto(ScheduledClass scheduledClass) {
-        return modelMapper.map(scheduledClass, ScheduledClassDTO.class);
+    @Override
+    public ScheduledClassDTO convert(ScheduledClass source) {
+        return modelMapper.map(source, ScheduledClassDTO.class);
     }
 }
 

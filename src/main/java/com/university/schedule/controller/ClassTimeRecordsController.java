@@ -3,9 +3,10 @@ package com.university.schedule.controller;
 import com.university.schedule.dto.ClassTimeDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.mapper.ClassTimeMapper;
+import com.university.schedule.converter.ClassTimeEntityToClassTimeDTOConverter;
 import com.university.schedule.model.ClassTime;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
+import com.university.schedule.service.ClassTimeDTOService;
 import com.university.schedule.service.ClassTimeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -27,9 +28,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClassTimeRecordsController {
 
+    private final ClassTimeDTOService classTimeDTOService;
+
     private final ClassTimeService classTimeService;
 
-    private final ClassTimeMapper classTimeMapper;
+    private final ClassTimeEntityToClassTimeDTOConverter classTimeEntityToClassTimeDTOConverter;
 
     private static final String UPDATE_FORM_TEMPLATE = "classtimesUpdateForm";
 
@@ -47,9 +50,7 @@ public class ClassTimeRecordsController {
         Sort.Order order = new Sort.Order(direction, sortField);
 
         Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<ClassTime> classTimes = classTimeService.findAll(pageable).toList();
-        List<ClassTimeDTO> classTimeDTOs = classTimes.stream()
-                .map(classTimeMapper::convertToDto).toList();
+        List<ClassTimeDTO> classTimeDTOs = classTimeDTOService.findAll(pageable);
 
         model.addAttribute("entities", classTimeDTOs);
         model.addAttribute("currentLimit", limit);
@@ -76,7 +77,7 @@ public class ClassTimeRecordsController {
     @Secured("EDIT_CLASSTIMES")
     @GetMapping("/classtimes/update/{id}")
     public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, ClassTime classTime) {
-        ClassTimeDTO classTimeDTO = classTimeMapper.convertToDto(classTimeService.findById(id));
+        ClassTimeDTO classTimeDTO = classTimeEntityToClassTimeDTOConverter.convert(classTimeService.findById(id));
         model.addAttribute("entity", classTimeDTO);
 
         return UPDATE_FORM_TEMPLATE;
@@ -98,7 +99,7 @@ public class ClassTimeRecordsController {
             }
         }
 
-        ClassTimeDTO classTimeDTO = classTimeMapper.convertToDto(classTimeService.findById(id));
+        ClassTimeDTO classTimeDTO = classTimeEntityToClassTimeDTOConverter.convert(classTimeService.findById(id));
         model.addAttribute("entity", classTimeDTO);
 
         return UPDATE_FORM_TEMPLATE;

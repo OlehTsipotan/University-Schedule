@@ -1,19 +1,13 @@
 package com.university.schedule.service;
 
-import com.university.schedule.dto.DefaultUserDetails;
 import com.university.schedule.exception.ServiceException;
-import com.university.schedule.mapper.UserDetailsMapper;
-import com.university.schedule.model.Authority;
+import com.university.schedule.converter.UserDetailsMapper;
 import com.university.schedule.model.User;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor

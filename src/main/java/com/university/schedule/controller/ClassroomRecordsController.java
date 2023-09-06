@@ -3,11 +3,12 @@ package com.university.schedule.controller;
 import com.university.schedule.dto.ClassroomDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.mapper.ClassroomMapper;
+import com.university.schedule.converter.ClassroomEntityToClassroomDTOConverter;
 import com.university.schedule.model.Building;
 import com.university.schedule.model.Classroom;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.BuildingService;
+import com.university.schedule.service.ClassroomDTOService;
 import com.university.schedule.service.ClassroomService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -29,12 +30,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClassroomRecordsController {
 
+    private final ClassroomDTOService classroomDTOService;
+
     private final ClassroomService classroomService;
-
     private final BuildingService buildingService;
-
-    private final ClassroomMapper classroomMapper;
-
     private static final String UPDATE_FORM_TEMPLATE = "classroomsUpdateForm";
 
     @Secured("VIEW_CLASSROOMS")
@@ -50,9 +49,7 @@ public class ClassroomRecordsController {
         Sort.Order order = new Sort.Order(direction, sortField);
 
         Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<Classroom> classrooms = classroomService.findAll(pageable).toList();
-        List<ClassroomDTO> classroomDTOs = classrooms.stream()
-                .map(classroomMapper::convertToDto).toList();
+        List<ClassroomDTO> classroomDTOs = classroomDTOService.findAll(pageable);
 
 
         model.addAttribute("entities", classroomDTOs);

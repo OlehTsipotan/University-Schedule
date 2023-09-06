@@ -3,24 +3,22 @@ package com.university.schedule.controller;
 import com.university.schedule.dto.StudentDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.mapper.StudentMapper;
-import com.university.schedule.model.Discipline;
+import com.university.schedule.converter.StudentEntityToStudentDTOConverter;
 import com.university.schedule.model.Group;
 import com.university.schedule.model.Role;
 import com.university.schedule.model.Student;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.GroupService;
 import com.university.schedule.service.RoleService;
+import com.university.schedule.service.StudentDTOService;
 import com.university.schedule.service.StudentService;
 import com.university.schedule.validation.UpdateValidation;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -39,11 +37,12 @@ public class StudentRecordsController {
 
     private final StudentService studentService;
 
+    private final StudentDTOService studentDTOService;
+
     private final GroupService groupService;
 
     private final RoleService roleService;
 
-    private final StudentMapper studentMapper;
 
     @Secured("VIEW_STUDENTS")
     @GetMapping("/students")
@@ -59,9 +58,7 @@ public class StudentRecordsController {
         Sort.Order order = new Sort.Order(direction, sortField);
 
         Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<Student> students = studentService.findAll(pageable).toList();
-        List<StudentDTO> studentDTOs = students.stream()
-                .map(studentMapper::convertToDto).toList();
+        List<StudentDTO> studentDTOs = studentDTOService.findAll(pageable);
 
         model.addAttribute("students", studentDTOs);
         model.addAttribute("currentLimit", limit);

@@ -1,4 +1,4 @@
-package com.university.schedule.mapper;
+package com.university.schedule.converter;
 
 import com.university.schedule.dto.DefaultUserDetails;
 import com.university.schedule.dto.TeacherDTO;

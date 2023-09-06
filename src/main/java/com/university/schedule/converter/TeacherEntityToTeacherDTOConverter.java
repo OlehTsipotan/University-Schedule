@@ -1,23 +1,23 @@
-package com.university.schedule.mapper;
+package com.university.schedule.converter;
 
 import com.university.schedule.dto.TeacherDTO;
 import com.university.schedule.model.*;
-import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Set;
 
 @Component
-public class TeacherMapper {
+public class TeacherEntityToTeacherDTOConverter implements Converter<Teacher, TeacherDTO> {
 
     private final ModelMapper modelMapper;
 
 
-    public TeacherMapper() {
+    public TeacherEntityToTeacherDTOConverter() {
         this.modelMapper = new ModelMapper();
-        Converter<Set<Course>, List<String>> converter = c -> c.getSource().stream().map(Course::getName).toList();
+        org.modelmapper.Converter<Set<Course>, List<String>> converter = c -> c.getSource().stream().map(Course::getName).toList();
         modelMapper.typeMap(Teacher.class, TeacherDTO.class).addMappings(
                 modelMapper -> {modelMapper.using(converter)
                         .map(Teacher::getCourses, TeacherDTO::setCourseNames);
@@ -25,7 +25,8 @@ public class TeacherMapper {
 
     }
 
-    public TeacherDTO convertToDto(Teacher teacher) {
-        return modelMapper.map(teacher, TeacherDTO.class);
+    @Override
+    public TeacherDTO convert(Teacher source) {
+        return modelMapper.map(source, TeacherDTO.class);
     }
 }

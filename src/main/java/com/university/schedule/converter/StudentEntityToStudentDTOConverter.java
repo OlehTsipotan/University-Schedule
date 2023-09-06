@@ -1,24 +1,24 @@
-package com.university.schedule.mapper;
+package com.university.schedule.converter;
 
 import com.university.schedule.dto.StudentDTO;
-import com.university.schedule.dto.TeacherDTO;
 import com.university.schedule.model.Student;
-import com.university.schedule.model.Teacher;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 @Component
-public class StudentMapper {
+public class StudentEntityToStudentDTOConverter implements Converter<Student, StudentDTO> {
 
     private final ModelMapper modelMapper;
 
-    public StudentMapper() {
+    public StudentEntityToStudentDTOConverter() {
         this.modelMapper = new ModelMapper();
         modelMapper.typeMap(Student.class, StudentDTO.class).addMappings(
                 modelMapper -> modelMapper.map(Student::isEnable, StudentDTO::setIsEnable));
     }
 
-    public StudentDTO convertToDto(Student student) {
-        return modelMapper.map(student, StudentDTO.class);
+    @Override
+    public StudentDTO convert(Student source) {
+        return modelMapper.map(source, StudentDTO.class);
     }
 }

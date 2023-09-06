@@ -35,7 +35,7 @@
                 role="form"
                 th:action="@{'/teachers/update/' + ${entity.getId()}}"
                 class="form-horizontal"
-                th:object="${teacher}">
+                th:object="${teacherUpdateDTO}">
             <!-- static ID Input -->
             <div class="form-group row mb-2">
                 <label for="staticId" class="col-sm-2 col-form-label fw-bold">ID</label>

@@ -1,6 +1,7 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.StudentDTO;
+import com.university.schedule.dto.StudentUpdateDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.converter.StudentEntityToStudentDTOConverter;
@@ -8,12 +9,10 @@ import com.university.schedule.model.Group;
 import com.university.schedule.model.Role;
 import com.university.schedule.model.Student;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
-import com.university.schedule.service.GroupService;
-import com.university.schedule.service.RoleService;
-import com.university.schedule.service.StudentDTOService;
-import com.university.schedule.service.StudentService;
+import com.university.schedule.service.*;
 import com.university.schedule.validation.UpdateValidation;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -37,6 +36,7 @@ public class StudentRecordsController {
 
     private final StudentService studentService;
 
+    private final StudentUpdateDTOService studentUpdateDTOService;
     private final StudentDTOService studentDTOService;
 
     private final GroupService groupService;
@@ -84,8 +84,8 @@ public class StudentRecordsController {
 
     @Secured("EDIT_STUDENTS")
     @GetMapping("/students/update/{id}")
-    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, Student student) {
-        Student studentToDisplay = studentService.findById(id);
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, StudentUpdateDTO studentUpdateDTO) {
+        StudentUpdateDTO studentToDisplay = studentUpdateDTOService.findById(id);
         List<Group> groups = groupService.findAll();
         List<Role> roles = roleService.findAll();
         model.addAttribute("entity", studentToDisplay);
@@ -97,15 +97,14 @@ public class StudentRecordsController {
 
     @Secured("EDIT_STUDENTS")
     @PostMapping("/students/update/{id}")
-    public String update(@PathVariable Long id, @Validated(UpdateValidation.class) @ModelAttribute Student student,
+    public String update(@PathVariable Long id, @Valid @ModelAttribute StudentUpdateDTO studentUpdateDTO,
                          BindingResult result,
                          @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable, Model model){
 
         if (!result.hasErrors()) {
             try {
-                student.setPassword(studentService.findById(id).getPassword());
-                student.setIsEnable(isEnable);
-                studentService.save(student);
+                studentUpdateDTO.setIsEnable(isEnable);
+                studentUpdateDTOService.save(studentUpdateDTO);
                 return "redirect:/students/update/" + id + "?success";
             } catch (ValidationException validationException) {
                 model.addAttribute("validationServiceErrors", validationException.getViolations());

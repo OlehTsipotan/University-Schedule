@@ -1,16 +1,14 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.TeacherDTO;
+import com.university.schedule.dto.TeacherUpdateDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.model.*;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
-import com.university.schedule.service.CourseService;
-import com.university.schedule.service.RoleService;
-import com.university.schedule.service.TeacherDTOService;
-import com.university.schedule.service.TeacherService;
-import com.university.schedule.validation.UpdateValidation;
+import com.university.schedule.service.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +17,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -34,6 +31,7 @@ public class TeacherRecordsController {
 
     private final TeacherService teacherService;
 
+    private final TeacherUpdateDTOService teacherUpdateDTOService;
     private final TeacherDTOService teacherDTOService;
 
     private final RoleService roleService;
@@ -80,8 +78,8 @@ public class TeacherRecordsController {
 
     @Secured("EDIT_TEACHERS")
     @GetMapping("/teachers/update/{id}")
-    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, Teacher teacher) {
-        Teacher teacherToDisplay = teacherService.findById(id);
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, TeacherUpdateDTO teacherUpdateDTO) {
+        TeacherUpdateDTO teacherToDisplay = teacherUpdateDTOService.findById(id);
         List<Course> courses = courseService.findAll();
         List<Role> roles = roleService.findAll();
         model.addAttribute("entity", teacherToDisplay);
@@ -93,15 +91,14 @@ public class TeacherRecordsController {
 
     @Secured("EDIT_TEACHERS")
     @PostMapping("/teachers/update/{id}")
-    public String update(@PathVariable Long id, @Validated(UpdateValidation.class) @ModelAttribute Teacher teacher,
+    public String update(@PathVariable Long id, @Valid @ModelAttribute TeacherUpdateDTO teacherUpdateDTO,
                          BindingResult result,
                          @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable, Model model){
 
         if (!result.hasErrors()) {
             try {
-                teacher.setPassword(teacherService.findById(id).getPassword());
-                teacher.setIsEnable(isEnable);
-                teacherService.save(teacher);
+                teacherUpdateDTO.setIsEnable(isEnable);
+                teacherUpdateDTOService.save(teacherUpdateDTO);
 
                 return "redirect:/teachers/update/" + id + "?success";
             } catch (ValidationException validationException) {

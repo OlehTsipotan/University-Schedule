@@ -1,5 +1,6 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.dto.UserUpdateDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.model.Course;
@@ -9,6 +10,7 @@ import com.university.schedule.model.User;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.RoleService;
 import com.university.schedule.service.UserService;
+import com.university.schedule.service.UserUpdateDTOService;
 import com.university.schedule.validation.UpdateValidation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -32,6 +34,8 @@ import java.util.List;
 public class UserRecordsController {
 
     private final UserService userService;
+
+    private final UserUpdateDTOService userUpdateDTOService;
 
     private final RoleService roleService;
 
@@ -76,8 +80,8 @@ public class UserRecordsController {
 
     @Secured("EDIT_USERS")
     @GetMapping("/users/update/{id}")
-    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, User user) {
-        User userToDisplay = userService.findById(id);
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, UserUpdateDTO userUpdateDTO) {
+        UserUpdateDTO userToDisplay = userUpdateDTOService.findById(id);
         List<Role> roles = roleService.findAll();
         model.addAttribute("entity", userToDisplay);
         model.addAttribute("roles", roles);
@@ -87,20 +91,14 @@ public class UserRecordsController {
 
     @Secured("EDIT_USERS")
     @PostMapping("/users/update/{id}")
-    public String update(@PathVariable Long id, @Validated(UpdateValidation.class) @ModelAttribute User user,
+    public String update(@PathVariable Long id, @Valid @ModelAttribute UserUpdateDTO userUpdateDTO,
                          BindingResult result,
                          @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable, Model model){
-        /*
-         TODO: create UserAdminUpdateDTO ( and for all extended classes too ), DTO class without password field
-         UserAdminUpdateDTO because in perspective there will be UserUpdateDTO with password field, for user changing
-         data by himself.
-         */
 
         if (!result.hasErrors()) {
             try {
-                user.setPassword(userService.findById(id).getPassword());
-                user.setIsEnable(isEnable);
-                userService.save(user);
+                userUpdateDTO.setIsEnable(isEnable);
+                userUpdateDTOService.save(userUpdateDTO);
                 return "redirect:/users/update/" + id + "?success";
             } catch (ValidationException validationException) {
                 model.addAttribute("validationServiceErrors", validationException.getViolations());
@@ -109,7 +107,7 @@ public class UserRecordsController {
             }
         }
 
-        User userToDisplay = userService.findById(id);
+        UserUpdateDTO userToDisplay = userUpdateDTOService.findById(id);
         List<Role> roles = roleService.findAll();
         model.addAttribute("entity", userToDisplay);
         model.addAttribute("roles", roles);

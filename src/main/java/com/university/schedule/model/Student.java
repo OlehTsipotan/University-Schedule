@@ -1,6 +1,5 @@
 package com.university.schedule.model;
 
-import com.university.schedule.service.TeacherService;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -42,11 +41,6 @@ public class Student extends User {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" +
-                "id = " + getId() + ", " +
-                "group = " + getGroup() + ", " +
-                "email = " + getEmail() + ", " +
-                "firstName = " + getFirstName() + ", " +
-                "lastName = " + getLastName() + ")";
+        return getClass().getSimpleName() + "(" + "id = " + getId() + ", " + "group = " + getGroup() + ", " + "email = " + getEmail() + ", " + "firstName = " + getFirstName() + ", " + "lastName = " + getLastName() + ", " + "role = " + getRole() + ", " + "isEnable = " + isEnable() + ")";
     }
 }

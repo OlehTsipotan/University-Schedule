@@ -1,11 +1,7 @@
 package com.university.schedule.model;
 
-import com.university.schedule.validation.UpdateValidation;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -31,25 +27,25 @@ public class User {
     private Long id;
 
     @NonNull
-    @NotBlank(message = "User email must not be blank", groups = UpdateValidation.class)
-    @Size(max = 255, groups = UpdateValidation.class)
+    @NotBlank(message = "User email must not be blank")
+    @Size(max = 255)
     private String email;
 
     @NonNull
-    @Null(groups = UpdateValidation.class)
     @NotBlank(message = "User password must not be blank")
+    @Size(max = 255)
     private String password;
 
     @NonNull
     @Column(name = "first_name")
-    @NotBlank(message = "User firstName must not be blank", groups = UpdateValidation.class)
-    @Size(max = 255, groups = UpdateValidation.class)
+    @NotBlank(message = "User firstName must not be blank")
+    @Size(max = 255)
     private String firstName;
 
     @NonNull
     @Column(name = "last_name")
-    @NotBlank(message = "User lastName must not be blank", groups = UpdateValidation.class)
-    @Size(max = 255, groups = UpdateValidation.class)
+    @NotBlank(message = "User lastName must not be blank")
+    @Size(max = 255)
     private String lastName;
 
     @ManyToOne

@@ -113,7 +113,7 @@ public class StudentRecordsController {
             }
         }
 
-        Student studentToDisplay = studentService.findById(id);
+        StudentUpdateDTO studentToDisplay = studentUpdateDTOService.findById(id);
         List<Group> groups = groupService.findAll();
         List<Role> roles = roleService.findAll();
         model.addAttribute("entity", studentToDisplay);

@@ -107,7 +107,7 @@ public class TeacherRecordsController {
                 model.addAttribute("serviceError", serviceException.getMessage());
             }
         }
-        Teacher teacherToDisplay = teacherService.findById(id);
+        TeacherUpdateDTO teacherToDisplay = teacherUpdateDTOService.findById(id);
         List<Course> courses = courseService.findAll();
         List<Role> roles = roleService.findAll();
         model.addAttribute("entity", teacherToDisplay);

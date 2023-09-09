@@ -39,6 +39,11 @@ public class Role {
     @ToString.Exclude
     private Set<Authority> authorities;
 
+    public Role(@NonNull Long id, @NonNull String name){
+        this.id = id;
+        this.name = name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

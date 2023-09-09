@@ -36,7 +36,6 @@ public class GroupRecordsController {
     private final GroupDTOService groupDTOService;
 
     private final DisciplineService disciplineService;
-    private final GroupEntityToGroupDTOConverter groupEntityToGroupDTOConverter;
 
     @Secured("EDIT_GROUPS")
     @GetMapping("/groups")

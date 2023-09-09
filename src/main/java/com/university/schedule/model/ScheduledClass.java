@@ -56,6 +56,7 @@ public class ScheduledClass {
 
     @ManyToOne
     @JoinColumn(name = "type_id")
+    @NotNull(message = "ScheduledClass classType must not be null")
     private ClassType classType;
 
     @ManyToMany
@@ -64,6 +65,7 @@ public class ScheduledClass {
             inverseJoinColumns = @JoinColumn(name = "group_id")
     )
     @ToString.Exclude
+    @NotNull(message = "ScheduledClass groups (Set) must not be null")
     private Set<Group> groups = new HashSet<>();
 
     @Override

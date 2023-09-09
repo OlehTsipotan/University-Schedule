@@ -42,6 +42,12 @@ public class Building {
     @ToString.Exclude
     private List<Classroom> classrooms;
 
+    public Building(@NonNull Long id, @NonNull String name, @NonNull String address){
+        this.id = id;
+        this.name = name;
+        this.address = address;
+    }
+
 
     @Override
     public boolean equals(Object o) {

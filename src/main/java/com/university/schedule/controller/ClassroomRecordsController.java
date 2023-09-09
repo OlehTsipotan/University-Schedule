@@ -31,7 +31,6 @@ import java.util.List;
 public class ClassroomRecordsController {
 
     private final ClassroomDTOService classroomDTOService;
-
     private final ClassroomService classroomService;
     private final BuildingService buildingService;
     private static final String UPDATE_FORM_TEMPLATE = "classroomsUpdateForm";

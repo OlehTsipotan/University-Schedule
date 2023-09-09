@@ -15,6 +15,7 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
+@Builder
 @Entity
 @Table(name = "classrooms", uniqueConstraints = { @UniqueConstraint(columnNames = { "name", "building_id" }) })
 public class Classroom {

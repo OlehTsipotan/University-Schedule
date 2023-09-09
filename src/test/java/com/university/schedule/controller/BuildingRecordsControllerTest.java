@@ -38,8 +38,8 @@ public class BuildingRecordsControllerTest {
 
 
     @Test
-    @WithMockUser(username = "username", authorities = {"ROLE_ADMIN", "VIEW_BUILDINGS"})
-    public void getAll_whenAllIsOk_processPage() throws Exception {
+    @WithMockUser(username = "username", authorities = {"VIEW_BUILDINGS"})
+    public void getAll_processPage() throws Exception {
         List<Building> buildingList = new ArrayList<>();
         buildingList.add(new Building("Building A", "Address A"));
         buildingList.add(new Building("Building B", "Address B"));
@@ -55,7 +55,7 @@ public class BuildingRecordsControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "username", authorities = {"ROLE_ADMIN", "EDIT_BUILDINGS"})
+    @WithMockUser(username = "username", authorities = {"EDIT_BUILDINGS"})
     public void delete() throws Exception {
         Long buildingId = 1L;
 
@@ -67,8 +67,8 @@ public class BuildingRecordsControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "username", authorities = {"ROLE_ADMIN", "EDIT_BUILDINGS"})
-    public void delete_whenBuildingServiceThrowsServiceException_thenErrorPage() throws Exception {
+    @WithMockUser(username = "username", authorities = {"EDIT_BUILDINGS"})
+    public void delete_whenBuildingServiceThrowsServiceException_thenRedirectToErrorPage() throws Exception {
         Long buildingId = 1L;
 
         doThrow(new ServiceException("Delete error")).when(buildingService).deleteById(buildingId);
@@ -82,7 +82,7 @@ public class BuildingRecordsControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "username", authorities = {"ROLE_ADMIN", "EDIT_BUILDINGS"})
+    @WithMockUser(username = "username", authorities = {"EDIT_BUILDINGS"})
     public void getUpdateForm() throws Exception {
         Long buildingId = 1L;
         Building building = new Building("Building A", "Address A");
@@ -99,7 +99,7 @@ public class BuildingRecordsControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "username", authorities = {"ROLE_ADMIN", "EDIT_BUILDINGS"})
+    @WithMockUser(username = "username", authorities = {"EDIT_BUILDINGS"})
     public void update_whenValidBuilding_thenRedirectSuccess() throws Exception {
 
         Long buildingId = 1L;
@@ -122,7 +122,7 @@ public class BuildingRecordsControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "username", authorities = {"ROLE_ADMIN", "EDIT_BUILDINGS"})
+    @WithMockUser(username = "username", authorities = {"EDIT_BUILDINGS"})
     public void update_whenNotValidBuilding_emptyField_thenProcessForm() throws Exception {
 
         Long buildingId = 1L;
@@ -149,7 +149,7 @@ public class BuildingRecordsControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "username", authorities = {"ROLE_ADMIN", "EDIT_BUILDINGS"})
+    @WithMockUser(username = "username", authorities = {"EDIT_BUILDINGS"})
     public void update_whenBuildingServiceThrowValidationException_thenProcessForm() throws Exception {
 
         Long buildingId = 1L;
@@ -181,7 +181,7 @@ public class BuildingRecordsControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "username", authorities = {"ROLE_ADMIN", "EDIT_BUILDINGS"})
+    @WithMockUser(username = "username", authorities = {"EDIT_BUILDINGS"})
     public void update_whenBuildingServiceThrowServiceException_thenProcessForm() throws Exception {
 
         Long buildingId = 1L;

@@ -4,8 +4,6 @@ import com.university.schedule.dto.ClassTimeDTO;
 import com.university.schedule.dto.ClassTimeUpdateDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.converter.ClassTimeEntityToClassTimeDTOConverter;
-import com.university.schedule.model.ClassTime;
 import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.ClassTimeDTOService;
 import com.university.schedule.service.ClassTimeService;
@@ -35,8 +33,6 @@ public class ClassTimeRecordsController {
     private final ClassTimeService classTimeService;
 
     private final ClassTimeUpdateDTOService classTimeUpdateDTOService;
-
-    private final ClassTimeEntityToClassTimeDTOConverter classTimeEntityToClassTimeDTOConverter;
 
     private static final String UPDATE_FORM_TEMPLATE = "classtimesUpdateForm";
 
@@ -103,8 +99,8 @@ public class ClassTimeRecordsController {
             }
         }
 
-        ClassTimeDTO classTimeDTO = classTimeEntityToClassTimeDTOConverter.convert(classTimeService.findById(id));
-        model.addAttribute("entity", classTimeDTO);
+        classTimeUpdateDTO = classTimeUpdateDTOService.findById(id);
+        model.addAttribute("entity", classTimeUpdateDTO);
 
         return UPDATE_FORM_TEMPLATE;
     }

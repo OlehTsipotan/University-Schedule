@@ -39,13 +39,6 @@ public class Group {
     @OneToMany(mappedBy = "group")
     @ToString.Exclude
     private List<Student> students = new ArrayList<>();
-
-    public Group(@NonNull Long id, @NonNull String name, @NonNull Discipline discipline){
-        this.id = id;
-        this.name = name;
-        this.discipline = discipline;
-    }
-
     @ManyToMany
     @JoinTable(
             name = "groups_courses",
@@ -54,6 +47,12 @@ public class Group {
     )
     @ToString.Exclude
     private Set<Course> courses = new HashSet<>();
+
+    public Group(@NonNull Long id, @NonNull String name, @NonNull Discipline discipline){
+        this.id = id;
+        this.name = name;
+        this.discipline = discipline;
+    }
 
     @Override
     public boolean equals(Object o) {

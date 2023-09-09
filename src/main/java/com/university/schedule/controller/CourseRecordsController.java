@@ -30,6 +30,7 @@ public class CourseRecordsController {
 
     private static final String UPDATE_FORM_TEMPLATE = "coursesUpdateForm";
 
+    @Secured("VIEW_COURSES")
     @GetMapping("/courses")
     public String getAll(Model model,
                          @RequestParam(defaultValue = "100") int limit,
@@ -54,6 +55,7 @@ public class CourseRecordsController {
         return "courses";
     }
 
+    @Secured("EDIT_COURSES")
     @GetMapping("/courses/delete/{id}")
     public RedirectView delete(@PathVariable(name = "id") Long id,
                          HttpServletRequest request) {

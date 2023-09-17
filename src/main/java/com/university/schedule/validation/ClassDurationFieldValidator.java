@@ -6,8 +6,8 @@ import jakarta.validation.ConstraintValidatorContext;
 import java.time.Duration;
 
 public class ClassDurationFieldValidator implements ConstraintValidator<ClassDuration, Duration> {
-    @Override
-    public boolean isValid(Duration duration, ConstraintValidatorContext constraintValidatorContext) {
-        return !duration.isNegative();
-    }
+	@Override
+	public boolean isValid(Duration duration, ConstraintValidatorContext constraintValidatorContext) {
+		return !duration.isNegative();
+	}
 }

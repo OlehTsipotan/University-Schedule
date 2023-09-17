@@ -1,26 +1,23 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.dto.CourseDTO;
+import com.university.schedule.dto.DisciplineDTO;
 import com.university.schedule.dto.GroupDTO;
-import com.university.schedule.exception.ServiceException;
-import com.university.schedule.exception.ValidationException;
-import com.university.schedule.converter.GroupEntityToGroupDTOConverter;
-import com.university.schedule.model.Discipline;
-import com.university.schedule.model.Group;
-import com.university.schedule.pageable.OffsetBasedPageRequest;
+import com.university.schedule.service.CourseService;
 import com.university.schedule.service.DisciplineService;
-import com.university.schedule.service.GroupDTOService;
 import com.university.schedule.service.GroupService;
+import com.university.schedule.utility.PaginationSortingUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -30,83 +27,78 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GroupRecordsController {
 
-    private static final String UPDATE_FORM_TEMPLATE = "groupsUpdateForm";
-    private final GroupService groupService;
+	private static final String UPDATE_FORM_TEMPLATE = "groupsUpdateForm";
+	private final GroupService groupService;
+	private final DisciplineService disciplineService;
+	private final CourseService courseService;
 
-    private final GroupDTOService groupDTOService;
+	@Secured("EDIT_GROUPS")
+	@GetMapping("/groups")
+	public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
+	                     @RequestParam(defaultValue = "0") int offset,
+	                     @RequestParam(defaultValue = "id,asc") String[] sort) {
+		Pageable pageable = PaginationSortingUtility.getPageable(limit, offset, sort);
+		List<GroupDTO> groupDTOs = groupService.findAllAsDTO(pageable);
 
-    private final DisciplineService disciplineService;
+		model.addAttribute("entities", groupDTOs);
+		model.addAttribute("currentLimit", limit);
+		model.addAttribute("currentOffset", offset);
+		model.addAttribute("sortField", sort[0]);
+		model.addAttribute("sortDirection", sort[0]);
+		model.addAttribute("reverseSortDirection", sort[1].equals("asc") ? "desc" : "asc");
 
-    @Secured("EDIT_GROUPS")
-    @GetMapping("/groups")
-    public String getAll(Model model,
-                         @RequestParam(defaultValue = "100") int limit,
-                         @RequestParam(defaultValue = "0") int offset,
-                         @RequestParam(defaultValue = "id,asc") String[] sort) {
-        String sortField = sort[0];
-        String sortDirection = sort[1];
+		return "groups";
+	}
 
-        Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort.Order order = new Sort.Order(direction, sortField);
+	@Secured("EDIT_GROUPS")
+	@GetMapping("/groups/delete/{id}")
+	public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request,
+	                           RedirectAttributes redirectAttributes) {
+		groupService.deleteById(id);
+		redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
 
-        Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<GroupDTO> groupDTOs = groupDTOService.findAll(pageable);
+		String referer = request.getHeader("Referer");
+		String redirectTo = (referer != null) ? referer : "/groups";
 
-        model.addAttribute("entities", groupDTOs);
-        model.addAttribute("currentLimit", limit);
-        model.addAttribute("currentOffset", offset);
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("sortDirection", sortDirection);
-        model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
+		return new RedirectView(redirectTo);
+	}
 
-        return "groups";
-    }
+	@Secured("EDIT_GROUPS")
+	@GetMapping("/groups/update/{id}")
+	public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, GroupDTO groupDTO) {
+		GroupDTO groupDTOToDisplay = groupService.findByIdAsDTO(id);
+		List<DisciplineDTO> disciplines = disciplineService.findAllAsDTO();
+		List<CourseDTO> courseDTOListToSelect = courseService.findAllAsDTO();
+		model.addAttribute("entity", groupDTOToDisplay);
+		model.addAttribute("disciplineDTOList", disciplines);
+		model.addAttribute("courseDTOList", courseDTOListToSelect);
 
-    @Secured("EDIT_GROUPS")
-    @GetMapping("/groups/delete/{id}")
-    public RedirectView delete(@PathVariable(name = "id") Long id,
-                         HttpServletRequest request) {
-        groupService.deleteById(id);
+		return UPDATE_FORM_TEMPLATE;
+	}
 
-        String referer = request.getHeader("Referer");
-        String redirectTo = (referer != null) ? referer : "/groups";
+	@Secured("EDIT_GROUPS")
+	@PostMapping("/groups/update/{id}")
+	public String update(@PathVariable Long id, @Valid @ModelAttribute GroupDTO groupDTO, BindingResult result,
+	                     Model model, RedirectAttributes redirectAttributes) {
 
+		groupDTO.setDisciplineDTO(disciplineService.findByIdAsDTO(groupDTO.getDisciplineDTO().getId()));
+		groupDTO.setCourseDTOS(
+				groupDTO.getCourseDTOS().stream().map(courseDTO -> courseService.findByIdAsDTO(courseDTO.getId()))
+						.toList());
 
-        return new RedirectView(redirectTo);
-    }
+		if (!result.hasErrors()) {
+			groupService.save(groupDTO);
+			redirectAttributes.addFlashAttribute("success", true);
+			return "redirect:/groups/update/" + id;
+		}
 
-    @Secured("EDIT_GROUPS")
-    @GetMapping("/groups/update/{id}")
-    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, Group group) {
-        Group groupToDisplay = groupService.findById(id);
-        List<Discipline> disciplines = disciplineService.findAll();
-        model.addAttribute("entity", groupToDisplay);
-        model.addAttribute("disciplines", disciplines);
+		GroupDTO groupDTOToDisplay = groupService.findByIdAsDTO(id);
+		List<DisciplineDTO> disciplines = disciplineService.findAllAsDTO();
+		List<CourseDTO> courseDTOListToSelect = courseService.findAllAsDTO();
+		model.addAttribute("entity", groupDTOToDisplay);
+		model.addAttribute("disciplineDTOList", disciplines);
+		model.addAttribute("courseDTOList", courseDTOListToSelect);
 
-        return UPDATE_FORM_TEMPLATE;
-    }
-
-    @Secured("EDIT_GROUPS")
-    @PostMapping("/groups/update/{id}")
-    public String update(@PathVariable Long id, @Valid @ModelAttribute Group group,
-                         BindingResult result, Model model) {
-
-        if (!result.hasErrors()) {
-            try {
-                groupService.save(group);
-                return "redirect:/groups/update/" + id + "?success";
-            } catch (ValidationException validationException) {
-                model.addAttribute("validationServiceErrors", validationException.getViolations());
-            } catch (ServiceException serviceException) {
-                model.addAttribute("serviceError", serviceException.getMessage());
-            }
-        }
-
-        Group groupToDisplay = groupService.findById(id);
-        List<Discipline> disciplines = disciplineService.findAll();
-        model.addAttribute("entity", groupToDisplay);
-        model.addAttribute("disciplines", disciplines);
-
-        return UPDATE_FORM_TEMPLATE;
-    }
+		return UPDATE_FORM_TEMPLATE;
+	}
 }

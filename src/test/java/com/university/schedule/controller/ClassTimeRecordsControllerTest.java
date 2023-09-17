@@ -2,11 +2,9 @@ package com.university.schedule.controller;
 
 
 import com.university.schedule.dto.ClassTimeDTO;
-import com.university.schedule.dto.ClassTimeUpdateDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.model.ClassTime;
-import com.university.schedule.service.*;
+import com.university.schedule.service.ClassTimeService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -29,128 +27,109 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ClassTimeRecordsController.class)
 public class ClassTimeRecordsControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
-    @MockBean
-    private ClassTimeDTOService classTimeDTOService;
+	@MockBean
+	private ClassTimeService classTimeService;
 
-    @MockBean
-    private ClassTimeService classTimeService;
+	@Test
+	@WithMockUser(username = "username", authorities = {"VIEW_CLASSTIMES"})
+	public void getAll_processPage() throws Exception {
+		List<ClassTimeDTO> classTimeDTOs = new ArrayList<>();
+		classTimeDTOs.add(new ClassTimeDTO(1L, 1, LocalTime.of(9, 0), 95));
+		classTimeDTOs.add(new ClassTimeDTO(2L, 2, LocalTime.of(11, 0), 95));
 
-    @MockBean
-    private ClassTimeUpdateDTOService classTimeUpdateDTOService;
+		when(classTimeService.findAllAsDTO(any(Pageable.class))).thenReturn(classTimeDTOs);
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"VIEW_CLASSTIMES"})
-    public void getAll_processPage() throws Exception {
-        List<ClassTimeDTO> classTimeDTOs = new ArrayList<>();
-        classTimeDTOs.add(new ClassTimeDTO(1L, 1, LocalTime.of(9, 0).toString(), 95));
-        classTimeDTOs.add(new ClassTimeDTO(2L, 2, LocalTime.of(11, 0).toString(), 95));
+		mockMvc.perform(get("/classtimes")).andExpect(status().isOk()).andExpect(view().name("classtimes"))
+				.andExpect(model().attributeExists("entities", "sortField", "sortDirection", "reverseSortDirection"))
+				.andExpect(model().attribute("entities", classTimeDTOs));
+	}
 
-        when(classTimeDTOService.findAll(any(Pageable.class))).thenReturn(classTimeDTOs);
+	@Test
+	@WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
+	public void delete() throws Exception {
+		Long classTimeId = 1L;
 
-        mockMvc.perform(get("/classtimes"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("classtimes"))
-                .andExpect(model().attributeExists("entities", "sortField", "sortDirection", "reverseSortDirection"))
-                .andExpect(model().attribute("entities", classTimeDTOs));
-    }
+		mockMvc.perform(get("/classtimes/delete/{id}", classTimeId)).andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("/classtimes"));
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
-    public void delete() throws Exception {
-        Long classTimeId = 1L;
+		verify(classTimeService, times(1)).deleteById(classTimeId);
+	}
 
-        mockMvc.perform(get("/classtimes/delete/{id}", classTimeId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/classtimes"));
+	@Test
+	@WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
+	public void getUpdateForm() throws Exception {
+		Long classTimeId = 1L;
+		ClassTimeDTO classTimeDTO = new ClassTimeDTO(classTimeId, 1, LocalTime.of(9, 0), 95);
 
-        verify(classTimeService, times(1)).deleteById(classTimeId);
-    }
+		when(classTimeService.findByIdAsDTO(classTimeId)).thenReturn(classTimeDTO);
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
-    public void getUpdateForm() throws Exception {
-        Long classTimeId = 1L;
-        ClassTimeUpdateDTO classTimeUpdateDTO = new ClassTimeUpdateDTO(classTimeId, 1, LocalTime.of(9, 0), 95);
+		mockMvc.perform(MockMvcRequestBuilders.get("/classtimes/update/{id}", classTimeId)).andExpect(status().isOk())
+				.andExpect(model().attributeExists("entity")).andExpect(view().name("classtimesUpdateForm"))
+				.andExpect(model().attribute("entity", classTimeDTO));
 
-        when(classTimeUpdateDTOService.findById(classTimeId)).thenReturn(classTimeUpdateDTO);
+		verify(classTimeService, times(1)).findByIdAsDTO(classTimeId);
+	}
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/classtimes/update/{id}", classTimeId))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("entity"))
-                .andExpect(view().name("classtimesUpdateForm"))
-                .andExpect(model().attribute("entity", classTimeUpdateDTO));
+	@Test
+	@WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
+	public void update_whenNotValidClassTime_emptyField_thenProcessForm() throws Exception {
+		Long classTimeId = 1L;
 
-        verify(classTimeUpdateDTOService, times(1)).findById(classTimeId);
-    }
+		ClassTimeDTO classTimeDTO = new ClassTimeDTO(classTimeId, 1, null, 95);
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
-    public void update_whenNotValidClassTime_emptyField_thenProcessForm() throws Exception {
-        Long classTimeId = 1L;
+		when(classTimeService.findByIdAsDTO(classTimeId)).thenReturn(classTimeDTO);
 
-        ClassTimeUpdateDTO classTimeUpdateDTO = new ClassTimeUpdateDTO(classTimeId, 1, null, 95);
+		mockMvc.perform(MockMvcRequestBuilders.post("/classtimes/update/{id}", classTimeId).with(csrf())
+						.flashAttr("classTimeUpdateDTO", classTimeDTO)).andExpect(status().isOk())
+				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", classTimeDTO))
+				.andExpect(view().name("classtimesUpdateForm"));
 
-        when(classTimeUpdateDTOService.findById(classTimeId)).thenReturn(classTimeUpdateDTO);
+		verify(classTimeService, times(0)).save((ClassTimeDTO) any());
+	}
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/classtimes/update/{id}", classTimeId)
-                        .with(csrf())
-                        .flashAttr("classTimeUpdateDTO", classTimeUpdateDTO))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("entity"))
-                .andExpect(model().attribute("entity", classTimeUpdateDTO))
-                .andExpect(view().name("classtimesUpdateForm"));
+	@Test
+	@WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
+	public void update_whenClassTimeServiceThrowValidationException_thenProcessForm() throws Exception {
+		Long classTimeId = 1L;
 
-        verify(classTimeService, times(0)).save((ClassTime) any());
-    }
+		ClassTimeDTO classTimeDTO = new ClassTimeDTO(classTimeId, 1, LocalTime.of(9, 0), 95);
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
-    public void update_whenClassTimeServiceThrowValidationException_thenProcessForm() throws Exception {
-        Long classTimeId = 1L;
+		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
-        ClassTimeUpdateDTO classTimeUpdateDTO = new ClassTimeUpdateDTO(classTimeId, 1, LocalTime.of(9, 0), 95);
+		when(classTimeService.save((ClassTimeDTO) any())).thenThrow(validationException);
+		when(classTimeService.findByIdAsDTO(classTimeId)).thenReturn(classTimeDTO);
 
-        ValidationException validationException = new ValidationException("testException", List.of("myError"));
+		mockMvc.perform(MockMvcRequestBuilders.post("/classtimes/update/{id}", classTimeId).with(csrf())
+						.flashAttr("classTimeUpdateDTO", classTimeDTO)).andExpect(status().isOk())
+				.andExpect(model().attributeExists("validationServiceErrors"))
+				.andExpect(model().attribute("validationServiceErrors", validationException.getViolations()))
+				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", classTimeDTO))
+				.andExpect(view().name("classtimesUpdateForm"));
 
-        when(classTimeUpdateDTOService.save(any())).thenThrow(validationException);
-        when(classTimeUpdateDTOService.findById(classTimeId)).thenReturn(classTimeUpdateDTO);
+		verify(classTimeService, times(1)).save(classTimeDTO);
+	}
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/classtimes/update/{id}", classTimeId)
-                        .with(csrf())
-                        .flashAttr("classTimeUpdateDTO", classTimeUpdateDTO))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("validationServiceErrors"))
-                .andExpect(model().attribute("validationServiceErrors", validationException.getViolations()))
-                .andExpect(model().attributeExists("entity"))
-                .andExpect(model().attribute("entity", classTimeUpdateDTO))
-                .andExpect(view().name("classtimesUpdateForm"));
+	@Test
+	@WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
+	public void update_whenClassTimeServiceThrowServiceException_thenProcessForm() throws Exception {
+		Long classTimeId = 1L;
 
-        verify(classTimeUpdateDTOService, times(1)).save(classTimeUpdateDTO);
-    }
+		ClassTimeDTO classTimeDTO = new ClassTimeDTO(classTimeId, 1, LocalTime.of(9, 0), 95);
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
-    public void update_whenClassTimeServiceThrowServiceException_thenProcessForm() throws Exception {
-        Long classTimeId = 1L;
+		ServiceException serviceException = new ServiceException("testException");
 
-        ClassTimeUpdateDTO classTimeUpdateDTO = new ClassTimeUpdateDTO(classTimeId, 1, LocalTime.of(9, 0), 95);
+		when(classTimeService.save((ClassTimeDTO) any())).thenThrow(serviceException);
+		when(classTimeService.findByIdAsDTO(classTimeId)).thenReturn(classTimeDTO);
 
-        ServiceException serviceException = new ServiceException("testException");
-
-        when(classTimeUpdateDTOService.save(any())).thenThrow(serviceException);
-        when(classTimeUpdateDTOService.findById(classTimeId)).thenReturn(classTimeUpdateDTO);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/classtimes/update/{id}", classTimeId)
-                        .with(csrf())
-                        .flashAttr("classTimeUpdateDTO", classTimeUpdateDTO))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("serviceError"))
-                .andExpect(model().attribute("serviceError", serviceException.getMessage()))
-                .andExpect(model().attribute("entity", classTimeUpdateDTO))
-                .andExpect(view().name("classtimesUpdateForm"));
-    }
+		mockMvc.perform(MockMvcRequestBuilders.post("/classtimes/update/{id}", classTimeId).with(csrf())
+						.flashAttr("classTimeUpdateDTO", classTimeDTO)).andExpect(status().isOk())
+				.andExpect(model().attributeExists("serviceError"))
+				.andExpect(model().attribute("serviceError", serviceException.getMessage()))
+				.andExpect(model().attribute("entity", classTimeDTO))
+				.andExpect(view().name("classtimesUpdateForm"));
+	}
 }
 

@@ -18,27 +18,27 @@ import java.util.Objects;
 @Entity
 public class ClassType {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "class_type_generator")
-    @SequenceGenerator(name = "class_type_generator", sequenceName = "class_types_seq", allocationSize = 1)
-    @Column(name = "class_type_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "class_type_generator")
+	@SequenceGenerator(name = "class_type_generator", sequenceName = "class_types_seq", allocationSize = 1)
+	@Column(name = "class_type_id")
+	private Long id;
 
-    @NonNull
-    @NotBlank(message = "ClassType name must not be blank")
-    @Size(max = 255)
-    private String name;
+	@NonNull
+	@NotBlank(message = "ClassType name must not be blank")
+	@Size(max = 255)
+	private String name;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        ClassType classType = (ClassType) o;
-        return getId() != null && Objects.equals(getId(), classType.getId());
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+		ClassType classType = (ClassType) o;
+		return getId() != null && Objects.equals(getId(), classType.getId());
+	}
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
 }

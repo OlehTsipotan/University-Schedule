@@ -14,17 +14,17 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class AdminController {
 
-    private final UserService userService;
+	private final UserService userService;
 
-    @GetMapping("/admin/login")
-    public String getLogin() {
-        return "login/adminLogin";
-    }
+	@GetMapping("/admin/login")
+	public String getLogin() {
+		return "login/adminLogin";
+	}
 
-    @GetMapping("/admin/dashboard")
-    public String getDashboard(Model model, Principal principal) {
-        String userFullName = userService.findByEmail(principal.getName()).getFullName();
-        model.addAttribute("userFullName", userFullName);
-        return "adminDashboard";
-    }
+	@GetMapping("/admin/dashboard")
+	public String getDashboard(Model model, Principal principal) {
+		String userFullName = userService.findByEmail(principal.getName()).getFullName();
+		model.addAttribute("userFullName", userFullName);
+		return "adminDashboard";
+	}
 }

@@ -1,22 +1,20 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.exception.ServiceException;
-import com.university.schedule.exception.ValidationException;
-import com.university.schedule.model.Course;
+import com.university.schedule.dto.DisciplineDTO;
 import com.university.schedule.model.Discipline;
-import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.DisciplineService;
+import com.university.schedule.utility.PaginationSortingUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -26,77 +24,64 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DisciplineRecordsController {
 
-    private final DisciplineService disciplineService;
+	private static final String UPDATE_FORM_TEMPLATE = "disciplinesUpdateForm";
+	private final DisciplineService disciplineService;
 
-    private static final String UPDATE_FORM_TEMPLATE = "disciplinesUpdateForm";
+	@Secured("VIEW_DISCIPLINES")
+	@GetMapping("/disciplines")
+	public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
+	                     @RequestParam(defaultValue = "0") int offset,
+	                     @RequestParam(defaultValue = "id,asc") String[] sort) {
 
-    @Secured("VIEW_DISCIPLINES")
-    @GetMapping("/disciplines")
-    public String getAll(Model model,
-                         @RequestParam(defaultValue = "100") int limit,
-                         @RequestParam(defaultValue = "0") int offset,
-                         @RequestParam(defaultValue = "id,asc") String[] sort) {
+		Pageable pageable = PaginationSortingUtility.getPageable(limit, offset, sort);
+		List<DisciplineDTO> disciplines = disciplineService.findAllAsDTO(pageable);
 
-        String sortField = sort[0];
-        String sortDirection = sort[1];
+		model.addAttribute("entities", disciplines);
+		model.addAttribute("currentLimit", limit);
+		model.addAttribute("currentOffset", offset);
+		model.addAttribute("sortField", sort[0]);
+		model.addAttribute("sortDirection", sort[1]);
+		model.addAttribute("reverseSortDirection", sort[1].equals("asc") ? "desc" : "asc");
 
-        Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort.Order order = new Sort.Order(direction, sortField);
+		return "disciplines";
+	}
 
-        Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<Discipline> disciplines = disciplineService.findAll(pageable).toList();
+	@Secured("EDIT_DISCIPLINES")
+	@GetMapping("/disciplines/delete/{id}")
+	public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request,
+	                           RedirectAttributes redirectAttributes) {
+		disciplineService.deleteById(id);
+		redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
 
-        model.addAttribute("entities", disciplines);
-        model.addAttribute("currentLimit", limit);
-        model.addAttribute("currentOffset", offset);
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("sortDirection", sortDirection);
-        model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
+		String referer = request.getHeader("Referer");
+		String redirectTo = (referer != null) ? referer : "/groups";
 
-        return "disciplines";
-    }
+		return new RedirectView(redirectTo);
+	}
 
-    @Secured("EDIT_DISCIPLINES")
-    @GetMapping("/disciplines/delete/{id}")
-    public RedirectView delete(@PathVariable(name = "id") Long id,
-                         HttpServletRequest request) {
-        disciplineService.deleteById(id);
+	@Secured("EDIT_DISCIPLINES")
+	@GetMapping("/disciplines/update/{id}")
+	public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, DisciplineDTO disciplineDTO) {
+		DisciplineDTO disciplineToDisplay = disciplineService.findByIdAsDTO(id);
+		model.addAttribute("entity", disciplineToDisplay);
 
-        String referer = request.getHeader("Referer");
-        String redirectTo = (referer != null) ? referer : "/disciplines";
+		return UPDATE_FORM_TEMPLATE;
+	}
 
+	@Secured("EDIT_DISCIPLINES")
+	@PostMapping("/disciplines/update/{id}")
+	public String update(@PathVariable Long id, @Valid @ModelAttribute Discipline discipline, BindingResult result,
+	                     Model model, RedirectAttributes redirectAttributes) {
 
-        return new RedirectView(redirectTo);
-    }
+		if (!result.hasErrors()) {
+			disciplineService.save(discipline);
+			redirectAttributes.addFlashAttribute("success", true);
+			return "redirect:/disciplines/update/" + id;
+		}
 
-    @Secured("EDIT_DISCIPLINES")
-    @GetMapping("/disciplines/update/{id}")
-    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, Discipline discipline) {
-        Discipline disciplineToDisplay = disciplineService.findById(id);
-        model.addAttribute("entity", disciplineToDisplay);
+		DisciplineDTO disciplineToDisplay = disciplineService.findByIdAsDTO(id);
+		model.addAttribute("entity", disciplineToDisplay);
 
-        return UPDATE_FORM_TEMPLATE;
-    }
-
-    @Secured("EDIT_DISCIPLINES")
-    @PostMapping("/disciplines/update/{id}")
-    public String update(@PathVariable Long id, @Valid @ModelAttribute Discipline discipline,
-                         BindingResult result, Model model){
-
-        if (!result.hasErrors()) {
-            try {
-                disciplineService.save(discipline);
-                return "redirect:/disciplines/update/" + id + "?success";
-            } catch (ValidationException validationException) {
-                model.addAttribute("validationServiceErrors", validationException.getViolations());
-            } catch (ServiceException serviceException) {
-                model.addAttribute("serviceError", serviceException.getMessage());
-            }
-        }
-
-        Discipline disciplineToDisplay = disciplineService.findById(id);
-        model.addAttribute("entity", disciplineToDisplay);
-
-        return UPDATE_FORM_TEMPLATE;
-    }
+		return UPDATE_FORM_TEMPLATE;
+	}
 }

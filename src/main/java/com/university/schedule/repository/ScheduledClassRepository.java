@@ -9,25 +9,38 @@ import java.util.Optional;
 
 public interface ScheduledClassRepository extends JpaRepository<ScheduledClass, Long> {
 
-    Optional<ScheduledClass> findByDateAndClassTimeAndTeacher(LocalDate date, ClassTime classTime, Teacher teacher);
-    List<ScheduledClass> findByDateBetweenAndGroups(LocalDate startDate, LocalDate endDate, Group group);
+	Optional<ScheduledClass> findByDateAndClassTimeAndTeacher(LocalDate date, ClassTime classTime, Teacher teacher);
 
-    List<ScheduledClass> findByDateBetweenAndGroupsAndCourse(LocalDate startDate, LocalDate endDate, Group group, Course course);
+	List<ScheduledClass> findByDateBetweenAndGroups(LocalDate startDate, LocalDate endDate, Group group);
 
-    List<ScheduledClass> findByDateBetweenAndGroupsAndCourseAndClassType(LocalDate startDate, LocalDate endDate, Group group, Course course, ClassType classType);
+	List<ScheduledClass> findByDateBetweenAndGroupsAndCourse(LocalDate startDate, LocalDate endDate, Group group,
+	                                                         Course course);
 
-    List<ScheduledClass> findByDateBetweenAndGroupsAndClassType(LocalDate startDate, LocalDate endDate, Group group, ClassType classType);
+	List<ScheduledClass> findByDateBetweenAndGroupsAndCourseAndClassType(LocalDate startDate, LocalDate endDate,
+	                                                                     Group group, Course course,
+	                                                                     ClassType classType);
 
-    List<ScheduledClass> findByDateBetweenAndTeacher(LocalDate startDate, LocalDate endDate, Teacher teacher);
+	List<ScheduledClass> findByDateBetweenAndGroupsAndClassType(LocalDate startDate, LocalDate endDate, Group group,
+	                                                            ClassType classType);
 
-    List<ScheduledClass> findByDateBetweenAndTeacherAndGroups(LocalDate startDate, LocalDate endDate, Teacher teacher, Group group);
+	List<ScheduledClass> findByDateBetweenAndTeacher(LocalDate startDate, LocalDate endDate, Teacher teacher);
 
-    List<ScheduledClass> findByDateBetweenAndTeacherAndGroupsAndCourse(LocalDate startDate, LocalDate endDate, Teacher teacher, Group group, Course course);
+	List<ScheduledClass> findByDateBetweenAndTeacherAndGroups(LocalDate startDate, LocalDate endDate, Teacher teacher,
+	                                                          Group group);
 
-    List<ScheduledClass> findByDateBetweenAndTeacherAndGroupsAndCourseAndClassType(LocalDate startDate, LocalDate endDate, Teacher teacher, Group group, Course course, ClassType classType);
+	List<ScheduledClass> findByDateBetweenAndTeacherAndGroupsAndCourse(LocalDate startDate, LocalDate endDate,
+	                                                                   Teacher teacher, Group group, Course course);
 
-    List<ScheduledClass> findByDateBetweenAndTeacherAndCourse(LocalDate startDate, LocalDate endDate, Teacher teacher, Course course);
+	List<ScheduledClass> findByDateBetweenAndTeacherAndGroupsAndCourseAndClassType(LocalDate startDate,
+	                                                                               LocalDate endDate, Teacher teacher,
+	                                                                               Group group, Course course,
+	                                                                               ClassType classType);
 
-    List<ScheduledClass> findByDateBetweenAndTeacherAndCourseAndClassType(LocalDate startDate, LocalDate endDate, Teacher teacher, Course course, ClassType classType);
+	List<ScheduledClass> findByDateBetweenAndTeacherAndCourse(LocalDate startDate, LocalDate endDate, Teacher teacher,
+	                                                          Course course);
+
+	List<ScheduledClass> findByDateBetweenAndTeacherAndCourseAndClassType(LocalDate startDate, LocalDate endDate,
+	                                                                      Teacher teacher, Course course,
+	                                                                      ClassType classType);
 
 }

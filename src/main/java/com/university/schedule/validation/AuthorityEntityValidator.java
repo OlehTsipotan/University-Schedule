@@ -13,30 +13,30 @@ import java.util.Optional;
 @Component
 public class AuthorityEntityValidator extends EntityValidator<Authority> {
 
-    private final AuthorityRepository authorityRepository;
+	private final AuthorityRepository authorityRepository;
 
-    public AuthorityEntityValidator(AuthorityRepository authorityRepository, Validator validator) {
-        super(validator);
-        this.authorityRepository = authorityRepository;
-    }
+	public AuthorityEntityValidator(AuthorityRepository authorityRepository, Validator validator) {
+		super(validator);
+		this.authorityRepository = authorityRepository;
+	}
 
-    @Override
-    public void validate(Authority authority) {
-        List<String> violations = new ArrayList<>();
-        try {
-            super.validate(authority);
-        } catch (ValidationException e) {
-            violations = e.getViolations();
-        }
+	@Override
+	public void validate(Authority authority) {
+		List<String> violations = new ArrayList<>();
+		try {
+			super.validate(authority);
+		} catch (ValidationException e) {
+			violations = e.getViolations();
+		}
 
-        Optional<Authority> authorityToCheck = authorityRepository.findByName(authority.getName());
-        if (authorityToCheck.isPresent() && !authority.equals(authorityToCheck.get())) {
-            violations.add(String.format("Authority with name = %s, already exists.", authority.getName()));
-        }
+		Optional<Authority> authorityToCheck = authorityRepository.findByName(authority.getName());
+		if (authorityToCheck.isPresent() && !authority.equals(authorityToCheck.get())) {
+			violations.add(String.format("Authority with name = %s, already exists.", authority.getName()));
+		}
 
-        if (!violations.isEmpty()) {
-            throw new ValidationException("Authority is not valid", violations);
-        }
+		if (!violations.isEmpty()) {
+			throw new ValidationException("Authority is not valid", violations);
+		}
 
-    }
+	}
 }

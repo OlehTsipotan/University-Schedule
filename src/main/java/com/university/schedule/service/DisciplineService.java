@@ -1,26 +1,25 @@
 package com.university.schedule.service;
 
+import com.university.schedule.dto.DisciplineDTO;
 import com.university.schedule.model.Discipline;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
 public interface DisciplineService {
 
-    Discipline findByName(String name);
+	List<Discipline> findAll();
 
-    List<Discipline> findAll();
+	List<DisciplineDTO> findAllAsDTO();
 
-    List<Discipline> findAll(Sort sort);
+	List<DisciplineDTO> findAllAsDTO(Pageable pageable);
 
-    Page<Discipline> findAll(Pageable pageable);
+	Long save(Discipline discipline);
 
-    Long save(Discipline discipline);
+	Long save(DisciplineDTO disciplineDTO);
 
-    Discipline findById(Long id);
+	DisciplineDTO findByIdAsDTO(Long id);
 
-    void deleteById(Long id);
+	void deleteById(Long id);
 
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
@@ -18,11 +18,8 @@
 <div th:replace="~{fragments/navbar :: navbar('Classroom Update')}"></div>
 <div class="container">
     <div class="row">
-        <div th:if="${param.success}">
+        <div th:if="${success}">
             <div class="alert alert-success mt-3">Updated!</div>
-        </div>
-        <div th:if="${serviceError != null}">
-            <div class="alert alert-warning mt-3" th:text="${serviceError}"></div>
         </div>
         <div th:if="${validationServiceErrors != null}">
             <div th:each="violation : ${validationServiceErrors}" class="alert alert-warning mt-3"
@@ -33,7 +30,7 @@
                 role="form"
                 th:action="@{'/classrooms/update/' + ${entity.getId()}}"
                 class="form-horizontal"
-                th:object="${classroom}">
+                th:object="${classroomDTO}">
             <!-- static ID input -->
             <div class="form-group row mb-2">
                 <label for="staticId" class="col-sm-2 col-form-label fw-bold">ID</label>
@@ -47,9 +44,9 @@
                 <label for="inputName" class="col-sm-2 col-form-label fw-bold">Name</label>
                 <div class="col-sm-10">
                     <input type="text" name="name" id="inputName" placeholder="Name"
-                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('name') ? 'is-invalid form-control' : 'form-control')}"
+                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('name') ? 'is-invalid form-control' : 'form-control')}"
                            th:value="${entity.getName()}" required>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
                     <div th:each="error : ${#fields.errors('name')}"
@@ -58,25 +55,27 @@
                     </div>
                 </div>
             </div>
-            <!-- Building select input -->
+            <!-- buildingDTO select input -->
             <div class="form-group row mb-2">
-                <label for="inputBuilding" class="col-sm-2 col-form-label fw-bold">Building</label>
+                <label for="inputBuildingDTO" class="col-sm-2 col-form-label fw-bold">Building</label>
                 <div class="col-sm-10">
-                    <select  name="building" id="inputBuilding" required
-                             th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('building') ? 'is-invalid form-select' : 'form-select')}">
-                        <option th:each="building : ${buildings}" th:value="${building.getId()}"
-                                th:text="${building.getName()}"
-                                th:selected="${building.equals(entity.getBuilding())}"></option>
+                    <select name="buildingDTO.id" id="inputBuildingDTO" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('buildingDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="buildingDTO : ${buildingDTOs}"
+                                th:value="${buildingDTO.getId()}"
+                                th:text="${buildingDTO.getName()}"
+                                th:selected="${buildingDTO.equals(entity.getBuildingDTO())}"></option>
                     </select>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('building')}"
+                    <div th:each="error : ${#fields.errors('buildingDTO')}"
                          class="invalid-feedback"
                          th:text=${error}>
                     </div>
                 </div>
             </div>
+
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>

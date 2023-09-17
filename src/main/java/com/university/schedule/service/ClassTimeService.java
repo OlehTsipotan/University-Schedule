@@ -1,26 +1,24 @@
 package com.university.schedule.service;
 
+import com.university.schedule.dto.ClassTimeDTO;
 import com.university.schedule.model.ClassTime;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ClassTimeService {
 
-    Long save(ClassTime classTime);
+	Long save(ClassTime classTime);
 
-    ClassTime findById(Long id);
+	Long save(ClassTimeDTO classTimeDTO);
 
-    ClassTime findByOrderNumber(Integer order);
+	ClassTimeDTO findByIdAsDTO(Long id);
 
-    List<ClassTime> findAll();
+	ClassTime findByOrderNumber(Integer order);
 
-    Page<ClassTime> findAll(Pageable pageable);
+	List<ClassTimeDTO> findAllAsDTO();
 
-    List<ClassTime> findAll(Sort sort);
+	List<ClassTimeDTO> findAllAsDTO(Pageable pageable);
 
-    void deleteById(Long id);
+	void deleteById(Long id);
 }

@@ -1,26 +1,21 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.dto.BuildingDTO;
 import com.university.schedule.dto.ClassroomDTO;
-import com.university.schedule.exception.ServiceException;
-import com.university.schedule.exception.ValidationException;
-import com.university.schedule.converter.ClassroomEntityToClassroomDTOConverter;
-import com.university.schedule.model.Building;
-import com.university.schedule.model.Classroom;
-import com.university.schedule.pageable.OffsetBasedPageRequest;
 import com.university.schedule.service.BuildingService;
-import com.university.schedule.service.ClassroomDTOService;
 import com.university.schedule.service.ClassroomService;
+import com.university.schedule.utility.PaginationSortingUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -30,81 +25,69 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ClassroomRecordsController {
 
-    private final ClassroomDTOService classroomDTOService;
-    private final ClassroomService classroomService;
-    private final BuildingService buildingService;
-    private static final String UPDATE_FORM_TEMPLATE = "classroomsUpdateForm";
+	private static final String UPDATE_FORM_TEMPLATE = "classroomsUpdateForm";
+	private final ClassroomService classroomService;
+	private final BuildingService buildingService;
 
-    @Secured("VIEW_CLASSROOMS")
-    @GetMapping("/classrooms")
-    public String getAll(Model model,
-                         @RequestParam(defaultValue = "100") int limit,
-                         @RequestParam(defaultValue = "0") int offset,
-                         @RequestParam(defaultValue = "id,asc") String[] sort) {
-        String sortField = sort[0];
-        String sortDirection = sort[1];
+	@Secured("VIEW_CLASSROOMS")
+	@GetMapping("/classrooms")
+	public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
+	                     @RequestParam(defaultValue = "0") int offset,
+	                     @RequestParam(defaultValue = "id,asc") String[] sort) {
+		Pageable pageable = PaginationSortingUtility.getPageable(limit, offset, sort);
+		List<ClassroomDTO> classroomDTOs = classroomService.findAllAsDTO(pageable);
 
-        Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort.Order order = new Sort.Order(direction, sortField);
+		model.addAttribute("entities", classroomDTOs);
+		model.addAttribute("currentLimit", limit);
+		model.addAttribute("currentOffset", offset);
+		model.addAttribute("sortField", sort[0]);
+		model.addAttribute("sortDirection", sort[1]);
+		model.addAttribute("reverseSortDirection", sort[1].equals("asc") ? "desc" : "asc");
 
-        Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<ClassroomDTO> classroomDTOs = classroomDTOService.findAll(pageable);
+		return "classrooms";
+	}
 
+	@Secured("EDIT_CLASSROOMS")
+	@GetMapping("/classrooms/delete/{id}")
+	public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request,
+	                           RedirectAttributes redirectAttributes) {
+		classroomService.deleteById(id);
+		redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
+		String referer = request.getHeader("Referer");
+		String redirectTo = (referer != null) ? referer : "/groups";
 
-        model.addAttribute("entities", classroomDTOs);
-        model.addAttribute("currentLimit", limit);
-        model.addAttribute("currentOffset", offset);
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("sortDirection", sortDirection);
-        model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
+		return new RedirectView(redirectTo);
+	}
 
-        return "classrooms";
-    }
+	@Secured("EDIT_CLASSROOMS")
+	@GetMapping("/classrooms/update/{id}")
+	public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, ClassroomDTO classroomDTO) {
+		ClassroomDTO classroomDTOToDisplay = classroomService.findByIdAsDTO(id);
+		List<BuildingDTO> buildingDTOListToSelect = buildingService.findAllAsDTO();
+		model.addAttribute("entity", classroomDTOToDisplay);
+		model.addAttribute("buildingDTOs", buildingDTOListToSelect);
 
-    @Secured("EDIT_CLASSROOMS")
-    @GetMapping("/classrooms/delete/{id}")
-    public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request) {
-        classroomService.deleteById(id);
+		return UPDATE_FORM_TEMPLATE;
+	}
 
-        String referer = request.getHeader("Referer");
-        String redirectTo = (referer != null) ? referer : "/classrooms";
+	@Secured("EDIT_CLASSROOMS")
+	@PostMapping("/classrooms/update/{id}")
+	public String update(@PathVariable Long id, @Valid @ModelAttribute ClassroomDTO classroomDTO, BindingResult result,
+	                     Model model, RedirectAttributes redirectAttributes,
+	                     @RequestParam("buildingDTO.id") Long selectedBuildingDTOId) {
+		classroomDTO.setBuildingDTO(buildingService.findByIdAsDTO(selectedBuildingDTOId));
+		if (!result.hasErrors()) {
+			classroomService.save(classroomDTO);
+			redirectAttributes.addFlashAttribute("success", true);
+			return "redirect:/classrooms/update/" + id;
+		}
 
-        return new RedirectView(redirectTo);
-    }
+		ClassroomDTO classroomDTOToDisplay = classroomService.findByIdAsDTO(id);
+		List<BuildingDTO> buildingDTOListToSelect = buildingService.findAllAsDTO();
+		model.addAttribute("entity", classroomDTOToDisplay);
+		model.addAttribute("buildingDTOs", buildingDTOListToSelect);
 
-    @Secured("EDIT_CLASSROOMS")
-    @GetMapping("/classrooms/update/{id}")
-    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, Classroom classroom) {
-        Classroom classroomToDisplay = classroomService.findById(id);
-        List<Building> buildingsToSelect = buildingService.findAll();
-        model.addAttribute("entity", classroomToDisplay);
-        model.addAttribute("buildings", buildingsToSelect);
-
-        return UPDATE_FORM_TEMPLATE;
-    }
-
-    @Secured("EDIT_CLASSROOMS")
-    @PostMapping("/classrooms/update/{id}")
-    public String update(@PathVariable Long id, @Valid @ModelAttribute Classroom classroom,
-                         BindingResult result, Model model){
-
-        if (!result.hasErrors()) {
-            try {
-                classroomService.save(classroom);
-                return "redirect:/classrooms/update/" + id + "?success";
-            } catch (ValidationException validationException) {
-                model.addAttribute("validationServiceErrors", validationException.getViolations());
-            } catch (ServiceException serviceException) {
-                model.addAttribute("serviceError", serviceException.getMessage());
-            }
-        }
-
-        Classroom classroomToDisplay = classroomService.findById(id);
-        List<Building> buildingsToSelect = buildingService.findAll();
-        model.addAttribute("entity", classroomToDisplay);
-        model.addAttribute("buildings", buildingsToSelect);
-
-        return UPDATE_FORM_TEMPLATE;
-    }
+		return UPDATE_FORM_TEMPLATE;
+	}
 
 }

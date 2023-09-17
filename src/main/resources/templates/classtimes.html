@@ -16,6 +16,9 @@
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar('ClassTimes')}"></div>
+<div th:if="${success}">
+    <div class="alert alert-success mt-3" th:text="${success}"></div>
+</div>
 <div th:if="${entities.size() > 0}">
     <table class="table table-hover table-bordered table-responsive-md">
         <thead class="thead-light">

@@ -13,31 +13,31 @@ import java.util.Optional;
 @Component
 public class GroupEntityValidator extends EntityValidator<Group> {
 
-    private final GroupRepository groupRepository;
+	private final GroupRepository groupRepository;
 
-    public GroupEntityValidator(GroupRepository groupRepository, Validator validator) {
-        super(validator);
-        this.groupRepository = groupRepository;
-    }
+	public GroupEntityValidator(GroupRepository groupRepository, Validator validator) {
+		super(validator);
+		this.groupRepository = groupRepository;
+	}
 
-    @Override
-    public void validate(Group group) {
-        List<String> violations = new ArrayList<>();
-        try {
-            super.validate(group);
-        } catch (ValidationException e) {
-            violations = e.getViolations();
-        }
+	@Override
+	public void validate(Group group) {
+		List<String> violations = new ArrayList<>();
+		try {
+			super.validate(group);
+		} catch (ValidationException e) {
+			violations = e.getViolations();
+		}
 
-        Optional<Group> groupToCheck = groupRepository.findByName(group.getName());
+		Optional<Group> groupToCheck = groupRepository.findByName(group.getName());
 
-        if (groupToCheck.isPresent() && !group.equals(groupToCheck.get())) {
-            violations.add(String.format("Group with name = %s, already exists.", group.getName()));
-        }
+		if (groupToCheck.isPresent() && !group.equals(groupToCheck.get())) {
+			violations.add(String.format("Group with name = %s, already exists.", group.getName()));
+		}
 
-        if (!violations.isEmpty()) {
-            throw new ValidationException("Group is not valid", violations);
-        }
+		if (!violations.isEmpty()) {
+			throw new ValidationException("Group is not valid", violations);
+		}
 
-    }
+	}
 }

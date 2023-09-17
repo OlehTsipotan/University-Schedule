@@ -1,5 +1,8 @@
 package com.university.schedule.service;
 
+import com.university.schedule.converter.ConverterService;
+import com.university.schedule.dto.ClassroomDTO;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Building;
 import com.university.schedule.model.Classroom;
@@ -8,9 +11,7 @@ import com.university.schedule.validation.ClassroomEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,101 +23,124 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class DefaultClassroomService implements ClassroomService {
 
-    private final ClassroomRepository classroomRepository;
+	private final ClassroomRepository classroomRepository;
 
-    private final ClassroomEntityValidator classroomValidationService;
+	private final ClassroomEntityValidator classroomValidationService;
 
+	private final ConverterService converterService;
 
-    @Override
-    @Transactional
-    public Long save(Classroom classroom) {
-        execute(() -> {
-            classroomValidationService.validate(classroom);
-            classroomRepository.save(classroom);
-        });
-        log.info("saved {}", classroom);
-        return classroom.getId();
-    }
+	@Override
+	@Transactional
+	public Long save(Classroom classroom) {
+		execute(() -> {
+			classroomValidationService.validate(classroom);
+			classroomRepository.save(classroom);
+		});
+		log.info("saved {}", classroom);
+		return classroom.getId();
+	}
 
-    @Override
-    public Classroom findById(Long id) {
-        Classroom classroom = execute(() -> classroomRepository.findById(id)).orElseThrow(
-                () -> new ServiceException("Classroom not found"));
-        log.debug("Retrieved {}", classroom);
-        return classroom;
-    }
+	@Override
+	@Transactional
+	public Long save(ClassroomDTO classroomDTO) {
+		Classroom classroom = convertToEntity(classroomDTO);
+		execute(() -> {
+			classroomValidationService.validate(classroom);
+			classroomRepository.save(classroom);
+		});
+		log.info("saved {}", classroom);
+		return classroom.getId();
+	}
 
-    @Override
-    public Classroom findByNameAndBuilding(String name, Building building) {
-        Classroom classroom = execute(() -> classroomRepository.findByNameAndBuilding(name, building)).orElseThrow(
-                () -> new ServiceException("Classroom not found"));
-        log.debug("Retrieved {}", classroom);
-        return classroom;
-    }
+	@Override
+	public ClassroomDTO findByIdAsDTO(Long id) {
+		Classroom classroom = execute(() -> classroomRepository.findById(id)).orElseThrow(
+				() -> new ServiceException("Classroom not found"));
+		log.debug("Retrieved {}", classroom);
+		return convertToDTO(classroom);
+	}
 
-    @Override
-    public List<Classroom> findByBuilding(Building building) {
-        List<Classroom> classrooms = execute(() -> classroomRepository.findByBuilding(building));
-        log.debug("Retrieved All {} Classrooms", classrooms.size());
-        return classrooms;
-    }
+	private Classroom findById(Long id) {
+		Classroom classroom = execute(() -> classroomRepository.findById(id)).orElseThrow(
+				() -> new ServiceException("Classroom not found"));
+		log.debug("Retrieved {}", classroom);
+		return classroom;
+	}
 
-    @Override
-    public List<Classroom> findAll() {
-        List<Classroom> classrooms = execute(() -> classroomRepository.findAll());
-        log.debug("Retrieved All {} Classrooms", classrooms.size());
-        return classrooms;
-    }
+	@Override
+	public Classroom findByNameAndBuilding(String name, Building building) {
+		Classroom classroom = execute(() -> classroomRepository.findByNameAndBuilding(name, building)).orElseThrow(
+				() -> new ServiceException("Classroom not found"));
+		log.debug("Retrieved {}", classroom);
+		return classroom;
+	}
 
-    @Override
-    public Page<Classroom> findAll(Pageable pageable) {
-        Page<Classroom> classrooms = execute(() -> classroomRepository.findAll(pageable));
-        log.debug("Retrieved All {} Classrooms", classrooms.getTotalElements());
-        return classrooms;
-    }
+	@Override
+	public List<Classroom> findByBuilding(Building building) {
+		List<Classroom> classrooms = execute(() -> classroomRepository.findByBuilding(building));
+		log.debug("Retrieved All {} Classrooms", classrooms.size());
+		return classrooms;
+	}
 
-    @Override
-    public List<Classroom> findAll(Sort sort) {
-        List<Classroom> classrooms = execute(() -> classroomRepository.findAll(sort));
-        log.debug("Retrieved All {} Classrooms", classrooms.size());
-        return classrooms;
-    }
+	@Override
+	public List<ClassroomDTO> findAllAsDTO() {
+		List<ClassroomDTO> classroomDTOList =
+				execute(() -> classroomRepository.findAll()).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} Classrooms", classroomDTOList.size());
+		return classroomDTOList;
+	}
 
-    @Override
-    @Transactional
-    public void deleteById(Long id) {
-        try {
-            findById(id);
-        } catch (ServiceException e) {
-            throw new ServiceException("There is no Classroom to delete with id = " + id);
-        }
-        execute(() -> classroomRepository.deleteById(id));
-        log.info("Deleted id = {}", id);
-    }
+	@Override
+	public List<ClassroomDTO> findAllAsDTO(Pageable pageable) {
+		List<ClassroomDTO> classroomDTOList =
+				execute(() -> classroomRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} Classrooms", classroomDTOList.size());
+		return classroomDTOList;
+	}
 
-    private <T> T execute(DaoSupplier<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (DataAccessException e) {
-            throw new ServiceException("DAO operation failed", e);
-        }
-    }
+	@Override
+	@Transactional
+	public void deleteById(Long id) {
+		try {
+			findById(id);
+		} catch (ServiceException e) {
+			throw new DeletionFailedException("There is no Classroom to delete with id = " + id);
+		}
+		execute(() -> classroomRepository.deleteById(id));
+		log.info("Deleted id = {}", id);
+	}
 
-    private void execute(DaoProcessor processor) {
-        try {
-            processor.process();
-        } catch (DataAccessException e) {
-            throw new ServiceException("DAO operation failed", e);
-        }
-    }
+	private ClassroomDTO convertToDTO(Classroom classroom) {
+		return converterService.convert(classroom, ClassroomDTO.class);
+	}
 
-    @FunctionalInterface
-    public interface DaoSupplier<T> {
-        T get();
-    }
+	private Classroom convertToEntity(ClassroomDTO classroomDTO) {
+		return converterService.convert(classroomDTO, Classroom.class);
+	}
 
-    @FunctionalInterface
-    public interface DaoProcessor {
-        void process();
-    }
+	private <T> T execute(DaoSupplier<T> supplier) {
+		try {
+			return supplier.get();
+		} catch (DataAccessException e) {
+			throw new ServiceException("DAO operation failed", e);
+		}
+	}
+
+	private void execute(DaoProcessor processor) {
+		try {
+			processor.process();
+		} catch (DataAccessException e) {
+			throw new ServiceException("DAO operation failed", e);
+		}
+	}
+
+	@FunctionalInterface
+	public interface DaoSupplier<T> {
+		T get();
+	}
+
+	@FunctionalInterface
+	public interface DaoProcessor {
+		void process();
+	}
 }

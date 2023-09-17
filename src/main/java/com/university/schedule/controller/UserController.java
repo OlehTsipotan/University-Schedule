@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class UserController {
 
-    @GetMapping("/user/login")
-    public String getLogin() {
-        return "login/userLogin";
-    }
+	@GetMapping("/user/login")
+	public String getLogin() {
+		return "login/userLogin";
+	}
 
 }

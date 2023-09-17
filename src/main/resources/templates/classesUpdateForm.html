@@ -19,11 +19,8 @@
 <div class="container">
     <div class="row">
         <!-- Alerts -->
-        <div th:if="${param.success}">
+        <div th:if="${success}">
             <div class="alert alert-success mt-3">Updated!</div>
-        </div>
-        <div th:if="${serviceError != null}">
-            <div class="alert alert-warning mt-3" th:text="${serviceError}"></div>
         </div>
         <div th:if="${validationServiceErrors != null}">
             <div th:each="violation : ${validationServiceErrors}" class="alert alert-warning mt-3"
@@ -35,7 +32,7 @@
                 role="form"
                 th:action="@{'/classes/update/' + ${entity.getId()}}"
                 class="form-horizontal"
-                th:object="${scheduledClass}">
+                th:object="${scheduledClassDTO}">
 
             <!-- static ID Input -->
             <div class="form-group row mb-2">
@@ -50,16 +47,16 @@
             <div class="form-group row mb-2">
                 <label for="inputCourse" class="col-sm-2 col-form-label fw-bold">Course</label>
                 <div class="col-sm-10">
-                    <select name="course" id="inputCourse" required
-                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('course') ? 'is-invalid form-select' : 'form-select')}">
-                        <option th:each="course : ${courses}" th:value="${course.getId()}"
-                                th:text="${course.getName()}"
-                                th:selected="${course.equals(entity.getCourse())}"></option>
+                    <select name="courseDTO.id" id="inputCourse" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('courseDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="courseDTO : ${courseDTOList}" th:value="${courseDTO.getId()}"
+                                th:text="${courseDTO.getName()}"
+                                th:selected="${courseDTO.getId() == entity.getCourseDTO().getId()}"></option>
                     </select>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('course')}"
+                    <div th:each="error : ${#fields.errors('courseDTO')}"
                          class="invalid-feedback"
                          th:text=${error}>
                     </div>
@@ -70,16 +67,16 @@
             <div class="form-group row mb-2">
                 <label for="inputTeacher" class="col-sm-2 col-form-label fw-bold">Teacher</label>
                 <div class="col-sm-10">
-                    <select name="teacher" id="inputTeacher" required
-                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('teacher') ? 'is-invalid form-select' : 'form-select')}">
-                        <option th:each="teacher : ${teachers}" th:value="${teacher.getId()}"
-                                th:text="${teacher.getFullName()}"
-                                th:selected="${teacher.equals(entity.getTeacher())}"></option>
+                    <select name="teacherDTO.id" id="inputTeacher" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('teacherDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="teacherDTO : ${teacherDTOList}" th:value="${teacherDTO.getId()}"
+                                th:text="${teacherDTO.getFullName()}"
+                                th:selected="${teacherDTO.getId() == entity.getTeacherDTO().getId()}"></option>
                     </select>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('teacher')}"
+                    <div th:each="error : ${#fields.errors('teacherDTO')}"
                          class="invalid-feedback"
                          th:text=${error}>
                     </div>
@@ -90,16 +87,16 @@
             <div class="form-group row mb-2">
                 <label for="inputClassroom" class="col-sm-2 col-form-label fw-bold">Classroom</label>
                 <div class="col-sm-10">
-                    <select name="classroom" id="inputClassroom" required
-                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('classroom') ? 'is-invalid form-select' : 'form-select')}">
-                        <option th:each="classroom : ${classrooms}" th:value="${classroom.getId()}"
-                                th:text="${classroom.getName() + ', ' + classroom.getBuildingName()}"
-                                th:selected="${classroom.getId() == entity.getClassroom().getId()}"></option>
+                    <select name="classroomDTO.id" id="inputClassroom" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('classroomDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="classroomDTO : ${classroomDTOList}" th:value="${classroomDTO.getId()}"
+                                th:text="${classroomDTO.getName() + ', ' + classroomDTO.getBuildingDTO().getName()}"
+                                th:selected="${classroomDTO.getId() == entity.getClassroomDTO().getId()}"></option>
                     </select>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('classroom')}"
+                    <div th:each="error : ${#fields.errors('classroomDTO')}"
                          class="invalid-feedback"
                          th:text=${error}>
                     </div>
@@ -110,16 +107,16 @@
             <div class="form-group row mb-2">
                 <label for="inputClassTime" class="col-sm-2 col-form-label fw-bold">Class Time</label>
                 <div class="col-sm-10">
-                    <select name="classTime" id="inputClassTime" required
-                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('classTime') ? 'is-invalid form-select' : 'form-select')}">
-                        <option th:each="classtime : ${classtimes}" th:value="${classtime.getId()}"
-                                th:text="@{${classtime.getOrderNumber()} + ', ' + ${classtime.getStartTime()} + ' for ' + ${classtime.getDurationMinutes()} + 'min.'}"
-                                th:selected="${classtime.getId() == entity.getClassTime().getId()}"></option>
+                    <select name="classTimeDTO.id" id="inputClassTime" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('classTimeDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="classTimeDTO : ${classTimeDTOList}" th:value="${classTimeDTO.getId()}"
+                                th:text="@{${classTimeDTO.getOrderNumber()} + ', ' + ${classTimeDTO.getStartTime()} + ' for ' + ${classTimeDTO.getDurationMinutes()} + 'min.'}"
+                                th:selected="${classTimeDTO.getId() == entity.getClassTimeDTO().getId()}"></option>
                     </select>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('classTime')}"
+                    <div th:each="error : ${#fields.errors('classTimeDTO')}"
                          class="invalid-feedback"
                          th:text=${error}>
                     </div>
@@ -131,10 +128,10 @@
                 <label for="inputDate" class="col-sm-2 col-form-label fw-bold">Date</label>
                 <div class="col-sm-10">
                     <input type="date" name="date" id="inputDate" placeholder="Date"
-                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('date') ? 'is-invalid form-control' : 'form-control')}"
+                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('date') ? 'is-invalid form-control' : 'form-control')}"
                            th:value="${entity.getDate()}" required>
                 </div>
-                <div th:if="${param.success}" class="valid-feedback">
+                <div th:if="${success}" class="valid-feedback">
                     Looks good!
                 </div>
                 <div th:each="error : ${#fields.errors('date')}"
@@ -147,16 +144,16 @@
             <div class="form-group row mb-2">
                 <label for="inputClassType" class="col-sm-2 col-form-label fw-bold">Class Type</label>
                 <div class="col-sm-10">
-                    <select name="classType" id="inputClassType" required
-                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('classType') ? 'is-invalid form-select' : 'form-select')}">
-                        <option th:each="classtype : ${classtypes}" th:value="${classtype.getId()}"
-                                th:text="${classtype.getName()}"
-                                th:selected="${classtype.equals(entity.getClassType())}"></option>
+                    <select name="classTypeDTO.id" id="inputClassType" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('classTypeDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="classTypeDTO : ${classTypeDTOList}" th:value="${classTypeDTO.getId()}"
+                                th:text="${classTypeDTO.getName()}"
+                                th:selected="${classTypeDTO.equals(entity.getClassTypeDTO())}"></option>
                     </select>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('classType')}"
+                    <div th:each="error : ${#fields.errors('classTypeDTO')}"
                          class="invalid-feedback"
                          th:text=${error}>
                     </div>
@@ -165,18 +162,18 @@
 
             <!-- Groups select input -->
             <div class="form-group row mb-2">
-                <label for="inputClassType" class="col-sm-2 col-form-label fw-bold">Groups</label>
+                <label for="inputGroup" class="col-sm-2 col-form-label fw-bold">Groups</label>
                 <div class="col-sm-10">
-                    <select multiple name="groups" id="inputGroups" required
-                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('groups') ? 'is-invalid form-select' : 'form-select')}">
-                        <option th:each="group : ${groups}" th:value="${group.getId()}"
-                                th:text="${group.getName()}"
-                                th:selected="${entity.getGroups().contains(group)}"></option>
+                    <select multiple name="groupDTOS" id="inputGroup" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('groupDTOS') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="groupDTO : ${groupDTOList}" th:value="${groupDTO.getId()}"
+                                th:text="${groupDTO.getName()}"
+                                th:selected="${entity.getGroupDTOS().contains(groupDTO)}"></option>
                     </select>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('groups')}"
+                    <div th:each="error : ${#fields.errors('groupDTOS')}"
                          class="invalid-feedback"
                          th:text=${error}>
                     </div>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
@@ -19,11 +19,8 @@
 <div class="container">
     <div class="row">
         <!-- Alerts -->
-        <div th:if="${param.success}">
+        <div th:if="${success}">
             <div class="alert alert-success mt-3">Updated!</div>
-        </div>
-        <div th:if="${serviceError != null}">
-            <div class="alert alert-warning mt-3" th:text="${serviceError}"></div>
         </div>
         <div th:if="${validationServiceErrors != null}">
             <div th:each="violation : ${validationServiceErrors}" class="alert alert-warning mt-3"
@@ -35,7 +32,7 @@
                 role="form"
                 th:action="@{'/teachers/update/' + ${entity.getId()}}"
                 class="form-horizontal"
-                th:object="${teacherUpdateDTO}">
+                th:object="${teacherDTO}">
             <!-- static ID Input -->
             <div class="form-group row mb-2">
                 <label for="staticId" class="col-sm-2 col-form-label fw-bold">ID</label>
@@ -50,9 +47,9 @@
                 <label for="inputFirstName" class="col-sm-2 col-form-label fw-bold">First Name</label>
                 <div class="col-sm-10">
                     <input type="text" name="firstName" id="inputFirstName" placeholder="First Name"
-                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('firstName') ? 'is-invalid form-control' : 'form-control')}"
+                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('firstName') ? 'is-invalid form-control' : 'form-control')}"
                            th:value="${entity.getFirstName()}" required>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
                     <div th:each="error : ${#fields.errors('firstName')}"
@@ -66,9 +63,9 @@
                 <label for="inputLastName" class="col-sm-2 col-form-label fw-bold">Last Name</label>
                 <div class="col-sm-10">
                     <input type="text" name="lastName" id="inputLastName" placeholder="Last Name"
-                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('lastName') ? 'is-invalid form-control' : 'form-control')}"
+                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('lastName') ? 'is-invalid form-control' : 'form-control')}"
                            th:value="${entity.getLastName()}" required>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
                     <div th:each="error : ${#fields.errors('lastName')}"
@@ -83,9 +80,9 @@
                 <label for="inputEmail" class="col-sm-2 col-form-label fw-bold">Email</label>
                 <div class="col-sm-10">
                     <input type="email" name="email" id="inputEmail" placeholder="myemail@email.com"
-                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('email') ? 'is-invalid form-control' : 'form-control')}"
+                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('email') ? 'is-invalid form-control' : 'form-control')}"
                            th:value="${entity.getEmail()}" required>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
                     <div th:each="error : ${#fields.errors('email')}"
@@ -95,20 +92,20 @@
                 </div>
             </div>
 
-            <!-- Course Input -->
+            <!-- Courses multiple select -->
             <div class="form-group row mb-2">
-                <label for="inputCourses" class="col-sm-2 col-form-label fw-bold">Courses</label>
+                <label for="inputCourses" class="col-sm-2 col-form-label fw-bold">Course</label>
                 <div class="col-sm-10">
-                    <select multiple name="courses" id="inputCourses" required
-                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('courses') ? 'is-invalid form-select' : 'form-select')}">
-                        <option th:each="course : ${courses}" th:value="${course.getId()}"
-                                th:text="${course.getName()}"
-                                th:selected="${entity.getCourses().contains(course)}"></option>
+                    <select multiple name="courseDTOS" id="inputCourses" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('courseDTOS') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="courseDTO : ${courseDTOList}" th:value="${courseDTO.getId()}"
+                                th:text="${courseDTO.getName()}"
+                                th:selected="${entity.getCourseDTOS().contains(courseDTO)}"></option>
                     </select>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('courses')}"
+                    <div th:each="error : ${#fields.errors('courseDTOS')}"
                          class="invalid-feedback"
                          th:text=${error}>
                     </div>
@@ -119,16 +116,16 @@
             <div class="form-group row mb-2">
                 <label for="inputRole" class="col-sm-2 col-form-label fw-bold">Role</label>
                 <div class="col-sm-10">
-                    <select class="form-select" name="role" id="inputRole" required
-                            th:class="${param.success != null ? 'is-valid form-select' : (#fields.hasErrors('role') ? 'is-invalid form-select' : 'form-select')}">
-                        <option th:each="role : ${roles}" th:value="${role.getId()}"
-                                th:text="${role.getName()}"
-                                th:selected="${role.equals(entity.getRole())}"></option>
+                    <select class="form-select" name="roleDTO.id" id="inputRole" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('roleDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="roleDTO : ${roleDTOList}" th:value="${roleDTO.getId()}"
+                                th:text="${roleDTO.getName()}"
+                                th:selected="${roleDTO.equals(entity.getRoleDTO())}"></option>
                     </select>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('role')}"
+                    <div th:each="error : ${#fields.errors('roleDTO')}"
                          class="invalid-feedback"
                          th:text=${error}>
                     </div>

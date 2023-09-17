@@ -2,6 +2,8 @@ package com.university.schedule.dto;
 
 import lombok.*;
 
+import java.time.LocalTime;
+
 @Getter
 @Setter
 @ToString
@@ -10,11 +12,11 @@ import lombok.*;
 @NoArgsConstructor
 public class ClassTimeDTO {
 
-    private Long id;
+	private Long id;
 
-    private Integer orderNumber;
+	private Integer orderNumber;
 
-    private String startTime;
+	private LocalTime startTime;
 
-    private Integer durationMinutes;
+	private Integer durationMinutes;
 }

@@ -31,10 +31,10 @@
         <tr th:each="entity : ${entities}">
             <th scope="row" th:text="${entity.getId()}"></th>
             <td th:text="${entity.getName()}"></td>
-            <td th:text="${entity.getDisciplineName()}"></td>
+            <td th:text="${entity.getDisciplineDTO().getName()}"></td>
             <td>
-                <span th:each="courseName, iterStat : ${entity.getCourseNames()}"><span
-                        th:text="${courseName}"></span><span th:if="${!iterStat.last}">, </span></span>
+                <span th:each="courseDTO, iterStat : ${entity.getCourseDTOS()}"><span
+                        th:text="${courseDTO.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
             </td>
             <td sec:authorize="hasAuthority('EDIT_GROUPS')" class="static-col">
                 <a th:href="@{'/groups/update/' + ${entity.getId()}}" id="btnUpdate"

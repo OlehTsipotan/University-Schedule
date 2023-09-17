@@ -1,9 +1,11 @@
 package com.university.schedule.service;
 
+import com.university.schedule.converter.ConverterService;
+import com.university.schedule.dto.RoleDTO;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Role;
 import com.university.schedule.repository.RoleRepository;
-import com.university.schedule.validation.EntityValidator;
 import com.university.schedule.validation.RoleEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,89 +21,110 @@ import java.util.List;
 @Slf4j
 @Service
 @Transactional(readOnly = true)
-public class DefaultRoleService implements RoleService{
+public class DefaultRoleService implements RoleService {
 
 
-    private final RoleRepository roleRepository;
+	private final RoleRepository roleRepository;
 
-    private final RoleEntityValidator roleEntityValidator;
+	private final ConverterService converterService;
 
-    @Override
-    public List<Role> findAll() {
-        List<Role> roles = execute(() -> roleRepository.findAll());
-        log.debug("Retrieved All {} Role", roles.size());
-        return roles;
-    }
+	private final RoleEntityValidator roleEntityValidator;
 
-    @Override
-    public Page<Role> findAll(Pageable pageable) {
-        Page<Role> roles = execute(() -> roleRepository.findAll(pageable));
-        log.debug("Retrieved All {} Role", roles.getTotalElements());
-        return roles;
-    }
+	@Override
+	public List<Role> findAll() {
+		List<Role> roles = execute(() -> roleRepository.findAll());
+		log.debug("Retrieved All {} Role", roles.size());
+		return roles;
+	}
 
-    @Override
-    @Transactional
-    public Long save(Role role) {
-        execute(() -> {
-            roleEntityValidator.validate(role);
-            roleRepository.save(role);
-        });
-        log.info("saved {}", role);
-        return role.getId();
-    }
+	@Override
+	public List<RoleDTO> findAllAsDTO() {
+		List<RoleDTO> roleDTOList = execute(() -> roleRepository.findAll()).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} Role", roleDTOList.size());
+		return roleDTOList;
+	}
 
-    @Override
-    public Role findById(Long id) {
-        Role role = execute(() -> roleRepository.findById(id)).orElseThrow(
-                () -> new ServiceException("Role not found"));
-        log.debug("Retrieved {}", role);
-        return role;
-    }
+	@Override
+	public Page<Role> findAll(Pageable pageable) {
+		Page<Role> roles = execute(() -> roleRepository.findAll(pageable));
+		log.debug("Retrieved All {} Role", roles.getTotalElements());
+		return roles;
+	}
 
-    @Override
-    public Role findByName(String name) {
-        Role role = execute(() -> roleRepository.findByName(name)).orElseThrow(
-                () -> new ServiceException("Role not found"));
-        log.debug("Retrieved {}", role);
-        return role;
-    }
+	@Override
+	@Transactional
+	public Long save(Role role) {
+		execute(() -> {
+			roleEntityValidator.validate(role);
+			roleRepository.save(role);
+		});
+		log.info("saved {}", role);
+		return role.getId();
+	}
 
-    @Override
-    @Transactional
-    public void deleteById(Long id) {
-        try{
-            findById(id);
-        } catch (ServiceException e){
-            throw new ServiceException("There is no Role to delete with id = "+ id);
-        }
-        execute(() -> roleRepository.deleteById(id));
-        log.info("Deleted id = {}", id);
-    }
+	@Override
+	public Role findById(Long id) {
+		Role role =
+				execute(() -> roleRepository.findById(id)).orElseThrow(() -> new ServiceException("Role not found"));
+		log.debug("Retrieved {}", role);
+		return role;
+	}
 
-    private <T> T execute(DaoSupplier<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (DataAccessException e) {
-            throw new ServiceException("DAO operation failed", e);
-        }
-    }
+	@Override
+	public RoleDTO findByIdAsDTO(Long id) {
+		Role role =
+				execute(() -> roleRepository.findById(id)).orElseThrow(() -> new ServiceException("Role not found"));
+		log.debug("Retrieved {}", role);
+		return convertToDTO(role);
+	}
 
-    private void execute(DaoProcessor processor) {
-        try {
-            processor.process();
-        } catch (DataAccessException e) {
-            throw new ServiceException("DAO operation failed", e);
-        }
-    }
+	@Override
+	public Role findByName(String name) {
+		Role role = execute(() -> roleRepository.findByName(name)).orElseThrow(
+				() -> new ServiceException("Role not found"));
+		log.debug("Retrieved {}", role);
+		return role;
+	}
 
-    @FunctionalInterface
-    public interface DaoSupplier<T> {
-        T get();
-    }
+	@Override
+	@Transactional
+	public void deleteById(Long id) {
+		try {
+			findById(id);
+		} catch (ServiceException e) {
+			throw new DeletionFailedException("There is no Role to delete with id = " + id);
+		}
+		execute(() -> roleRepository.deleteById(id));
+		log.info("Deleted id = {}", id);
+	}
 
-    @FunctionalInterface
-    public interface DaoProcessor {
-        void process();
-    }
+	private RoleDTO convertToDTO(Role source) {
+		return converterService.convert(source, RoleDTO.class);
+	}
+
+	private <T> T execute(DaoSupplier<T> supplier) {
+		try {
+			return supplier.get();
+		} catch (DataAccessException e) {
+			throw new ServiceException("DAO operation failed", e);
+		}
+	}
+
+	private void execute(DaoProcessor processor) {
+		try {
+			processor.process();
+		} catch (DataAccessException e) {
+			throw new ServiceException("DAO operation failed", e);
+		}
+	}
+
+	@FunctionalInterface
+	public interface DaoSupplier<T> {
+		T get();
+	}
+
+	@FunctionalInterface
+	public interface DaoProcessor {
+		void process();
+	}
 }

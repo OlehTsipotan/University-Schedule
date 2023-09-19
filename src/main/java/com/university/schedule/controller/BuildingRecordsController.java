@@ -51,7 +51,7 @@ public class BuildingRecordsController {
 		buildingService.deleteById(id);
 		redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
 		String referer = request.getHeader("Referer");
-		String redirectTo = (referer != null) ? referer : "/groups";
+		String redirectTo = (referer != null) ? referer : "/buildings";
 
 		return new RedirectView(redirectTo);
 	}

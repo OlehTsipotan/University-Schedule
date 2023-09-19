@@ -52,7 +52,7 @@ public class CourseRecordsController {
 		redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
 
 		String referer = request.getHeader("Referer");
-		String redirectTo = (referer != null) ? referer : "/groups";
+		String redirectTo = (referer != null) ? referer : "/courses";
 
 		return new RedirectView(redirectTo);
 	}

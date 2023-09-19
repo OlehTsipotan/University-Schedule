@@ -54,7 +54,7 @@ public class DisciplineRecordsController {
 		redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
 
 		String referer = request.getHeader("Referer");
-		String redirectTo = (referer != null) ? referer : "/groups";
+		String redirectTo = (referer != null) ? referer : "/disciplines";
 
 		return new RedirectView(redirectTo);
 	}

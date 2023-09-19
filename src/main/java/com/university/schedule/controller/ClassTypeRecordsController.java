@@ -51,7 +51,7 @@ public class ClassTypeRecordsController {
 		classTypeService.deleteById(id);
 		redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
 		String referer = request.getHeader("Referer");
-		String redirectTo = (referer != null) ? referer : "/groups";
+		String redirectTo = (referer != null) ? referer : "/classtypes";
 
 		return new RedirectView(redirectTo);
 	}

@@ -4,6 +4,7 @@ import com.university.schedule.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -18,12 +19,11 @@ import org.springframework.web.servlet.view.RedirectView;
 public class GlobalExceptionHandler {
 
 
-	//	@ExceptionHandler(RuntimeException.class)
-	//	public String handleException(RuntimeException runtimeException, Model model) {
-	//		model.addAttribute("exceptionMessage", runtimeException.getMessage());
-	//		throw runtimeException;
-	//		/*return "error";*/
-	//	}
+	@ExceptionHandler(RuntimeException.class)
+	public String handleException(RuntimeException runtimeException, Model model) {
+		model.addAttribute("exceptionMessage", runtimeException.getMessage());
+		return "error";
+	}
 
 	@ExceptionHandler(ValidationException.class)
 	public String handleValidationException(ValidationException validationException,

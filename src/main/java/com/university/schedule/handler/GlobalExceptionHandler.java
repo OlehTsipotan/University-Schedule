@@ -22,7 +22,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(RuntimeException.class)
 	public String handleException(RuntimeException runtimeException, Model model) {
 		model.addAttribute("exceptionMessage", runtimeException.getMessage());
-		return "error";
+		return "redirect:error";
 	}
 
 	@ExceptionHandler(ValidationException.class)

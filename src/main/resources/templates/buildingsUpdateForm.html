@@ -15,7 +15,7 @@
     <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar('Building Update')}"></div>
+<div th:replace="~{fragments/navbar :: navbarWithBackPage('Building Update', '/buildings')}"></div>
 <div class="container">
     <div class="row">
         <div th:if="${success}">

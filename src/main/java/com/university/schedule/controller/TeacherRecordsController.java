@@ -92,8 +92,6 @@ public class TeacherRecordsController {
 				teacherDTO.getCourseDTOS().stream().map(courseDTO -> courseService.findByIdAsDTO(courseDTO.getId()))
 						.toList());
 
-		log.info(teacherDTO.toString());
-
 		if (!result.hasErrors()) {
 			teacherDTO.setIsEnable(isEnable);
 			teacherService.save(teacherDTO);

@@ -70,11 +70,12 @@ public class DisciplineRecordsController {
 
 	@Secured("EDIT_DISCIPLINES")
 	@PostMapping("/disciplines/update/{id}")
-	public String update(@PathVariable Long id, @Valid @ModelAttribute Discipline discipline, BindingResult result,
+	public String update(@PathVariable Long id, @Valid @ModelAttribute DisciplineDTO disciplineDTO,
+	                     BindingResult result,
 	                     Model model, RedirectAttributes redirectAttributes) {
 
 		if (!result.hasErrors()) {
-			disciplineService.save(discipline);
+			disciplineService.save(disciplineDTO);
 			redirectAttributes.addFlashAttribute("success", true);
 			return "redirect:/disciplines/update/" + id;
 		}

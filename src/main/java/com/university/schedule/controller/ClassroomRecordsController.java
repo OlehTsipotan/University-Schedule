@@ -65,7 +65,7 @@ public class ClassroomRecordsController {
 		ClassroomDTO classroomDTOToDisplay = classroomService.findByIdAsDTO(id);
 		List<BuildingDTO> buildingDTOListToSelect = buildingService.findAllAsDTO();
 		model.addAttribute("entity", classroomDTOToDisplay);
-		model.addAttribute("buildingDTOs", buildingDTOListToSelect);
+		model.addAttribute("buildingDTOList", buildingDTOListToSelect);
 
 		return UPDATE_FORM_TEMPLATE;
 	}
@@ -85,7 +85,7 @@ public class ClassroomRecordsController {
 		ClassroomDTO classroomDTOToDisplay = classroomService.findByIdAsDTO(id);
 		List<BuildingDTO> buildingDTOListToSelect = buildingService.findAllAsDTO();
 		model.addAttribute("entity", classroomDTOToDisplay);
-		model.addAttribute("buildingDTOs", buildingDTOListToSelect);
+		model.addAttribute("buildingDTOList", buildingDTOListToSelect);
 
 		return UPDATE_FORM_TEMPLATE;
 	}

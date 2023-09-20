@@ -1,10 +1,10 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.dto.BuildingDTO;
 import com.university.schedule.dto.ClassroomDTO;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.model.Building;
-import com.university.schedule.model.Classroom;
 import com.university.schedule.service.BuildingService;
 import com.university.schedule.service.ClassroomService;
 import org.junit.jupiter.api.Test;
@@ -41,9 +41,10 @@ public class ClassroomRecordsControllerTest {
 	@WithMockUser(username = "username", authorities = {"VIEW_CLASSROOMS"})
 	public void getAll_processPage() throws Exception {
 		List<ClassroomDTO> classroomDTOs = new ArrayList<>();
-		String buildingName = "Building A";
-		classroomDTOs.add(ClassroomDTO.builder().id(1L).name("Classroom A").buildingName(buildingName).build());
-		classroomDTOs.add(ClassroomDTO.builder().id(2L).name("Classroom B").buildingName(buildingName).build());
+
+		BuildingDTO buildingDTO = new BuildingDTO(1L, "buildingName", "buildingAddress");
+		classroomDTOs.add(ClassroomDTO.builder().id(1L).name("Classroom A").buildingDTO(buildingDTO).build());
+		classroomDTOs.add(ClassroomDTO.builder().id(2L).name("Classroom B").buildingDTO(buildingDTO).build());
 
 		when(classroomService.findAllAsDTO((Pageable) any())).thenReturn(classroomDTOs);
 
@@ -65,14 +66,13 @@ public class ClassroomRecordsControllerTest {
 
 	@Test
 	@WithMockUser(username = "username", authorities = {"EDIT_CLASSROOMS"})
-	public void delete_whenBuildingServiceThrowsServiceException_thenRedirectToErrorPage() throws Exception {
+	public void delete_whenClassroomServiceThrowsDeletionFailedException_thenRedirectToErrorPage() throws Exception {
 		Long classroomId = 1L;
 
-		doThrow(new ServiceException("Delete error")).when(classroomService).deleteById(classroomId);
+		doThrow(new DeletionFailedException("Delete error")).when(classroomService).deleteById(classroomId);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/classrooms/delete/{id}", classroomId))
-				.andExpect(view().name("error")).andExpect(model().attributeExists("message"));
-
+				.andExpect(status().is3xxRedirection());
 
 		verify(classroomService, times(1)).deleteById(classroomId);
 	}
@@ -81,21 +81,22 @@ public class ClassroomRecordsControllerTest {
 	@WithMockUser(username = "username", authorities = {"EDIT_CLASSROOMS"})
 	public void getUpdateForm() throws Exception {
 		Long classroomId = 1L;
-		Building building = new Building("Building A", "Address A");
-		ClassroomDTO classroomDTO = ClassroomDTO.builder().id(classroomId).name("Classroom A").building(building).build();
+		BuildingDTO buildingDTO = new BuildingDTO(1L, "Building A", "Address A");
+		ClassroomDTO classroomDTO =
+				ClassroomDTO.builder().id(classroomId).name("Classroom A").buildingDTO(buildingDTO).build();
 
-		List<Building> buildingList = List.of(building);
+		List<BuildingDTO> buildingDTOList = List.of(buildingDTO);
 
 		when(classroomService.findByIdAsDTO(classroomId)).thenReturn(classroomDTO);
-		when(buildingService.findAll()).thenReturn(buildingList);
+		when(buildingService.findAllAsDTO()).thenReturn(buildingDTOList);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/classrooms/update/{id}", classroomId)).andExpect(status().isOk())
 				.andExpect(model().attributeExists("entity")).andExpect(view().name("classroomsUpdateForm"))
-				.andExpect(model().attribute("buildings", buildingList))
+				.andExpect(model().attribute("buildingDTOList", buildingDTOList))
 				.andExpect(model().attribute("entity", classroomDTO));
 
 		verify(classroomService, times(1)).findByIdAsDTO(classroomId);
-		verify(buildingService, times(1)).findAll();
+		verify(buildingService, times(1)).findAllAsDTO();
 	}
 
 	@Test
@@ -105,83 +106,81 @@ public class ClassroomRecordsControllerTest {
 		Long classroomId = 1L;
 		Long buildingId = 1L;
 
-		Building building = Building.builder().id(buildingId).name("Building A").address("Address A").build();
+		BuildingDTO buildingDTO = BuildingDTO.builder().id(buildingId).name("Building A").address("Address A").build();
 
-		List<Building> buildingList = List.of(building);
+		List<BuildingDTO> buildingDTOList = List.of(buildingDTO);
 
-		ClassroomDTO classroomDTO = ClassroomDTO.builder().name("").id(classroomId).building(building).build();
+		ClassroomDTO classroomDTO = ClassroomDTO.builder().name("").id(classroomId).buildingDTO(buildingDTO).build();
 
 		when(classroomService.findByIdAsDTO(classroomId)).thenReturn(classroomDTO);
-		when(buildingService.findAll()).thenReturn(buildingList);
+		when(buildingService.findAllAsDTO()).thenReturn(buildingDTOList);
 
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/classrooms/update/{id}", buildingId).with(csrf())
-						.flashAttr("classroom", classroomDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", classroomDTO))
-				.andExpect(model().attribute("buildings", buildingList)).andExpect(view().name("classroomsUpdateForm"));
+						.param("buildingDTO.id", String.valueOf(buildingId)).flashAttr("classroomDTO", classroomDTO))
+				.andExpect(status().isOk()).andExpect(model().attributeExists("entity"))
+				.andExpect(model().attribute("entity", classroomDTO))
+				.andExpect(model().attribute("buildingDTOList", buildingDTOList))
+				.andExpect(view().name("classroomsUpdateForm"));
 
 		verify(classroomService, times(1)).findByIdAsDTO(classroomId);
-		verify(buildingService, times(1)).findAll();
+		verify(buildingService, times(1)).findAllAsDTO();
 	}
 
 	@Test
 	@WithMockUser(username = "username", authorities = {"EDIT_CLASSROOMS"})
-	public void update_whenClassroomServiceThrowValidationException_thenProcessForm() throws Exception {
+	public void update_whenClassroomServiceThrowValidationException() throws Exception {
 
 		Long classroomId = 1L;
 		Long buildingId = 1L;
 
-		Building building = Building.builder().id(buildingId).name("Building A").address("Address A").build();
+		BuildingDTO buildingDTO = BuildingDTO.builder().id(buildingId).name("Building A").address("Address A").build();
 
-		List<Building> buildingList = List.of(building);
+		List<BuildingDTO> buildingList = List.of(buildingDTO);
 
 		ClassroomDTO classroomDTO =
-				ClassroomDTO.builder().id(classroomId).name("Classroom A").building(building).build();
+				ClassroomDTO.builder().id(classroomId).name("Classroom A").buildingDTO(buildingDTO).build();
 
 		when(classroomService.findByIdAsDTO(classroomId)).thenReturn(classroomDTO);
-		when(buildingService.findAll()).thenReturn(buildingList);
+		when(buildingService.findAllAsDTO()).thenReturn(buildingList);
 
 		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
 		when(classroomService.save((ClassroomDTO) any())).thenThrow(validationException);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/classrooms/update/{id}", classroomId).with(csrf())
-						.flashAttr("classroom", classroomDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("validationServiceErrors"))
-				.andExpect(model().attribute("validationServiceErrors", validationException.getViolations()))
-				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", classroomDTO))
-				.andExpect(model().attribute("buildings", buildingList)).andExpect(view().name("classroomsUpdateForm"));
+						.param("buildingDTO.id", String.valueOf(buildingId)).flashAttr("classroomDTO", classroomDTO))
+				.andExpect(status().is3xxRedirection());
 
 		verify(classroomService, times(1)).save(classroomDTO);
 	}
 
 	@Test
 	@WithMockUser(username = "username", authorities = {"EDIT_CLASSROOMS"})
-	public void update_whenClassroomServiceThrowServiceException_thenProcessForm() throws Exception {
+	public void update_whenClassroomServiceThrowServiceException() throws Exception {
 
 		Long classroomId = 1L;
 		Long buildingId = 1L;
 
-		Building building = Building.builder().id(buildingId).name("Building A").address("Address A").build();
+		BuildingDTO buildingDTO = BuildingDTO.builder().id(buildingId).name("Building A").address("Address A").build();
 
-		List<Building> buildingList = List.of(building);
+		List<BuildingDTO> buildingList = List.of(buildingDTO);
 
 		ClassroomDTO classroomDTO =
-				ClassroomDTO.builder().id(classroomId).name("Classroom A").building(building).build();
+				ClassroomDTO.builder().id(classroomId).name("Classroom A").buildingDTO(buildingDTO).build();
 
 		when(classroomService.findByIdAsDTO(classroomId)).thenReturn(classroomDTO);
-		when(buildingService.findAll()).thenReturn(buildingList);
+		when(buildingService.findAllAsDTO()).thenReturn(buildingList);
 
 		ServiceException serviceException = new ServiceException("testException");
 
 		when(classroomService.save((ClassroomDTO) any())).thenThrow(serviceException);
 
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/classrooms/update/{id}", buildingId).with(csrf())
-						.flashAttr("classroom", classroomDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("serviceError"))
-				.andExpect(model().attribute("serviceError", serviceException.getMessage()))
-				.andExpect(model().attribute("entity", classroomDTO))
-				.andExpect(model().attribute("buildings", buildingList)).andExpect(view().name("classroomsUpdateForm"));
+		mockMvc.perform(MockMvcRequestBuilders.post("/classrooms/update/{id}", classroomId).with(csrf())
+						.param("buildingDTO.id", String.valueOf(buildingId)).flashAttr("classroomDTO", classroomDTO))
+				.andExpect(status().is3xxRedirection());
+
+		verify(classroomService, times(1)).save(classroomDTO);
 	}
 }

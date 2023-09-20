@@ -1,6 +1,7 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.BuildingDTO;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.model.Building;
@@ -60,14 +61,13 @@ public class BuildingRecordsControllerTest {
 
 	@Test
 	@WithMockUser(username = "username", authorities = {"EDIT_BUILDINGS"})
-	public void delete_whenBuildingServiceThrowsServiceException_thenRedirectToErrorPage() throws Exception {
+	public void delete_whenBuildingServiceThrowsDeletionFailedException_thenThrowDeletionFailedException()
+			throws Exception {
 		Long buildingId = 1L;
 
-		doThrow(new ServiceException("Delete error")).when(buildingService).deleteById(buildingId);
+		doThrow(new DeletionFailedException("Delete error")).when(buildingService).deleteById(buildingId);
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/buildings/delete/{id}", buildingId))
-				.andExpect(view().name("error")).andExpect(model().attributeExists("message"));
-
+		mockMvc.perform(MockMvcRequestBuilders.get("/buildings/delete/{id}", buildingId)).andExpect(status().is3xxRedirection());
 
 		verify(buildingService, times(1)).deleteById(buildingId);
 	}
@@ -123,29 +123,24 @@ public class BuildingRecordsControllerTest {
 
 	@Test
 	@WithMockUser(username = "username", authorities = {"EDIT_BUILDINGS"})
-	public void update_whenBuildingServiceThrowValidationException_thenProcessForm() throws Exception {
-
+	public void update_whenBuildingServiceThrowValidationException() throws Exception {
 		Long buildingId = 1L;
 
 		BuildingDTO buildingDTO = BuildingDTO.builder().id(buildingId).name("Building A").address("Address A").build();
 
 		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
-		when(buildingService.findByIdAsDTO(buildingId)).thenReturn(buildingDTO);
 		when(buildingService.save(buildingDTO)).thenThrow(validationException);
 
-
 		mockMvc.perform(MockMvcRequestBuilders.post("/buildings/update/{id}", buildingId).with(csrf())
-						.flashAttr("buildingDTO", buildingDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("entity"))
-				.andExpect(model().attributeExists("validationServiceErrors"))
-				.andExpect(model().attribute("validationServiceErrors", validationException.getViolations()))
-				.andExpect(model().attribute("entity", buildingDTO)).andExpect(view().name("buildingsUpdateForm"));
+				.flashAttr("buildingDTO", buildingDTO)).andExpect(status().is3xxRedirection());
+
+		verify(buildingService, times(1)).save(buildingDTO);
 	}
 
 	@Test
 	@WithMockUser(username = "username", authorities = {"EDIT_BUILDINGS"})
-	public void update_whenBuildingServiceThrowServiceException_thenProcessForm() throws Exception {
+	public void update_whenBuildingServiceThrowServiceException() throws Exception {
 
 		Long buildingId = 1L;
 
@@ -153,15 +148,11 @@ public class BuildingRecordsControllerTest {
 
 		ServiceException serviceException = new ServiceException("testException");
 
-		when(buildingService.findByIdAsDTO(buildingId)).thenReturn(buildingDTO);
 		when(buildingService.save(buildingDTO)).thenThrow(serviceException);
 
-
 		mockMvc.perform(MockMvcRequestBuilders.post("/buildings/update/{id}", buildingId).with(csrf())
-						.flashAttr("buildingDTO", buildingDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("entity")).andExpect(model().attributeExists("serviceError"))
-				.andExpect(model().attribute("serviceError", serviceException.getMessage()))
-				.andExpect(model().attribute("entity", buildingDTO)).andExpect(view().name("buildingsUpdateForm"));
+				.flashAttr("buildingDTO", buildingDTO)).andExpect(status().is3xxRedirection());
+		verify(buildingService, times(1)).save(buildingDTO);
 	}
 
 

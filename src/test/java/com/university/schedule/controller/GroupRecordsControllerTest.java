@@ -1,10 +1,11 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.dto.CourseDTO;
+import com.university.schedule.dto.DisciplineDTO;
 import com.university.schedule.dto.GroupDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.model.Discipline;
-import com.university.schedule.model.Group;
+import com.university.schedule.service.CourseService;
 import com.university.schedule.service.DisciplineService;
 import com.university.schedule.service.GroupService;
 import org.junit.jupiter.api.Test;
@@ -34,6 +35,8 @@ public class GroupRecordsControllerTest {
 	private GroupService groupService;
 
 	@MockBean
+	private CourseService courseService;
+	@MockBean
 	private DisciplineService disciplineService;
 
 	@Test
@@ -41,13 +44,14 @@ public class GroupRecordsControllerTest {
 	public void getAll_processPage() throws Exception {
 		List<GroupDTO> groupDTOs = new ArrayList<>();
 
-		String disciplineName = "Discipline 1";
-		List<String> courseNameList = List.of("Course 1", "Course 2");
+		CourseDTO courseDTO = new CourseDTO(1L, "courseName");
+		List<CourseDTO> courseDTOList = List.of(courseDTO);
+		DisciplineDTO disciplineDTO = new DisciplineDTO(1L, "disciplineName");
 
-		groupDTOs.add(new GroupDTO(1L, "Group 1", disciplineName, courseNameList));
-		groupDTOs.add(new GroupDTO(2L, "Group 2", disciplineName, courseNameList));
+		groupDTOs.add(new GroupDTO(1L, "Group 1", disciplineDTO, courseDTOList));
+		groupDTOs.add(new GroupDTO(2L, "Group 2", disciplineDTO, courseDTOList));
 
-		when(groupDTOService.findAll(any(Pageable.class))).thenReturn(groupDTOs);
+		when(groupService.findAllAsDTO(any(Pageable.class))).thenReturn(groupDTOs);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/groups")).andExpect(status().isOk())
 				.andExpect(view().name("groups"))
@@ -69,24 +73,24 @@ public class GroupRecordsControllerTest {
 	@Test
 	@WithMockUser(username = "username", authorities = {"EDIT_GROUPS"})
 	public void getUpdateForm() throws Exception {
-		Long groupId = 1L;
+		Long groupDTOId = 1L;
+		CourseDTO courseDTO = new CourseDTO(1L, "courseName");
+		List<CourseDTO> courseDTOList = List.of(courseDTO);
+		DisciplineDTO disciplineDTO = new DisciplineDTO(1L, "disciplineName");
+		List<DisciplineDTO> disciplineDTOList = List.of(disciplineDTO);
 
-		Discipline discipline1 = new Discipline(1L, "Discipline 1");
-		Discipline discipline2 = new Discipline(2L, "Discipline 2");
+		GroupDTO groupDTO = new GroupDTO(groupDTOId, "Group 2", disciplineDTO, courseDTOList);
 
-		List<Discipline> disciplines = new ArrayList<>(List.of(discipline1, discipline2));
+		when(groupService.findByIdAsDTO(groupDTOId)).thenReturn(groupDTO);
+		when(disciplineService.findAllAsDTO()).thenReturn(disciplineDTOList);
 
-		Group group = new Group(groupId, "Group 1", discipline1);
+		mockMvc.perform(MockMvcRequestBuilders.get("/groups/update/{id}", groupDTOId)).andExpect(status().isOk())
+				.andExpect(model().attributeExists("entity", "disciplineDTOList"))
+				.andExpect(view().name("groupsUpdateForm")).andExpect(model().attribute("entity", groupDTO))
+				.andExpect(model().attribute("disciplineDTOList", disciplineDTOList));
 
-		when(groupService.findById(groupId)).thenReturn(group);
-		when(disciplineService.findAll()).thenReturn(disciplines);
-
-		mockMvc.perform(MockMvcRequestBuilders.get("/groups/update/{id}", groupId)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("entity", "disciplines")).andExpect(view().name("groupsUpdateForm"))
-				.andExpect(model().attribute("entity", group)).andExpect(model().attribute("disciplines", disciplines));
-
-		verify(groupService, times(1)).findById(groupId);
-		verify(disciplineService, times(1)).findAll();
+		verify(groupService, times(1)).findByIdAsDTO(groupDTOId);
+		verify(disciplineService, times(1)).findAllAsDTO();
 	}
 
 	@Test
@@ -94,20 +98,25 @@ public class GroupRecordsControllerTest {
 	public void update_whenNotValidGroup_emptyField_thenProcessForm() throws Exception {
 		Long groupId = 1L;
 
-		Discipline discipline1 = new Discipline(1L, "Discipline 1");
-		Discipline discipline2 = new Discipline(2L, "Discipline 2");
+		DisciplineDTO disciplineDTO1 = new DisciplineDTO(1L, "Discipline 1");
+		DisciplineDTO disciplineDTO2 = new DisciplineDTO(2L, "Discipline 2");
 
-		List<Discipline> disciplines = new ArrayList<>(List.of(discipline1, discipline2));
+		List<DisciplineDTO> disciplineDTOList = List.of(disciplineDTO1, disciplineDTO2);
 
-		Group group = new Group(groupId, "", discipline1); // Empty name
+		CourseDTO courseDTO = new CourseDTO(1L, "courseName");
+		List<CourseDTO> courseDTOList = List.of(courseDTO);
 
-		when(groupService.findById(groupId)).thenReturn(group);
-		when(disciplineService.findAll()).thenReturn(disciplines);
+		GroupDTO groupDTO = new GroupDTO(groupId, "", disciplineDTO1, courseDTOList); // Empty name
 
-		mockMvc.perform(
-						MockMvcRequestBuilders.post("/groups/update/{id}", groupId).with(csrf()).flashAttr("group", group))
-				.andExpect(status().isOk()).andExpect(model().attributeExists("entity"))
-				.andExpect(model().attribute("entity", group)).andExpect(view().name("groupsUpdateForm"));
+		when(groupService.findByIdAsDTO(groupId)).thenReturn(groupDTO);
+		when(disciplineService.findAllAsDTO()).thenReturn(disciplineDTOList);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/groups/update/{id}", groupId).with(csrf())
+						.flashAttr("groupDTO", groupDTO)).andExpect(status().isOk())
+				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", groupDTO))
+				.andExpect(view().name("groupsUpdateForm"));
+
+		verify(groupService, times(0)).save(groupDTO);
 
 	}
 
@@ -115,27 +124,27 @@ public class GroupRecordsControllerTest {
 	@WithMockUser(username = "username", authorities = {"EDIT_GROUPS"})
 	public void update_whenGroupServiceThrowValidationException_thenProcessForm() throws Exception {
 		Long groupId = 1L;
-		Discipline discipline1 = new Discipline(1L, "Discipline 1");
-		Discipline discipline2 = new Discipline(2L, "Discipline 2");
 
-		List<Discipline> disciplines = new ArrayList<>(List.of(discipline1, discipline2));
+		DisciplineDTO disciplineDTO1 = new DisciplineDTO(1L, "Discipline 1");
+		DisciplineDTO disciplineDTO2 = new DisciplineDTO(2L, "Discipline 2");
 
-		Group group = new Group(groupId, "Group 1", discipline1);
+		List<DisciplineDTO> disciplineDTOList = List.of(disciplineDTO1, disciplineDTO2);
+
+		CourseDTO courseDTO = new CourseDTO(1L, "courseName");
+		List<CourseDTO> courseDTOList = List.of(courseDTO);
+
+		GroupDTO groupDTO = new GroupDTO(groupId, "GroupDTOName", disciplineDTO1, courseDTOList);
 
 		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
-		when(groupService.save(any())).thenThrow(validationException);
-		when(groupService.findById(groupId)).thenReturn(group);
-		when(disciplineService.findAll()).thenReturn(disciplines);
+		when(groupService.save((GroupDTO) any())).thenThrow(validationException);
+		when(groupService.findByIdAsDTO(groupId)).thenReturn(groupDTO);
+		when(disciplineService.findAllAsDTO()).thenReturn(disciplineDTOList);
 
-		mockMvc.perform(
-						MockMvcRequestBuilders.post("/groups/update/{id}", groupId).with(csrf()).flashAttr("group", group))
-				.andExpect(status().isOk()).andExpect(model().attributeExists("validationServiceErrors"))
-				.andExpect(model().attribute("validationServiceErrors", validationException.getViolations()))
-				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", group))
-				.andExpect(view().name("groupsUpdateForm"));
+		mockMvc.perform(MockMvcRequestBuilders.post("/groups/update/{id}", groupId).with(csrf())
+				.flashAttr("groupDTO", groupDTO)).andExpect(status().is3xxRedirection());
 
-		verify(groupService, times(1)).save(group);
+		verify(groupService, times(1)).save(groupDTO);
 	}
 
 	@Test
@@ -143,23 +152,24 @@ public class GroupRecordsControllerTest {
 	public void update_whenGroupServiceThrowServiceException_thenProcessForm() throws Exception {
 		Long groupId = 1L;
 
-		Discipline discipline1 = new Discipline(1L, "Discipline 1");
-		Discipline discipline2 = new Discipline(2L, "Discipline 2");
+		DisciplineDTO disciplineDTO1 = new DisciplineDTO(1L, "Discipline 1");
+		DisciplineDTO disciplineDTO2 = new DisciplineDTO(2L, "Discipline 2");
 
-		List<Discipline> disciplines = new ArrayList<>(List.of(discipline1, discipline2));
+		List<DisciplineDTO> disciplineDTOList = List.of(disciplineDTO1, disciplineDTO2);
 
-		Group group = new Group(groupId, "Group 1", discipline1);
+		CourseDTO courseDTO = new CourseDTO(1L, "courseName");
+		List<CourseDTO> courseDTOList = List.of(courseDTO);
+
+		GroupDTO groupDTO = new GroupDTO(groupId, "GroupDTOName", disciplineDTO1, courseDTOList);
 
 		ServiceException serviceException = new ServiceException("testException");
 
-		when(groupService.save(any())).thenThrow(serviceException);
-		when(groupService.findById(groupId)).thenReturn(group);
-		when(disciplineService.findAll()).thenReturn(disciplines);
+		when(groupService.save((GroupDTO) any())).thenThrow(serviceException);
+		when(groupService.findByIdAsDTO(groupId)).thenReturn(groupDTO);
+		when(disciplineService.findAllAsDTO()).thenReturn(disciplineDTOList);
 
-		mockMvc.perform(
-						MockMvcRequestBuilders.post("/groups/update/{id}", groupId).with(csrf()).flashAttr("group", group))
-				.andExpect(status().isOk()).andExpect(model().attributeExists("serviceError"))
-				.andExpect(model().attribute("serviceError", serviceException.getMessage()))
-				.andExpect(model().attribute("entity", group)).andExpect(view().name("groupsUpdateForm"));
+		mockMvc.perform(MockMvcRequestBuilders.post("/groups/update/{id}", groupId).with(csrf())
+				.flashAttr("groupDTO", groupDTO)).andExpect(status().is3xxRedirection());
+		verify(groupService, times(1)).save(groupDTO);
 	}
 }

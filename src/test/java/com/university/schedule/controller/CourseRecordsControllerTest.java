@@ -69,7 +69,7 @@ public class CourseRecordsControllerTest {
 				.andExpect(model().attributeExists("entity")).andExpect(view().name("coursesUpdateForm"))
 				.andExpect(model().attribute("entity", courseDTO));
 
-		verify(courseService, times(1)).findById(courseId);
+		verify(courseService, times(1)).findByIdAsDTO(courseId);
 	}
 
 	@Test
@@ -82,8 +82,9 @@ public class CourseRecordsControllerTest {
 		when(courseService.findByIdAsDTO(courseId)).thenReturn(courseDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/courses/update/{id}", courseId).with(csrf())
-						.flashAttr("course", courseDTO)).andExpect(status().isOk()).andExpect(model().attributeExists("entity"))
-				.andExpect(model().attribute("entity", courseDTO)).andExpect(view().name("coursesUpdateForm"));
+						.flashAttr("courseDTO", courseDTO)).andExpect(status().isOk())
+				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", courseDTO))
+				.andExpect(view().name("coursesUpdateForm"));
 
 	}
 
@@ -100,11 +101,7 @@ public class CourseRecordsControllerTest {
 		when(courseService.findByIdAsDTO(courseId)).thenReturn(courseDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/courses/update/{id}", courseId).with(csrf())
-						.flashAttr("course", courseDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("validationServiceErrors"))
-				.andExpect(model().attribute("validationServiceErrors", validationException.getViolations()))
-				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", courseDTO))
-				.andExpect(view().name("coursesUpdateForm"));
+				.flashAttr("courseDTO", courseDTO)).andExpect(status().is3xxRedirection());
 
 		verify(courseService, times(1)).save(courseDTO);
 	}
@@ -122,9 +119,8 @@ public class CourseRecordsControllerTest {
 		when(courseService.findByIdAsDTO(courseId)).thenReturn(courseDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/courses/update/{id}", courseId).with(csrf())
-						.flashAttr("course", courseDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("serviceError"))
-				.andExpect(model().attribute("serviceError", serviceException.getMessage()))
-				.andExpect(model().attribute("entity", courseDTO)).andExpect(view().name("coursesUpdateForm"));
+				.flashAttr("courseDTO", courseDTO)).andExpect(status().is3xxRedirection());
+
+		verify(courseService, times(1)).save(courseDTO);
 	}
 }

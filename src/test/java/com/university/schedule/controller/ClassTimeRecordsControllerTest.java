@@ -2,6 +2,7 @@ package com.university.schedule.controller;
 
 
 import com.university.schedule.dto.ClassTimeDTO;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.service.ClassTimeService;
@@ -59,6 +60,19 @@ public class ClassTimeRecordsControllerTest {
 	}
 
 	@Test
+	@WithMockUser(username = "username", authorities = {"EDIT_CLASSROOMS"})
+	public void delete_whenClassTimeServiceThrowsDeletionFailedException_thenRedirectToErrorPage() throws Exception {
+		Long classroomId = 1L;
+
+		doThrow(new DeletionFailedException("Delete error")).when(classTimeService).deleteById(classroomId);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/classtimes/delete/{id}", classroomId))
+				.andExpect(status().is3xxRedirection());
+
+		verify(classTimeService, times(1)).deleteById(classroomId);
+	}
+
+	@Test
 	@WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
 	public void getUpdateForm() throws Exception {
 		Long classTimeId = 1L;
@@ -83,7 +97,7 @@ public class ClassTimeRecordsControllerTest {
 		when(classTimeService.findByIdAsDTO(classTimeId)).thenReturn(classTimeDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/classtimes/update/{id}", classTimeId).with(csrf())
-						.flashAttr("classTimeUpdateDTO", classTimeDTO)).andExpect(status().isOk())
+						.flashAttr("classTimeDTO", classTimeDTO)).andExpect(status().isOk())
 				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", classTimeDTO))
 				.andExpect(view().name("classtimesUpdateForm"));
 
@@ -92,7 +106,7 @@ public class ClassTimeRecordsControllerTest {
 
 	@Test
 	@WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
-	public void update_whenClassTimeServiceThrowValidationException_thenProcessForm() throws Exception {
+	public void update_whenClassTimeServiceThrowValidationException() throws Exception {
 		Long classTimeId = 1L;
 
 		ClassTimeDTO classTimeDTO = new ClassTimeDTO(classTimeId, 1, LocalTime.of(9, 0), 95);
@@ -103,18 +117,14 @@ public class ClassTimeRecordsControllerTest {
 		when(classTimeService.findByIdAsDTO(classTimeId)).thenReturn(classTimeDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/classtimes/update/{id}", classTimeId).with(csrf())
-						.flashAttr("classTimeUpdateDTO", classTimeDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("validationServiceErrors"))
-				.andExpect(model().attribute("validationServiceErrors", validationException.getViolations()))
-				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", classTimeDTO))
-				.andExpect(view().name("classtimesUpdateForm"));
+				.flashAttr("classTimeDTO", classTimeDTO)).andExpect(status().is3xxRedirection());
 
 		verify(classTimeService, times(1)).save(classTimeDTO);
 	}
 
 	@Test
 	@WithMockUser(username = "username", authorities = {"EDIT_CLASSTIMES"})
-	public void update_whenClassTimeServiceThrowServiceException_thenProcessForm() throws Exception {
+	public void update_whenClassTimeServiceThrowServiceException() throws Exception {
 		Long classTimeId = 1L;
 
 		ClassTimeDTO classTimeDTO = new ClassTimeDTO(classTimeId, 1, LocalTime.of(9, 0), 95);
@@ -125,11 +135,9 @@ public class ClassTimeRecordsControllerTest {
 		when(classTimeService.findByIdAsDTO(classTimeId)).thenReturn(classTimeDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/classtimes/update/{id}", classTimeId).with(csrf())
-						.flashAttr("classTimeUpdateDTO", classTimeDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("serviceError"))
-				.andExpect(model().attribute("serviceError", serviceException.getMessage()))
-				.andExpect(model().attribute("entity", classTimeDTO))
-				.andExpect(view().name("classtimesUpdateForm"));
+				.flashAttr("classTimeDTO", classTimeDTO)).andExpect(status().is3xxRedirection());
+
+		verify(classTimeService, times(1)).save(classTimeDTO);
 	}
 }
 

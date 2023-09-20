@@ -1,11 +1,13 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.dto.CourseDTO;
+import com.university.schedule.dto.RoleDTO;
 import com.university.schedule.dto.TeacherDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.model.Course;
-import com.university.schedule.model.Role;
-import com.university.schedule.service.*;
+import com.university.schedule.service.CourseService;
+import com.university.schedule.service.RoleService;
+import com.university.schedule.service.TeacherService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -32,14 +34,6 @@ public class TeacherRecordsControllerTest {
 	private TeacherService teacherService;
 
 	@MockBean
-	private TeacherUpdateDTOService teacherUpdateDTOService;
-
-	@MockBean
-	private
-
-	TeacherDTOService teacherDTOService;
-
-	@MockBean
 	private RoleService roleService;
 
 	@MockBean
@@ -48,21 +42,20 @@ public class TeacherRecordsControllerTest {
 	@Test
 	@WithMockUser(username = "username", authorities = {"VIEW_TEACHERS"})
 	public void getAll_processPage() throws Exception {
-		// Create a list of TeacherDTOs for testing
-		List<TeacherDTO> teacherDTOs = new ArrayList<>();
-		teacherDTOs.add(
-				new TeacherDTO(1L, "email 1", "password 1", "firstName 1", "lastName 1", List.of("course 1"), true));
-		teacherDTOs.add(
-				new TeacherDTO(2L, "email 2", "password 2", "firstName 2", "lastName 2", List.of("course 2"), true));
+		CourseDTO courseDTO = new CourseDTO(1L, "courseDTOName");
+		List<CourseDTO> courseDTOS = List.of(courseDTO);
+		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
+		List<TeacherDTO> teacherDTOS = new ArrayList<>();
+		teacherDTOS.add(new TeacherDTO(1L, "email 1", "firstName 1", "lastName 1", roleDTO, true, courseDTOS));
 
 		// Mock the behavior of teacherDTOService
-		when(teacherDTOService.findAll(any(Pageable.class))).thenReturn(teacherDTOs);
+		when(teacherService.findAllAsDTO(any(Pageable.class))).thenReturn(teacherDTOS);
 
 		// Perform a GET request to /teachers and verify the result
 		mockMvc.perform(MockMvcRequestBuilders.get("/teachers")).andExpect(status().isOk())
 				.andExpect(view().name("teachers")).andExpect(
-						model().attributeExists("teachers", "currentLimit", "currentOffset", "sortField", "sortDirection",
-								"reverseSortDirection")).andExpect(model().attribute("teachers", teacherDTOs));
+						model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
+								"reverseSortDirection")).andExpect(model().attribute("entities", teacherDTOS));
 	}
 
 	@Test
@@ -81,30 +74,26 @@ public class TeacherRecordsControllerTest {
 	public void getUpdateForm() throws Exception {
 		Long teacherId = 1L;
 
-		Course course = new Course(1L, "Group A");
-		List<Course> courseList = new ArrayList<>();
-		courseList.add(course);
+		CourseDTO courseDTO = new CourseDTO(1L, "courseDTOName");
+		List<CourseDTO> courseDTOS = List.of(courseDTO);
+		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
+		List<RoleDTO> roleDTOS = List.of(roleDTO);
+		TeacherDTO teacherDTO =
+				new TeacherDTO(teacherId, "email 1", "firstName 1", "lastName 1", roleDTO, true, courseDTOS);
 
-
-		Role role = new Role(1L, "Role A");
-		List<Role> roles = new ArrayList<>();
-		roles.add(role);
-
-		TeacherUpdateDTO teacherUpdateDTO =
-				new TeacherUpdateDTO(1L, "email 1", "firstName 1", "lastName 1", courseList, role, true);
-
-		when(teacherUpdateDTOService.findById(teacherId)).thenReturn(teacherUpdateDTO);
-		when(courseService.findAll()).thenReturn(courseList);
-		when(roleService.findAll()).thenReturn(roles);
+		when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
+		when(courseService.findAllAsDTO()).thenReturn(courseDTOS);
+		when(roleService.findAllAsDTO()).thenReturn(roleDTOS);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/teachers/update/{id}", teacherId)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("entity", "courses", "roles"))
-				.andExpect(view().name("teachersUpdateForm")).andExpect(model().attribute("entity", teacherUpdateDTO))
-				.andExpect(model().attribute("courses", courseList)).andExpect(model().attribute("roles", roles));
+				.andExpect(model().attributeExists("entity", "courseDTOList", "roleDTOList"))
+				.andExpect(view().name("teachersUpdateForm")).andExpect(model().attribute("entity", teacherDTO))
+				.andExpect(model().attribute("courseDTOList", courseDTOS))
+				.andExpect(model().attribute("roleDTOList", roleDTOS));
 
-		verify(teacherUpdateDTOService, times(1)).findById(teacherId);
-		verify(courseService, times(1)).findAll();
-		verify(roleService, times(1)).findAll();
+		verify(teacherService, times(1)).findByIdAsDTO(teacherId);
+		verify(courseService, times(1)).findAllAsDTO();
+		verify(roleService, times(1)).findAllAsDTO();
 	}
 
 	@Test
@@ -112,24 +101,18 @@ public class TeacherRecordsControllerTest {
 	public void update_whenNotValidTeacherUpdateDTO_emptyField_thenProcessForm() throws Exception {
 		Long teacherId = 1L;
 
-		Course course = new Course(1L, "Group A");
-		List<Course> courseList = new ArrayList<>();
-		courseList.add(course);
+		CourseDTO courseDTO = new CourseDTO(1L, "courseDTOName");
+		List<CourseDTO> courseDTOS = List.of(courseDTO);
+		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
+		List<RoleDTO> roleDTOS = List.of(roleDTO);
+		TeacherDTO teacherDTO = new TeacherDTO(teacherId, "email 1", "firstName 1", "", roleDTO, true, courseDTOS);
 
-
-		Role role = new Role(1L, "Role A");
-		List<Role> roles = new ArrayList<>();
-		roles.add(role);
-
-		TeacherUpdateDTO teacherUpdateDTO =
-				new TeacherUpdateDTO(1L, "", "firstName 1", "lastName 1", courseList, role, true);
-
-		when(teacherUpdateDTOService.findById(teacherId)).thenReturn(teacherUpdateDTO);
+		when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/teachers/update/{id}", teacherId)
 						.param("isEnable", "false") // Add any other request parameters as needed
-						.with(csrf()).flashAttr("teacherUpdateDTO", teacherUpdateDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", teacherUpdateDTO))
+						.with(csrf()).flashAttr("teacherDTO", teacherDTO)).andExpect(status().isOk())
+				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", teacherDTO))
 				.andExpect(view().name("teachersUpdateForm"));
 	}
 
@@ -138,32 +121,25 @@ public class TeacherRecordsControllerTest {
 	public void update_whenTeacherUpdateDTOServiceThrowValidationException_thenProcessForm() throws Exception {
 		Long teacherId = 1L;
 
-		Course course = new Course(1L, "Group A");
-		List<Course> courseList = new ArrayList<>();
-		courseList.add(course);
-
-
-		Role role = new Role(1L, "Role A");
-		List<Role> roles = new ArrayList<>();
-		roles.add(role);
-
-		TeacherUpdateDTO teacherUpdateDTO =
-				new TeacherUpdateDTO(1L, "email 1", "firstName 1", "lastName 1", courseList, role, true);
+		CourseDTO courseDTO = new CourseDTO(1L, "courseDTOName");
+		List<CourseDTO> courseDTOS = List.of(courseDTO);
+		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
+		List<RoleDTO> roleDTOS = List.of(roleDTO);
+		TeacherDTO teacherDTO =
+				new TeacherDTO(teacherId, "email 1", "firstName 1", "lastName 1", roleDTO, true, courseDTOS);
 
 		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
-		when(teacherUpdateDTOService.save(any())).thenThrow(validationException);
-		when(teacherUpdateDTOService.findById(teacherId)).thenReturn(teacherUpdateDTO);
+		when(teacherService.save((TeacherDTO) any())).thenThrow(validationException);
+		when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
+		when(courseService.findByIdAsDTO(courseDTO.getId())).thenReturn(courseDTO);
+		when(roleService.findByIdAsDTO(roleDTO.getId())).thenReturn(roleDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/teachers/update/{id}", teacherId)
-						.param("isEnable", "false") // Add any other request parameters as needed
-						.with(csrf()).flashAttr("teacherUpdateDTO", teacherUpdateDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("validationServiceErrors"))
-				.andExpect(model().attribute("validationServiceErrors", validationException.getViolations()))
-				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", teacherUpdateDTO))
-				.andExpect(view().name("teachersUpdateForm"));
+				.param("isEnable", "false") // Add any other request parameters as needed
+				.with(csrf()).flashAttr("teacherDTO", teacherDTO)).andExpect(status().is3xxRedirection());
 
-		verify(teacherUpdateDTOService, times(1)).save(teacherUpdateDTO);
+		verify(teacherService, times(1)).save(teacherDTO);
 	}
 
 	@Test
@@ -171,28 +147,24 @@ public class TeacherRecordsControllerTest {
 	public void update_whenTeacherUpdateDTOServiceThrowServiceException_thenProcessForm() throws Exception {
 		Long teacherId = 1L;
 
-		Course course = new Course(1L, "Group A");
-		List<Course> courseList = new ArrayList<>();
-		courseList.add(course);
-
-
-		Role role = new Role(1L, "Role A");
-		List<Role> roles = new ArrayList<>();
-		roles.add(role);
-
-		TeacherUpdateDTO teacherUpdateDTO =
-				new TeacherUpdateDTO(1L, "email 1", "firstName 1", "lastName 1", courseList, role, true);
+		CourseDTO courseDTO = new CourseDTO(1L, "courseDTOName");
+		List<CourseDTO> courseDTOS = List.of(courseDTO);
+		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
+		List<RoleDTO> roleDTOS = List.of(roleDTO);
+		TeacherDTO teacherDTO =
+				new TeacherDTO(teacherId, "email 1", "firstName 1", "lastName 1", roleDTO, true, courseDTOS);
 
 		ServiceException serviceException = new ServiceException("testException");
 
-		when(teacherUpdateDTOService.save(any())).thenThrow(serviceException);
-		when(teacherUpdateDTOService.findById(teacherId)).thenReturn(teacherUpdateDTO);
+		when(teacherService.save((TeacherDTO) any())).thenThrow(serviceException);
+		when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
+		when(courseService.findByIdAsDTO(courseDTO.getId())).thenReturn(courseDTO);
+		when(roleService.findByIdAsDTO(roleDTO.getId())).thenReturn(roleDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/teachers/update/{id}", teacherId)
-						.param("isEnable", "false") // Add any other request parameters as needed
-						.with(csrf()).flashAttr("teacherUpdateDTO", teacherUpdateDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("serviceError"))
-				.andExpect(model().attribute("serviceError", serviceException.getMessage()))
-				.andExpect(model().attribute("entity", teacherUpdateDTO)).andExpect(view().name("teachersUpdateForm"));
+				.param("isEnable", "false") // Add any other request parameters as needed
+				.with(csrf()).flashAttr("teacherDTO", teacherDTO)).andExpect(status().is3xxRedirection());
+
+		verify(teacherService, times(1)).save(teacherDTO);
 	}
 }

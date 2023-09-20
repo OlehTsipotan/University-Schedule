@@ -1,14 +1,13 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.dto.DisciplineDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.model.Discipline;
 import com.university.schedule.service.DisciplineService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -34,11 +33,11 @@ public class DisciplineRecordsControllerTest {
 	@Test
 	@WithMockUser(username = "username", authorities = {"VIEW_DISCIPLINES"})
 	public void getAll_processPage() throws Exception {
-		List<Discipline> disciplines = new ArrayList<>();
-		disciplines.add(new Discipline(1L, "Discipline 1"));
-		disciplines.add(new Discipline(2L, "Discipline 2"));
+		List<DisciplineDTO> disciplines = new ArrayList<>();
+		disciplines.add(new DisciplineDTO(1L, "Discipline 1"));
+		disciplines.add(new DisciplineDTO(2L, "Discipline 2"));
 
-		when(disciplineService.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(disciplines));
+		when(disciplineService.findAllAsDTO(any(Pageable.class))).thenReturn(disciplines);
 
 		mockMvc.perform(MockMvcRequestBuilders.get(("/disciplines"))).andExpect(status().isOk())
 				.andExpect(view().name("disciplines"))
@@ -61,15 +60,15 @@ public class DisciplineRecordsControllerTest {
 	@WithMockUser(username = "username", authorities = {"EDIT_DISCIPLINES"})
 	public void getUpdateForm() throws Exception {
 		Long disciplineId = 1L;
-		Discipline discipline = new Discipline(disciplineId, "Discipline 1");
+		DisciplineDTO disciplineDTO = new DisciplineDTO(disciplineId, "Discipline 1");
 
-		when(disciplineService.findById(disciplineId)).thenReturn(discipline);
+		when(disciplineService.findByIdAsDTO(disciplineId)).thenReturn(disciplineDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/disciplines/update/{id}", disciplineId)).andExpect(status().isOk())
 				.andExpect(model().attributeExists("entity")).andExpect(view().name("disciplinesUpdateForm"))
-				.andExpect(model().attribute("entity", discipline));
+				.andExpect(model().attribute("entity", disciplineDTO));
 
-		verify(disciplineService, times(1)).findById(disciplineId);
+		verify(disciplineService, times(1)).findByIdAsDTO(disciplineId);
 	}
 
 	@Test
@@ -77,13 +76,13 @@ public class DisciplineRecordsControllerTest {
 	public void update_whenNotValidDiscipline_emptyField_thenProcessForm() throws Exception {
 		Long disciplineId = 1L;
 
-		Discipline discipline = new Discipline(disciplineId, ""); // Empty name
+		DisciplineDTO disciplineDTO = new DisciplineDTO(disciplineId, ""); // Empty name
 
-		when(disciplineService.findById(disciplineId)).thenReturn(discipline);
+		when(disciplineService.findByIdAsDTO(disciplineId)).thenReturn(disciplineDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/disciplines/update/{id}", disciplineId).with(csrf())
-						.flashAttr("discipline", discipline)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", discipline))
+						.flashAttr("disciplineDTO", disciplineDTO)).andExpect(status().is3xxRedirection())
+				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", disciplineDTO))
 				.andExpect(view().name("disciplinesUpdateForm"));
 
 	}
@@ -93,21 +92,16 @@ public class DisciplineRecordsControllerTest {
 	public void update_whenDisciplineServiceThrowValidationException_thenProcessForm() throws Exception {
 		Long disciplineId = 1L;
 
-		Discipline discipline = new Discipline(disciplineId, "Discipline 1");
+		DisciplineDTO disciplineDTO = new DisciplineDTO(disciplineId, "Discipline 1");
 
 		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
-		when(disciplineService.save(any())).thenThrow(validationException);
-		when(disciplineService.findById(disciplineId)).thenReturn(discipline);
+		when(disciplineService.save((DisciplineDTO) any())).thenThrow(validationException);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/disciplines/update/{id}", disciplineId).with(csrf())
-						.flashAttr("discipline", discipline)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("validationServiceErrors"))
-				.andExpect(model().attribute("validationServiceErrors", validationException.getViolations()))
-				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", discipline))
-				.andExpect(view().name("disciplinesUpdateForm"));
+				.flashAttr("disciplineDTO", disciplineDTO)).andExpect(status().is3xxRedirection());
 
-		verify(disciplineService, times(1)).save(discipline);
+		verify(disciplineService, times(1)).save(disciplineDTO);
 	}
 
 	@Test
@@ -115,18 +109,16 @@ public class DisciplineRecordsControllerTest {
 	public void update_whenDisciplineServiceThrowServiceException_thenProcessForm() throws Exception {
 		Long disciplineId = 1L;
 
-		Discipline discipline = new Discipline(disciplineId, "Discipline 1");
+		DisciplineDTO disciplineDTO = new DisciplineDTO(disciplineId, "Discipline 1");
 
 		ServiceException serviceException = new ServiceException("testException");
 
-		when(disciplineService.save(any())).thenThrow(serviceException);
-		when(disciplineService.findById(disciplineId)).thenReturn(discipline);
+		when(disciplineService.save((DisciplineDTO) any())).thenThrow(serviceException);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/disciplines/update/{id}", disciplineId).with(csrf())
-						.flashAttr("discipline", discipline)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("serviceError"))
-				.andExpect(model().attribute("serviceError", serviceException.getMessage()))
-				.andExpect(model().attribute("entity", discipline)).andExpect(view().name("disciplinesUpdateForm"));
+				.flashAttr("disciplineDTO", disciplineDTO)).andExpect(status().is3xxRedirection());
+
+		verify(disciplineService, times(1)).save(disciplineDTO);
 	}
 }
 

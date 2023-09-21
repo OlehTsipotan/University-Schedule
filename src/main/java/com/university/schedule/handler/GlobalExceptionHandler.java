@@ -20,9 +20,9 @@ public class GlobalExceptionHandler {
 
 
 	@ExceptionHandler(RuntimeException.class)
-	public String handleException(RuntimeException runtimeException, Model model) {
-		model.addAttribute("exceptionMessage", runtimeException.getMessage());
-		return "redirect:error";
+	public String handleException(RuntimeException runtimeException, Model model, RedirectAttributes redirectAttributes) {
+		redirectAttributes.addFlashAttribute("exceptionMessage", runtimeException.getMessage());
+		return "redirect:/error";
 	}
 
 	@ExceptionHandler(ValidationException.class)

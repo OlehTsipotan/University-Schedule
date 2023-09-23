@@ -78,6 +78,15 @@
                 entityName = 'Classes',
                 text='Main schedule items',
                 iconClassName='fa-solid fa-calendar-days')}"></div>
+            <div sec:authorize="hasAuthority('VIEW_ROLES')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
+                entityName = 'Roles',
+                text='User roles inside whole system',
+                iconClassName='fa-solid fa-masks-theater')}"></div>
+            <div sec:authorize="hasAuthority('VIEW_AUTHORITIES')"
+                 th:replace="~{fragments/entityCardColumn.html :: formColumn(
+                entityName = 'Authorities',
+                text='Role accesses',
+                iconClassName='fa-solid fa-lock-open')}"></div>
         </div>
     </div>
 </section>

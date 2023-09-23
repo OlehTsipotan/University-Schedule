@@ -1,5 +1,6 @@
 package com.university.schedule.config;
 
+import com.university.schedule.formatter.StringToAuthorityDTOFormatter;
 import com.university.schedule.formatter.StringToCourseDTOFormatter;
 import com.university.schedule.formatter.StringToGroupDTOFormatter;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	public void addFormatters(FormatterRegistry registry) {
 		registry.addFormatter(new StringToCourseDTOFormatter());
 		registry.addFormatter(new StringToGroupDTOFormatter());
+		registry.addFormatter(new StringToAuthorityDTOFormatter());
 	}
 
 	@Override

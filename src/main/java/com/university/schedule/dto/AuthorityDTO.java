@@ -4,8 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @ToString
@@ -13,14 +11,13 @@ import java.util.List;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class RoleDTO {
+public class AuthorityDTO {
 
 	private Long id;
 
-	@NonNull
-	@NotBlank(message = "RoleDTO name must not be blank")
+	@NotBlank(message = "Authority name must not be blank")
 	@Size(max = 255)
 	private String name;
 
-	private List<AuthorityDTO> authorityDTOS;
+
 }

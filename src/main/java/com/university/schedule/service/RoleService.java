@@ -13,11 +13,13 @@ public interface RoleService {
 
 	List<RoleDTO> findAllAsDTO();
 
-	Page<Role> findAll(Pageable pageable);
+	List<RoleDTO> findAllAsDTO(Pageable pageable);
 
 	Role findByName(String name);
 
 	Long save(Role role);
+
+	Long save(RoleDTO roleDTO);
 
 	Role findById(Long id);
 

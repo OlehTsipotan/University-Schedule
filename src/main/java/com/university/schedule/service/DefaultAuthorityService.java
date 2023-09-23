@@ -1,5 +1,8 @@
 package com.university.schedule.service;
 
+import com.university.schedule.converter.ConverterService;
+import com.university.schedule.dto.AuthorityDTO;
+import com.university.schedule.dto.RoleDTO;
 import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Authority;
@@ -24,6 +27,8 @@ public class DefaultAuthorityService implements AuthorityService {
 
 	private final AuthorityRepository authorityRepository;
 
+	private final ConverterService converterService;
+
 	private final AuthorityEntityValidator authorityEntityValidator;
 
 	@Override
@@ -38,11 +43,31 @@ public class DefaultAuthorityService implements AuthorityService {
 	}
 
 	@Override
+	@Transactional
+	public Long save(AuthorityDTO authorityDTO) {
+		Authority authority = convertToEntity(authorityDTO);
+		execute(() -> {
+			authorityEntityValidator.validate(authority);
+			authorityRepository.save(authority);
+		});
+		log.info("saved {}", authority);
+		return authority.getId();
+	}
+
+	@Override
 	public Authority findById(Long id) {
 		Authority authority = execute(() -> authorityRepository.findById(id)).orElseThrow(
 				() -> new ServiceException("Authority not found"));
 		log.debug("Retrieved {}", authority);
 		return authority;
+	}
+
+	@Override
+	public AuthorityDTO findByIdAsDTO(Long id) {
+		Authority authority = execute(() -> authorityRepository.findById(id)).orElseThrow(
+				() -> new ServiceException("Authority not found"));
+		log.debug("Retrieved {}", authority);
+		return convertToDTO(authority);
 	}
 
 	@Override
@@ -68,10 +93,19 @@ public class DefaultAuthorityService implements AuthorityService {
 	}
 
 	@Override
-	public Page<Authority> findAll(Pageable pageable) {
-		Page<Authority> authorities = execute(() -> authorityRepository.findAll(pageable));
-		log.debug("Retrieved All {} Authorities", authorities.getTotalElements());
-		return authorities;
+	public List<AuthorityDTO> findAllAsDTO() {
+		List<AuthorityDTO> authorityDTOList =
+				execute(() -> authorityRepository.findAll()).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} Authorities", authorityDTOList.size());
+		return authorityDTOList;
+	}
+
+	@Override
+	public List<AuthorityDTO> findAllAsDTO(Pageable pageable) {
+		List<AuthorityDTO> authorityDTOList =
+				execute(() -> authorityRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} Authorities", authorityDTOList.size());
+		return authorityDTOList;
 	}
 
 	@Override
@@ -85,6 +119,14 @@ public class DefaultAuthorityService implements AuthorityService {
 		execute(() -> authorityRepository.deleteById(id));
 		log.info("Deleted id = {}", id);
 
+	}
+
+	private AuthorityDTO convertToDTO(Authority source) {
+		return converterService.convert(source, AuthorityDTO.class);
+	}
+
+	private Authority convertToEntity(AuthorityDTO source) {
+		return converterService.convert(source, Authority.class);
 	}
 
 	private <T> T execute(DaoSupplier<T> supplier) {

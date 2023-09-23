@@ -24,6 +24,7 @@ import java.util.List;
 public class BuildingRecordsController {
 
 	private static final String UPDATE_FORM_TEMPLATE = "buildingsUpdateForm";
+	private static final String INSERT_FORM_TEMPLATE = "buildingsInsertForm";
 	private final BuildingService buildingService;
 
 	@Secured("VIEW_BUILDINGS")
@@ -66,6 +67,12 @@ public class BuildingRecordsController {
 		return UPDATE_FORM_TEMPLATE;
 	}
 
+	@Secured("INSERT_BUILDINGS")
+	@GetMapping("/buildings/insert")
+	public String getInsertForm(Model model, BuildingDTO buildingDTO) {
+		return INSERT_FORM_TEMPLATE;
+	}
+
 	@Secured("EDIT_BUILDINGS")
 	@PostMapping("/buildings/update/{id}")
 	public String update(@PathVariable Long id, @Valid @ModelAttribute BuildingDTO buildingDTO, BindingResult result,
@@ -80,6 +87,21 @@ public class BuildingRecordsController {
 		BuildingDTO buildingDTOToDisplay = buildingService.findByIdAsDTO(id);
 
 		model.addAttribute("entity", buildingDTOToDisplay);
+
+		return UPDATE_FORM_TEMPLATE;
+
+	}
+
+	@Secured("INSERT_BUILDINGS")
+	@PostMapping("/buildings/insert")
+	public String insert(@Valid @ModelAttribute BuildingDTO buildingDTO, BindingResult result,
+	                     Model model, RedirectAttributes redirectAttributes) {
+
+		if (!result.hasErrors()) {
+			Long id = buildingService.save(buildingDTO);
+			redirectAttributes.addFlashAttribute("insertedSuccessId", id);
+			return "redirect:/buildings";
+		}
 
 		return UPDATE_FORM_TEMPLATE;
 

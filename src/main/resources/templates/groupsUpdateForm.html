@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <meta name="description" content="University schedule web-application "/>
     <meta name="author" content="Oleh Tsipotan"/>
-    <title>Discipline update</title>
+    <title>Group update</title>
 
     <link th:href="@{/styles/main.css}" rel="stylesheet"/>
 
@@ -34,7 +34,7 @@
                 method="post"
                 role="form"
                 th:action="@{'/groups/update/' + ${entity.getId()}}"
-                class="form-horizontal"
+                class="form-horizontal mt-3"
                 th:object="${groupDTO}">
 
             <!-- static ID input -->

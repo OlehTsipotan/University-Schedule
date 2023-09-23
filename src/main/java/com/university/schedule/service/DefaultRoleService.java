@@ -45,15 +45,29 @@ public class DefaultRoleService implements RoleService {
 	}
 
 	@Override
-	public Page<Role> findAll(Pageable pageable) {
-		Page<Role> roles = execute(() -> roleRepository.findAll(pageable));
-		log.debug("Retrieved All {} Role", roles.getTotalElements());
-		return roles;
+	public List<RoleDTO> findAllAsDTO(Pageable pageable) {
+		List<RoleDTO> roleDTOS =
+				execute(() -> roleRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} Role", roleDTOS.size());
+		return roleDTOS;
 	}
 
 	@Override
 	@Transactional
 	public Long save(Role role) {
+		execute(() -> {
+			roleEntityValidator.validate(role);
+			roleRepository.save(role);
+		});
+		log.info("saved {}", role);
+		return role.getId();
+	}
+
+	@Override
+	@Transactional
+	public Long save(RoleDTO roleDTO) {
+		Role role = convertToEntity(roleDTO);
+		log.info("SERVICE: " + role.getAuthorities().toString());
 		execute(() -> {
 			roleEntityValidator.validate(role);
 			roleRepository.save(role);
@@ -100,6 +114,10 @@ public class DefaultRoleService implements RoleService {
 
 	private RoleDTO convertToDTO(Role source) {
 		return converterService.convert(source, RoleDTO.class);
+	}
+
+	private Role convertToEntity(RoleDTO source) {
+		return converterService.convert(source, Role.class);
 	}
 
 	private <T> T execute(DaoSupplier<T> supplier) {

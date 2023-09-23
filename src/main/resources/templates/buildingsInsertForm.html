@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
     <meta name="description" content="University schedule web-application "/>
     <meta name="author" content="Oleh Tsipotan"/>
-    <title>Building update</title>
+    <title>Building insert</title>
 
     <link th:href="@{/styles/main.css}" rel="stylesheet"/>
 
@@ -15,11 +15,11 @@
     <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbarWithBackPage('Building Update', '/buildings')}"></div>
+<div th:replace="~{fragments/navbar :: navbarWithBackPage('Building Insert', '/buildings')}"></div>
 <div class="container">
     <div class="row">
         <div th:if="${success}">
-            <div class="alert alert-success mt-3">Updated!</div>
+            <div class="alert alert-success mt-3">Inserted!</div>
         </div>
         <div th:if="${validationServiceErrors != null}">
             <div th:each="violation : ${validationServiceErrors}" class="alert alert-warning mt-3"
@@ -29,25 +29,16 @@
         <form
                 method="post"
                 role="form"
-                th:action="@{'/buildings/update/' + ${entity.getId()}}"
+                th:action="@{'/buildings/insert'}"
                 class="form-horizontal mt-3"
                 th:object="${buildingDTO}">
-            <!-- static ID input -->
-            <div class="form-group row mb-2">
-                <label for="staticId" class="col-sm-2 col-form-label fw-bold">ID</label>
-                <div class="col-sm-10">
-                    <input type="text" readonly class="form-control-plaintext fw-bold" id="staticId"
-                           th:value="${entity.getId()}">
-                </div>
-            </div>
             <!-- Name input -->
             <div class="form-group row mb-2">
                 <label for="inputName" class="col-sm-2 col-form-label fw-bold">Name</label>
                 <div class="col-sm-10">
                     <input type="text"
                            name="name" id="inputName" placeholder="Name"
-                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('name') ? 'is-invalid form-control' : 'form-control')}"
-                           th:value="${entity.getName()}" required>
+                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('name') ? 'is-invalid form-control' : 'form-control')}" required>
                     <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
@@ -64,8 +55,7 @@
                 <div class="col-sm-10">
                     <input type="text"
                            th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('address') ? 'is-invalid form-control' : 'form-control')}"
-                           class="form-control" name="address" id="inputAddress" placeholder="Address"
-                           th:value="${entity.getAddress()}" required>
+                           class="form-control" name="address" id="inputAddress" placeholder="Address" required>
                     <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
@@ -74,10 +64,10 @@
                          th:text=${error}>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
             </div>
         </form>
     </div>

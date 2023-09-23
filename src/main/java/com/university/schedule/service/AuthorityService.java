@@ -1,8 +1,8 @@
 package com.university.schedule.service;
 
+import com.university.schedule.dto.AuthorityDTO;
 import com.university.schedule.model.Authority;
 import com.university.schedule.model.Role;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -11,7 +11,11 @@ public interface AuthorityService {
 
 	Long save(Authority authority);
 
+	Long save(AuthorityDTO authorityDTO);
+
 	Authority findById(Long id);
+
+	AuthorityDTO findByIdAsDTO(Long id);
 
 	Authority findByName(String name);
 
@@ -19,7 +23,9 @@ public interface AuthorityService {
 
 	List<Authority> findAll();
 
-	Page<Authority> findAll(Pageable pageable);
+	List<AuthorityDTO> findAllAsDTO();
+
+	List<AuthorityDTO> findAllAsDTO(Pageable pageable);
 
 	void deleteById(Long id);
 }

@@ -24,6 +24,8 @@ import java.util.List;
 public class ScheduledClassRecordsController {
 	private static final String UPDATE_FORM_TEMPLATE = "classesUpdateForm";
 
+	private static final String INSERT_FORM_TEMPLATE = "classesInsertForm";
+
 	private final ClassroomService classroomService;
 	private final ClassTimeService classTimeService;
 	private final ScheduledClassService scheduledClassService;
@@ -124,5 +126,63 @@ public class ScheduledClassRecordsController {
 		model.addAttribute("groupDTOList", groupDTOList);
 
 		return UPDATE_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_CLASSES")
+	@GetMapping("/classes/insert")
+	public String getInsertForm(Model model, ScheduledClassDTO scheduledClassDTO) {
+		List<CourseDTO> courseDTOList = courseService.findAllAsDTO();
+		List<TeacherDTO> teacherDTOList = teacherService.findAllAsDTO();
+		List<ClassroomDTO> classroomDTOList = classroomService.findAllAsDTO();
+		List<ClassTimeDTO> classTimeDTOList = classTimeService.findAllAsDTO();
+		List<ClassTypeDTO> classTypeDTOList = classTypeService.findAllAsDTO();
+		List<GroupDTO> groupDTOList = groupService.findAllAsDTO();
+
+		model.addAttribute("courseDTOList", courseDTOList);
+		model.addAttribute("teacherDTOList", teacherDTOList);
+		model.addAttribute("classroomDTOList", classroomDTOList);
+		model.addAttribute("classTimeDTOList", classTimeDTOList);
+		model.addAttribute("classTypeDTOList", classTypeDTOList);
+		model.addAttribute("groupDTOList", groupDTOList);
+		return INSERT_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_CLASSES")
+	@PostMapping("/classes/insert")
+	public String insert(@Valid @ModelAttribute ScheduledClassDTO scheduledClassDTO, BindingResult result, Model model,
+	                     RedirectAttributes redirectAttributes) {
+
+		scheduledClassDTO.setCourseDTO(courseService.findByIdAsDTO(scheduledClassDTO.getCourseDTO().getId()));
+		scheduledClassDTO.setTeacherDTO(teacherService.findByIdAsDTO(scheduledClassDTO.getTeacherDTO().getId()));
+		scheduledClassDTO.setClassroomDTO(classroomService.findByIdAsDTO(scheduledClassDTO.getClassroomDTO().getId()));
+		scheduledClassDTO.setClassTimeDTO(classTimeService.findByIdAsDTO(scheduledClassDTO.getClassTimeDTO().getId()));
+		scheduledClassDTO.setClassTypeDTO(classTypeService.findByIdAsDTO(scheduledClassDTO.getClassTypeDTO().getId()));
+		scheduledClassDTO.setClassTypeDTO(classTypeService.findByIdAsDTO(scheduledClassDTO.getClassTypeDTO().getId()));
+		scheduledClassDTO.setGroupDTOS(
+				scheduledClassDTO.getGroupDTOS().stream().map(groupDTO -> groupService.findByIdAsDTO(groupDTO.getId()))
+						.toList());
+
+		if (!result.hasErrors()) {
+			Long id = scheduledClassService.save(scheduledClassDTO);
+			redirectAttributes.addFlashAttribute("insertedSuccessId", id);
+			return "redirect:/classes";
+		}
+
+		List<CourseDTO> courseDTOList = courseService.findAllAsDTO();
+		List<TeacherDTO> teacherDTOList = teacherService.findAllAsDTO();
+		List<ClassroomDTO> classroomDTOList = classroomService.findAllAsDTO();
+		List<ClassTimeDTO> classTimeDTOList = classTimeService.findAllAsDTO();
+		List<ClassTypeDTO> classTypeDTOList = classTypeService.findAllAsDTO();
+		List<GroupDTO> groupDTOList = groupService.findAllAsDTO();
+
+		model.addAttribute("courseDTOList", courseDTOList);
+		model.addAttribute("teacherDTOList", teacherDTOList);
+		model.addAttribute("classroomDTOList", classroomDTOList);
+		model.addAttribute("classTimeDTOList", classTimeDTOList);
+		model.addAttribute("classTypeDTOList", classTypeDTOList);
+		model.addAttribute("groupDTOList", groupDTOList);
+
+		return INSERT_FORM_TEMPLATE;
+
 	}
 }

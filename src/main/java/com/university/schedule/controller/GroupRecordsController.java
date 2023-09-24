@@ -28,6 +28,8 @@ import java.util.List;
 public class GroupRecordsController {
 
 	private static final String UPDATE_FORM_TEMPLATE = "groupsUpdateForm";
+
+	private static final String INSERT_FORM_TEMPLATE = "groupsInsertForm";
 	private final GroupService groupService;
 	private final DisciplineService disciplineService;
 	private final CourseService courseService;
@@ -100,5 +102,40 @@ public class GroupRecordsController {
 		model.addAttribute("courseDTOList", courseDTOListToSelect);
 
 		return UPDATE_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_GROUPS")
+	@GetMapping("/groups/insert")
+	public String getInsertForm(Model model, GroupDTO groupDTO) {
+		List<DisciplineDTO> disciplines = disciplineService.findAllAsDTO();
+		List<CourseDTO> courseDTOListToSelect = courseService.findAllAsDTO();
+		model.addAttribute("disciplineDTOList", disciplines);
+		model.addAttribute("courseDTOList", courseDTOListToSelect);
+		return INSERT_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_GROUPS")
+	@PostMapping("/groups/insert")
+	public String insert(@Valid @ModelAttribute GroupDTO groupDTO, BindingResult result, Model model,
+	                     RedirectAttributes redirectAttributes) {
+
+		groupDTO.setDisciplineDTO(disciplineService.findByIdAsDTO(groupDTO.getDisciplineDTO().getId()));
+		groupDTO.setCourseDTOS(
+				groupDTO.getCourseDTOS().stream().map(courseDTO -> courseService.findByIdAsDTO(courseDTO.getId()))
+						.toList());
+
+		if (!result.hasErrors()) {
+			Long id = groupService.save(groupDTO);
+			redirectAttributes.addFlashAttribute("insertedSuccessId", id);
+			return "redirect:/groups";
+		}
+
+		List<DisciplineDTO> disciplines = disciplineService.findAllAsDTO();
+		List<CourseDTO> courseDTOListToSelect = courseService.findAllAsDTO();
+		model.addAttribute("disciplineDTOList", disciplines);
+		model.addAttribute("courseDTOList", courseDTOListToSelect);
+
+		return INSERT_FORM_TEMPLATE;
+
 	}
 }

@@ -26,6 +26,7 @@ import java.util.List;
 public class ClassroomRecordsController {
 
 	private static final String UPDATE_FORM_TEMPLATE = "classroomsUpdateForm";
+	private static final String INSERT_FORM_TEMPLATE = "classroomsInsertForm";
 	private final ClassroomService classroomService;
 	private final BuildingService buildingService;
 
@@ -88,6 +89,34 @@ public class ClassroomRecordsController {
 		model.addAttribute("buildingDTOList", buildingDTOListToSelect);
 
 		return UPDATE_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_CLASSROOMS")
+	@GetMapping("/classrooms/insert")
+	public String getInsertForm(Model model, ClassroomDTO classroomDTO) {
+		List<BuildingDTO> buildingDTOListToSelect = buildingService.findAllAsDTO();
+		model.addAttribute("buildingDTOList", buildingDTOListToSelect);
+		return INSERT_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_CLASSROOMS")
+	@PostMapping("/classrooms/insert")
+	public String insert(@Valid @ModelAttribute ClassroomDTO classroomDTO, BindingResult result, Model model,
+	                     RedirectAttributes redirectAttributes,
+	                     @RequestParam("buildingDTO.id") Long selectedBuildingDTOId) {
+
+		classroomDTO.setBuildingDTO(buildingService.findByIdAsDTO(selectedBuildingDTOId));
+		if (!result.hasErrors()) {
+			Long id = classroomService.save(classroomDTO);
+			redirectAttributes.addFlashAttribute("insertedSuccessId", id);
+			return "redirect:/classrooms";
+		}
+
+		List<BuildingDTO> buildingDTOListToSelect = buildingService.findAllAsDTO();
+		model.addAttribute("buildingDTOList", buildingDTOListToSelect);
+
+		return INSERT_FORM_TEMPLATE;
+
 	}
 
 }

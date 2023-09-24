@@ -24,6 +24,8 @@ import java.util.List;
 public class ClassTypeRecordsController {
 
 	private static final String UPDATE_FORM_TEMPLATE = "classtypesUpdateForm";
+
+	private static final String INSERT_FORM_TEMPLATE = "classtypesInsertForm";
 	private final ClassTypeService classTypeService;
 
 	@Secured("VIEW_CLASSTYPES")
@@ -80,5 +82,26 @@ public class ClassTypeRecordsController {
 		model.addAttribute("entity", classTypeDTOToDisplay);
 
 		return UPDATE_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_CLASSTYPES")
+	@GetMapping("/classtypes/insert")
+	public String getInsertForm(Model model, ClassTypeDTO classTypeDTO) {
+		return INSERT_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_CLASSTYPES")
+	@PostMapping("/classtypes/insert")
+	public String insert(@Valid @ModelAttribute ClassTypeDTO classTypeDTO, BindingResult result, Model model,
+	                     RedirectAttributes redirectAttributes) {
+
+		if (!result.hasErrors()) {
+			Long id = classTypeService.save(classTypeDTO);
+			redirectAttributes.addFlashAttribute("insertedSuccessId", id);
+			return "redirect:/classtypes";
+		}
+
+		return INSERT_FORM_TEMPLATE;
+
 	}
 }

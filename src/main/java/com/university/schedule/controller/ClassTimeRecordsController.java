@@ -1,6 +1,8 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.dto.BuildingDTO;
 import com.university.schedule.dto.ClassTimeDTO;
+import com.university.schedule.dto.ClassroomDTO;
 import com.university.schedule.service.ClassTimeService;
 import com.university.schedule.utility.PaginationSortingUtility;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,6 +26,8 @@ import java.util.List;
 public class ClassTimeRecordsController {
 
 	private static final String UPDATE_FORM_TEMPLATE = "classtimesUpdateForm";
+
+	private static final String INSERT_FORM_TEMPLATE = "classtimesInsertForm";
 	private final ClassTimeService classTimeService;
 
 	@Secured("VIEW_CLASSTIMES")
@@ -81,5 +85,26 @@ public class ClassTimeRecordsController {
 		model.addAttribute("entity", classTimeDTO);
 
 		return UPDATE_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_CLASSTIMES")
+	@GetMapping("/classtimes/insert")
+	public String getInsertForm(Model model, ClassTimeDTO classTimeDTO) {
+		return INSERT_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_CLASSTIMES")
+	@PostMapping("/classtimes/insert")
+	public String insert(@Valid @ModelAttribute ClassTimeDTO classTimeDTO, BindingResult result, Model model,
+	                     RedirectAttributes redirectAttributes) {
+
+		if (!result.hasErrors()) {
+			Long id = classTimeService.save(classTimeDTO);
+			redirectAttributes.addFlashAttribute("insertedSuccessId", id);
+			return "redirect:/classtimes";
+		}
+
+		return INSERT_FORM_TEMPLATE;
+
 	}
 }

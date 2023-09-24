@@ -105,7 +105,7 @@ public class RoleRecordsController {
 
 	@Secured("INSERT_ROLES")
 	@PostMapping("/roles/insert")
-	public String insert(@Valid @ModelAttribute RoleDTO roleDTO, BindingResult result,
+	public String insert(@Valid @ModelAttribute RoleDTO roleDTO, BindingResult result, Model model,
 	                     RedirectAttributes redirectAttributes) {
 
 		roleDTO.setAuthorityDTOS(roleDTO.getAuthorityDTOS().stream()
@@ -117,6 +117,8 @@ public class RoleRecordsController {
 			return "redirect:/authorities";
 		}
 
+		List<AuthorityDTO> authorityDTOList = authorityService.findAllAsDTO();
+		model.addAttribute("authorityDTOList", authorityDTOList);
 		return INSERT_FORM_TEMPLATE;
 
 	}

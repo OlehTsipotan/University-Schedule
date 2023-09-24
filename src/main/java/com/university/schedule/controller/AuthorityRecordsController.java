@@ -105,7 +105,7 @@ public class AuthorityRecordsController {
 			return "redirect:/authorities";
 		}
 
-		return UPDATE_FORM_TEMPLATE;
+		return INSERT_FORM_TEMPLATE;
 
 	}
 }

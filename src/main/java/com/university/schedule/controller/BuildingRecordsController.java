@@ -103,7 +103,7 @@ public class BuildingRecordsController {
 			return "redirect:/buildings";
 		}
 
-		return UPDATE_FORM_TEMPLATE;
+		return INSERT_FORM_TEMPLATE;
 
 	}
 }

@@ -1,5 +1,6 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.dto.CourseDTO;
 import com.university.schedule.dto.DisciplineDTO;
 import com.university.schedule.model.Discipline;
 import com.university.schedule.service.DisciplineService;
@@ -25,6 +26,8 @@ import java.util.List;
 public class DisciplineRecordsController {
 
 	private static final String UPDATE_FORM_TEMPLATE = "disciplinesUpdateForm";
+
+	private static final String INSERT_FORM_TEMPLATE = "disciplinesInsertForm";
 	private final DisciplineService disciplineService;
 
 	@Secured("VIEW_DISCIPLINES")
@@ -71,8 +74,7 @@ public class DisciplineRecordsController {
 	@Secured("EDIT_DISCIPLINES")
 	@PostMapping("/disciplines/update/{id}")
 	public String update(@PathVariable Long id, @Valid @ModelAttribute DisciplineDTO disciplineDTO,
-	                     BindingResult result,
-	                     Model model, RedirectAttributes redirectAttributes) {
+	                     BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 
 		if (!result.hasErrors()) {
 			disciplineService.save(disciplineDTO);
@@ -84,5 +86,26 @@ public class DisciplineRecordsController {
 		model.addAttribute("entity", disciplineToDisplay);
 
 		return UPDATE_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_DISCIPLINES")
+	@GetMapping("/disciplines/insert")
+	public String getInsertForm(Model model, DisciplineDTO disciplineDTO) {
+		return INSERT_FORM_TEMPLATE;
+	}
+
+	@Secured("INSERT_DISCIPLINES")
+	@PostMapping("/disciplines/insert")
+	public String insert(@Valid @ModelAttribute DisciplineDTO disciplineDTO, BindingResult result, Model model,
+	                     RedirectAttributes redirectAttributes) {
+
+		if (!result.hasErrors()) {
+			Long id = disciplineService.save(disciplineDTO);
+			redirectAttributes.addFlashAttribute("insertedSuccessId", id);
+			return "redirect:/disciplines";
+		}
+
+		return INSERT_FORM_TEMPLATE;
+
 	}
 }

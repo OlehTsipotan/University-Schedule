@@ -19,6 +19,9 @@
 <div th:if="${success}">
     <div class="alert alert-success mt-3" th:text="${success}"></div>
 </div>
+<div th:if="${insertedSuccessId}">
+    <div class="alert alert-success mt-3" th:text="@{'Inserted Record with ID = ' + ${insertedSuccessId} + '.'}"></div>
+</div>
 <div th:if="${entities.size() > 0}">
     <table class="table table-hover table-bordered table-responsive-md">
         <thead class="thead-light">
@@ -45,6 +48,10 @@
         </tr>
         </tbody>
     </table>
+    <div sec:authorize="hasAuthority('INSERT_CLASSTIMES')" class="sticky-bottom bg-light p-3">
+        <button type="button"
+                class="btn btn-primary"><a class="nav-link" href="/classtimes/insert">Insert new</a></button>
+    </div>
 </div>
 <div class="" th:unless="${entities.size() > 0}">
     <span>No ClassTimes found!</span>

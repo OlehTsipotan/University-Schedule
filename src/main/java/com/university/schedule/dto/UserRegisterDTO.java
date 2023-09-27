@@ -1,5 +1,6 @@
 package com.university.schedule.dto;
 
+import com.university.schedule.validation.Password;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -24,6 +25,7 @@ public class UserRegisterDTO {
 	@Size(max = 255)
 	private String lastName;
 
+	@Password(message = "Minimum 4 characters, at least 1 letter and 1 number")
 	@NotBlank(message = "User password must not be blank")
 	@Size(min = 4, max = 25)
 	private String password;

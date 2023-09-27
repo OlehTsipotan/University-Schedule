@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,22 +26,20 @@ import java.util.List;
 public class DefaultUserService implements UserService {
 
 	private final UserRepository userRepository;
-
 	private final UserEntityValidator userEntityValidator;
-
 	private final ConverterService converterService;
 
 	@Override
 	public List<User> findAll() {
 		List<User> users = execute(() -> userRepository.findAll());
-		log.debug("Retrieved All {} Groups", users.size());
+		log.debug("Retrieved All {} Users", users.size());
 		return users;
 	}
 
 	@Override
 	public List<UserDTO> findAllAsDTO() {
 		List<UserDTO> userDTOList = execute(() -> userRepository.findAll()).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Groups", userDTOList.size());
+		log.debug("Retrieved All {} Users", userDTOList.size());
 		return userDTOList;
 	}
 
@@ -48,7 +47,7 @@ public class DefaultUserService implements UserService {
 	public List<UserDTO> findAllAsDTO(Pageable pageable) {
 		List<UserDTO> userDTOList =
 				execute(() -> userRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Groups", userDTOList.size());
+		log.debug("Retrieved All {} Users", userDTOList.size());
 		return userDTOList;
 	}
 
@@ -65,7 +64,7 @@ public class DefaultUserService implements UserService {
 
 	@Override
 	@Transactional
-	public Long save(UserDTO userDTO) {
+	public Long update(UserDTO userDTO) {
 
 		User foundedUser = findById(userDTO.getId());
 

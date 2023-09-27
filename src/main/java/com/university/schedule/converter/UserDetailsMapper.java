@@ -1,9 +1,7 @@
 package com.university.schedule.converter;
 
 import com.university.schedule.dto.DefaultUserDetails;
-import com.university.schedule.model.Authority;
-import com.university.schedule.model.Role;
-import com.university.schedule.model.User;
+import com.university.schedule.model.*;
 import com.university.schedule.service.AuthorityService;
 import org.modelmapper.Converter;
 import org.modelmapper.ModelMapper;
@@ -36,9 +34,27 @@ public class UserDetailsMapper {
 			modelMapper.map(User::isEnable, DefaultUserDetails::setIsEnable);
 		});
 
+		modelMapper.typeMap(Teacher.class, DefaultUserDetails.class).addMappings(modelMapper -> {
+			modelMapper.using(converter).map(Teacher::getRole, DefaultUserDetails::setGrantedAuthorities);
+			modelMapper.map(Teacher::isEnable, DefaultUserDetails::setIsEnable);
+		});
+
+		modelMapper.typeMap(Student.class, DefaultUserDetails.class).addMappings(modelMapper -> {
+			modelMapper.using(converter).map(Student::getRole, DefaultUserDetails::setGrantedAuthorities);
+			modelMapper.map(Student::isEnable, DefaultUserDetails::setIsEnable);
+		});
+
 	}
 
 	public UserDetails convertToUserDetails(User user) {
 		return modelMapper.map(user, DefaultUserDetails.class);
+	}
+
+	public UserDetails convertToUserDetails(Teacher teacher) {
+		return modelMapper.map(teacher, DefaultUserDetails.class);
+	}
+
+	public UserDetails convertToUserDetails(Student student) {
+		return modelMapper.map(student, DefaultUserDetails.class);
 	}
 }

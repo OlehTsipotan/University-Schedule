@@ -74,10 +74,10 @@ public class WebSecurityConfig {
 				.authorizeHttpRequests(
 						authorizeRequests -> authorizeRequests.requestMatchers("/css/**", "/js/**", "/webjars/**",
 										"/styles/**", "/assets/**").permitAll().requestMatchers("/admin/login").permitAll()
-								.anyRequest().authenticated()).securityMatcher("/**").formLogin(
-						login -> login.loginPage("/user/login").usernameParameter("email")
-								.loginProcessingUrl("/user/login")
-								.successHandler(customUserAuthenticationSuccessHandler).permitAll())
+								.requestMatchers("/user/register").permitAll().anyRequest().authenticated())
+				.securityMatcher("/**").formLogin(login -> login.loginPage("/user/login").usernameParameter("email")
+						.loginProcessingUrl("/user/login").successHandler(customUserAuthenticationSuccessHandler)
+						.permitAll())
 				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(customLogoutSuccessHandler))
 				.exceptionHandling(handler -> handler.accessDeniedHandler(accessDeniedHandler())).build();
 	}

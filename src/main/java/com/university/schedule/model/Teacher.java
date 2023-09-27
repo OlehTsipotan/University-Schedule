@@ -24,15 +24,8 @@ public class Teacher extends User {
 	private Set<Course> courses = new HashSet<>();
 
 	public Teacher(User user) {
-		super(user.getId(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName());
-	}
-
-	public Teacher(Long id, String email, String password, String firstName, String lastName) {
-		super(id, email, password, firstName, lastName);
-	}
-
-	public Teacher(Long id, String email, String password, String firstName, String lastName, Boolean isEnable) {
-		super(id, email, password, firstName, lastName, isEnable);
+		super(user.getId(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(),
+				user.isEnable(), user.getRole());
 	}
 
 	public Teacher(String email, String password, String firstName, String lastName) {

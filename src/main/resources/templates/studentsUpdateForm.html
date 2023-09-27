@@ -99,7 +99,7 @@
                             th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('groupDTO') ? 'is-invalid form-select' : 'form-select')}">
                         <option th:each="groupDTO : ${groupDTOList}" th:value="${groupDTO.getId()}"
                                 th:text="${groupDTO.getName()}"
-                                th:selected="${groupDTO.getId() == entity.getGroupDTO().getId()}"></option>
+                                th:selected="${groupDTO.equals(entity.getGroupDTO())}"></option>
                     </select>
                     <div th:if="${success}" class="valid-feedback">
                         Looks good!

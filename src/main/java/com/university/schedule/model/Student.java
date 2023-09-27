@@ -20,12 +20,13 @@ public class Student extends User {
 	@JoinColumn(name = "group_id")
 	private Group group;
 
-	public Student(String email, String password, String firstName, String lastName) {
-		super(email, password, firstName, lastName, true);
+	public Student(User user) {
+		super(user.getId(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(),
+				user.isEnable(), user.getRole());
 	}
 
-	public Student(Long id, String email, String password, String firstName, String lastName) {
-		super(id, email, password, firstName, lastName);
+	public Student(String email, String password, String firstName, String lastName) {
+		super(email, password, firstName, lastName, true);
 	}
 
 	@Override

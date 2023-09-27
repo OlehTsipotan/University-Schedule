@@ -13,6 +13,8 @@ public interface RoleService {
 
 	List<RoleDTO> findAllAsDTO();
 
+	List<RoleDTO> findAllForRegistrationAsDTO();
+
 	List<RoleDTO> findAllAsDTO(Pageable pageable);
 
 	Role findByName(String name);

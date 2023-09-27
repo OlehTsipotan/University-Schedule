@@ -2,6 +2,7 @@ package com.university.schedule.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.Hibernate;
@@ -57,23 +58,24 @@ public class User {
 	@Getter(AccessLevel.NONE)
 	private Boolean isEnable;
 
-	public User(@NonNull Long id, @NonNull String email, @NonNull String password, @NonNull String firstName,
-	            @NonNull String lastName) {
-		this(id, email, password, firstName, lastName, true);
+	public User(Long id, @NonNull String email, @NonNull String password, @NonNull String firstName,
+	            @NonNull String lastName, @NonNull Role role) {
+		this(id, email, password, firstName, lastName, true, role);
 	}
 
 	public User(@NonNull String email, @NonNull String password, @NonNull String firstName, @NonNull String lastName) {
 		this(email, password, firstName, lastName, true);
 	}
 
-	public User(@NonNull Long id, @NonNull String email, @NonNull String password, @NonNull String firstName,
-	            @NonNull String lastName, @NonNull Boolean isEnable) {
+	public User(Long id, @NonNull String email, @NonNull String password, @NonNull String firstName,
+	            @NonNull String lastName, @NonNull Boolean isEnable, @NonNull Role role) {
 		this.id = id;
 		this.email = email;
 		this.password = password;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.isEnable = isEnable;
+		this.role = role;
 	}
 
 	public Boolean isEnable() {

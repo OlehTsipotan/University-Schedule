@@ -6,6 +6,7 @@ import com.university.schedule.dto.StudentDTO;
 import com.university.schedule.model.Group;
 import com.university.schedule.model.Role;
 import com.university.schedule.model.Student;
+import org.modelmapper.Condition;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -28,10 +29,12 @@ public class StudentEntityToStudentDTOConverter implements Converter<Student, St
 		org.modelmapper.Converter<Group, GroupDTO> groupDTOConverter =
 				group -> groupEntityToGroupDTOConverter.convert(group.getSource());
 
+		Condition notNull = ctx -> ctx.getSource() != null;
+
 		modelMapper.typeMap(Student.class, StudentDTO.class).addMappings(modelMapper -> {
 			modelMapper.map(Student::isEnable, StudentDTO::setIsEnable);
-			modelMapper.using(roleDTOConverter).map(Student::getRole, StudentDTO::setRoleDTO);
-			modelMapper.using(groupDTOConverter).map(Student::getGroup, StudentDTO::setGroupDTO);
+			modelMapper.when(notNull).using(roleDTOConverter).map(Student::getRole, StudentDTO::setRoleDTO);
+			modelMapper.when(notNull).using(groupDTOConverter).map(Student::getGroup, StudentDTO::setGroupDTO);
 		});
 	}
 

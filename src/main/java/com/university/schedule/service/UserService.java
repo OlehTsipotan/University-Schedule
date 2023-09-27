@@ -16,7 +16,7 @@ public interface UserService {
 
 	Long save(User user);
 
-	Long save(UserDTO userDTO);
+	Long update(UserDTO userDTO);
 
 	UserDTO findByIdAsDTO(Long id);
 

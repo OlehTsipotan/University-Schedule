@@ -45,6 +45,15 @@ public class DefaultRoleService implements RoleService {
 	}
 
 	@Override
+	public List<RoleDTO> findAllForRegistrationAsDTO() {
+		List<RoleDTO> roleDTOList =
+				execute(() -> roleRepository.findAll()).stream().map(this::convertToDTO).filter(roleDTO ->
+								!"Admin".equals(roleDTO.getName())).toList();
+		log.debug("Retrieved All {} Role", roleDTOList.size());
+		return roleDTOList;
+	}
+
+	@Override
 	public List<RoleDTO> findAllAsDTO(Pageable pageable) {
 		List<RoleDTO> roleDTOS =
 				execute(() -> roleRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();

@@ -21,6 +21,7 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(RuntimeException.class)
 	public String handleException(RuntimeException runtimeException, Model model, RedirectAttributes redirectAttributes) {
+		log.info(runtimeException.getMessage());
 		redirectAttributes.addFlashAttribute("exceptionMessage", runtimeException.getMessage());
 		return "redirect:/error";
 	}

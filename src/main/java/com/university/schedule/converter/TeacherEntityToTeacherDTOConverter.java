@@ -6,6 +6,7 @@ import com.university.schedule.dto.TeacherDTO;
 import com.university.schedule.model.Course;
 import com.university.schedule.model.Role;
 import com.university.schedule.model.Teacher;
+import org.modelmapper.Condition;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -32,11 +33,12 @@ public class TeacherEntityToTeacherDTOConverter implements Converter<Teacher, Te
 
 		org.modelmapper.Converter<Set<Course>, List<CourseDTO>> courseDTOSConverter =
 				courseList -> courseList.getSource().stream().map(courseEntityToCourseDTOConverter::convert).toList();
+		Condition notNull = ctx -> ctx.getSource() != null;
 
 		modelMapper.typeMap(Teacher.class, TeacherDTO.class).addMappings(modelMapper -> {
 			modelMapper.map(Teacher::isEnable, TeacherDTO::setIsEnable);
-			modelMapper.using(roleDTOConverter).map(Teacher::getRole, TeacherDTO::setRoleDTO);
-			modelMapper.using(courseDTOSConverter).map(Teacher::getCourses, TeacherDTO::setCourseDTOS);
+			modelMapper.when(notNull).using(roleDTOConverter).map(Teacher::getRole, TeacherDTO::setRoleDTO);
+			modelMapper.when(notNull).using(courseDTOSConverter).map(Teacher::getCourses, TeacherDTO::setCourseDTOS);
 		});
 
 	}

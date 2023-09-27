@@ -79,7 +79,7 @@ public class UserRecordsController {
 		userDTO.setRoleDTO(roleService.findByIdAsDTO(userDTO.getRoleDTO().getId()));
 		if (!result.hasErrors()) {
 			userDTO.setIsEnable(isEnable);
-			userService.save(userDTO);
+			userService.update(userDTO);
 			redirectAttributes.addFlashAttribute("success", true);
 			return "redirect:/users/update/" + id;
 		}

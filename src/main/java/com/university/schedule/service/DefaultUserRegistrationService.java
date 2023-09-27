@@ -43,7 +43,7 @@ public class DefaultUserRegistrationService implements UserRegistrationService {
 		} else if ("Student".equals(user.getRole().getName())) {
 			return execute(() -> studentService.save(new Student(user)));
 		}
-		throw new RegistrationFailedException("Can`t register user with " + user.getRole().toString());
+		throw new RegistrationFailedException("Can`t register user with role = " + user.getRole().getName());
 
 	}
 

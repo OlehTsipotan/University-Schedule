@@ -82,7 +82,7 @@ public class DefaultBuildingService implements BuildingService {
 	@Override
 	public List<Building> findAll() {
 		List<Building> buildings = execute(() -> buildingRepository.findAll());
-		log.debug("Retrieved All {} Groups", buildings.size());
+		log.debug("Retrieved All {} Buildings", buildings.size());
 		return buildings;
 	}
 
@@ -90,7 +90,7 @@ public class DefaultBuildingService implements BuildingService {
 	public List<BuildingDTO> findAllAsDTO() {
 		List<BuildingDTO> buildingDTOList =
 				execute(() -> buildingRepository.findAll()).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Groups", buildingDTOList.size());
+		log.debug("Retrieved All {} Buildings", buildingDTOList.size());
 		return buildingDTOList;
 	}
 
@@ -98,7 +98,7 @@ public class DefaultBuildingService implements BuildingService {
 	public List<BuildingDTO> findAllAsDTO(Pageable pageable) {
 		List<BuildingDTO> buildingDTOList =
 				execute(() -> buildingRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Groups", buildingDTOList.size());
+		log.debug("Retrieved All {} Buildings", buildingDTOList.size());
 		return buildingDTOList;
 	}
 

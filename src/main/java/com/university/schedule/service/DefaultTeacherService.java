@@ -32,7 +32,7 @@ public class DefaultTeacherService implements TeacherService {
 	@Override
 	public List<Teacher> findAll() {
 		List<Teacher> teachers = execute(() -> teacherRepository.findAll());
-		log.debug("Retrieved All {} Groups", teachers.size());
+		log.debug("Retrieved All {} Teachers", teachers.size());
 		return teachers;
 	}
 
@@ -40,7 +40,7 @@ public class DefaultTeacherService implements TeacherService {
 	public List<TeacherDTO> findAllAsDTO() {
 		List<TeacherDTO> teacherDTOList =
 				execute(() -> teacherRepository.findAll()).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Groups", teacherDTOList.size());
+		log.debug("Retrieved All {} Teachers", teacherDTOList.size());
 		return teacherDTOList;
 	}
 
@@ -48,7 +48,7 @@ public class DefaultTeacherService implements TeacherService {
 	public List<TeacherDTO> findAllAsDTO(Pageable pageable) {
 		List<TeacherDTO> teacherDTOList =
 				execute(() -> teacherRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Groups", teacherDTOList.size());
+		log.debug("Retrieved All {} Teachers", teacherDTOList.size());
 		return teacherDTOList;
 	}
 

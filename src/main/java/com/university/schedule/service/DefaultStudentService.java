@@ -32,7 +32,7 @@ public class DefaultStudentService implements StudentService {
 	@Override
 	public List<Student> findAll() {
 		List<Student> students = execute(() -> studentRepository.findAll());
-		log.debug("Retrieved All {} Groups", students.size());
+		log.debug("Retrieved All {} Students", students.size());
 		return students;
 	}
 
@@ -40,7 +40,7 @@ public class DefaultStudentService implements StudentService {
 	public List<StudentDTO> findAllAsDTO() {
 		List<StudentDTO> studentDTOList =
 				execute(() -> studentRepository.findAll()).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Groups", studentDTOList.size());
+		log.debug("Retrieved All {} Students", studentDTOList.size());
 		return studentDTOList;
 	}
 
@@ -48,7 +48,7 @@ public class DefaultStudentService implements StudentService {
 	public List<StudentDTO> findAllAsDTO(Pageable pageable) {
 		List<StudentDTO> studentDTOList =
 				execute(() -> studentRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Groups", studentDTOList.size());
+		log.debug("Retrieved All {} Students", studentDTOList.size());
 		return studentDTOList;
 	}
 

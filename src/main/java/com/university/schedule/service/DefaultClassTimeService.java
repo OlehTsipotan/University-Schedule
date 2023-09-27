@@ -76,7 +76,7 @@ public class DefaultClassTimeService implements ClassTimeService {
 
 	private List<ClassTime> findAll() {
 		List<ClassTime> classTimes = execute(() -> classTimeRepository.findAll());
-		log.debug("Retrieved All {} Groups", classTimes.size());
+		log.debug("Retrieved All {} ClassTimes", classTimes.size());
 		return classTimes;
 	}
 
@@ -84,14 +84,14 @@ public class DefaultClassTimeService implements ClassTimeService {
 	public List<ClassTimeDTO> findAllAsDTO(Pageable pageable) {
 		List<ClassTimeDTO> classTimeDTOList =
 				execute(() -> classTimeRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Groups", classTimeDTOList.size());
+		log.debug("Retrieved All {} ClassTimes", classTimeDTOList.size());
 		return classTimeDTOList;
 	}
 
 	public List<ClassTimeDTO> findAllAsDTO() {
 		List<ClassTimeDTO> classTimeDTOList =
 				execute(() -> classTimeRepository.findAll()).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Groups", classTimeDTOList.size());
+		log.debug("Retrieved All {} ClassTimes", classTimeDTOList.size());
 		return classTimeDTOList;
 	}
 

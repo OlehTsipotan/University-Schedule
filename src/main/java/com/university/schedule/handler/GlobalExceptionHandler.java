@@ -1,5 +1,6 @@
 package com.university.schedule.handler;
 
+import com.university.schedule.exception.RegistrationFailedException;
 import com.university.schedule.exception.ValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,15 @@ public class GlobalExceptionHandler {
 		log.info(runtimeException.getMessage());
 		redirectAttributes.addFlashAttribute("exceptionMessage", runtimeException.getMessage());
 		return "redirect:/error";
+	}
+
+	@ExceptionHandler(RegistrationFailedException.class)
+	public String handleRegistrationException(RegistrationFailedException registrationFailedException,
+	                                        RedirectAttributes redirectAttributes, WebRequest request) {
+		redirectAttributes.addFlashAttribute("registrationServiceError", registrationFailedException.getMessage());
+
+		log.error("RegistrationException occurs, {}", registrationFailedException.getMessage());
+		return "redirect:/user/register";
 	}
 
 	@ExceptionHandler(ValidationException.class)

@@ -1,5 +1,7 @@
 # University Schedule App
 
+**NOT FINISHED**
+
 This project is a Java Spring web application for accessing and managing university schedules. It provides functionalities to create, view, and manage schedules for teachers, students and groups.
 
 ## Table of Contents

@@ -1,6 +1,6 @@
 package com.university.schedule.exception;
 
-public class RegistrationFailedException extends ServiceException{
+public class RegistrationFailedException extends ServiceException {
 
 	public RegistrationFailedException(String errorMessage) {
 		super(errorMessage);

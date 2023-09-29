@@ -2,7 +2,6 @@ package com.university.schedule.service;
 
 import com.university.schedule.converter.ConverterService;
 import com.university.schedule.dto.AuthorityDTO;
-import com.university.schedule.dto.RoleDTO;
 import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Authority;
@@ -12,7 +11,6 @@ import com.university.schedule.validation.AuthorityEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -1,7 +1,6 @@
 package com.university.schedule.formatter;
 
 import com.university.schedule.dto.AuthorityDTO;
-import com.university.schedule.dto.CourseDTO;
 import org.springframework.format.Formatter;
 
 import java.text.ParseException;

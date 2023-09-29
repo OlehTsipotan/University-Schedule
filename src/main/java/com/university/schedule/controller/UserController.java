@@ -1,11 +1,9 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.RoleDTO;
-import com.university.schedule.dto.UserDTO;
 import com.university.schedule.dto.UserRegisterDTO;
 import com.university.schedule.service.RoleService;
 import com.university.schedule.service.UserRegistrationService;
-import com.university.schedule.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

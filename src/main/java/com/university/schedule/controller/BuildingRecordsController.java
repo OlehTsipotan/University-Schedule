@@ -94,8 +94,8 @@ public class BuildingRecordsController {
 
 	@Secured("INSERT_BUILDINGS")
 	@PostMapping("/buildings/insert")
-	public String insert(@Valid @ModelAttribute BuildingDTO buildingDTO, BindingResult result,
-	                     Model model, RedirectAttributes redirectAttributes) {
+	public String insert(@Valid @ModelAttribute BuildingDTO buildingDTO, BindingResult result, Model model,
+	                     RedirectAttributes redirectAttributes) {
 
 		if (!result.hasErrors()) {
 			Long id = buildingService.save(buildingDTO);

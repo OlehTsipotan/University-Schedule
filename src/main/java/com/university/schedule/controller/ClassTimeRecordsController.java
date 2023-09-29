@@ -1,8 +1,6 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.dto.BuildingDTO;
 import com.university.schedule.dto.ClassTimeDTO;
-import com.university.schedule.dto.ClassroomDTO;
 import com.university.schedule.service.ClassTimeService;
 import com.university.schedule.utility.PaginationSortingUtility;
 import jakarta.servlet.http.HttpServletRequest;

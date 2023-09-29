@@ -1,9 +1,7 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.AuthorityDTO;
-import com.university.schedule.dto.BuildingDTO;
 import com.university.schedule.service.AuthorityService;
-import com.university.schedule.service.BuildingService;
 import com.university.schedule.utility.PaginationSortingUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

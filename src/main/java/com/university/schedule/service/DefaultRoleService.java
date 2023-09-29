@@ -10,7 +10,6 @@ import com.university.schedule.validation.RoleEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,9 +45,8 @@ public class DefaultRoleService implements RoleService {
 
 	@Override
 	public List<RoleDTO> findAllForRegistrationAsDTO() {
-		List<RoleDTO> roleDTOList =
-				execute(() -> roleRepository.findAll()).stream().map(this::convertToDTO).filter(roleDTO ->
-								!"Admin".equals(roleDTO.getName())).toList();
+		List<RoleDTO> roleDTOList = execute(() -> roleRepository.findAll()).stream().map(this::convertToDTO)
+				.filter(roleDTO -> !"Admin".equals(roleDTO.getName())).toList();
 		log.debug("Retrieved All {} Role", roleDTOList.size());
 		return roleDTOList;
 	}

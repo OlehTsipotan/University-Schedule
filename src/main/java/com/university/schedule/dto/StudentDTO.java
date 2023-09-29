@@ -2,8 +2,6 @@ package com.university.schedule.dto;
 
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @ToString

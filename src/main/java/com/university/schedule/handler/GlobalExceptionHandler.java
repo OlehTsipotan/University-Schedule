@@ -21,7 +21,8 @@ public class GlobalExceptionHandler {
 
 
 	@ExceptionHandler(RuntimeException.class)
-	public String handleException(RuntimeException runtimeException, Model model, RedirectAttributes redirectAttributes) {
+	public String handleException(RuntimeException runtimeException, Model model,
+	                              RedirectAttributes redirectAttributes) {
 		log.info(runtimeException.getMessage());
 		redirectAttributes.addFlashAttribute("exceptionMessage", runtimeException.getMessage());
 		return "redirect:/error";
@@ -29,7 +30,7 @@ public class GlobalExceptionHandler {
 
 	@ExceptionHandler(RegistrationFailedException.class)
 	public String handleRegistrationException(RegistrationFailedException registrationFailedException,
-	                                        RedirectAttributes redirectAttributes, WebRequest request) {
+	                                          RedirectAttributes redirectAttributes, WebRequest request) {
 		redirectAttributes.addFlashAttribute("registrationServiceError", registrationFailedException.getMessage());
 
 		log.error("RegistrationException occurs, {}", registrationFailedException.getMessage());

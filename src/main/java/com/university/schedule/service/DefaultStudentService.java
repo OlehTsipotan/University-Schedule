@@ -65,7 +65,7 @@ public class DefaultStudentService implements StudentService {
 
 	@Override
 	@Transactional
-	public Long save(StudentDTO studentDTO) {
+	public Long update(StudentDTO studentDTO) {
 		Student foundedStudent = findById(studentDTO.getId());
 		Student studentToSave = convertToEntity(studentDTO);
 		studentToSave.setPassword(foundedStudent.getPassword());

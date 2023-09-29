@@ -130,7 +130,7 @@ public class TeacherRecordsControllerTest {
 
 		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
-		when(teacherService.save((TeacherDTO) any())).thenThrow(validationException);
+		when(teacherService.update((TeacherDTO) any())).thenThrow(validationException);
 		when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
 		when(courseService.findByIdAsDTO(courseDTO.getId())).thenReturn(courseDTO);
 		when(roleService.findByIdAsDTO(roleDTO.getId())).thenReturn(roleDTO);
@@ -139,7 +139,7 @@ public class TeacherRecordsControllerTest {
 				.param("isEnable", "false") // Add any other request parameters as needed
 				.with(csrf()).flashAttr("teacherDTO", teacherDTO)).andExpect(status().is3xxRedirection());
 
-		verify(teacherService, times(1)).save(teacherDTO);
+		verify(teacherService, times(1)).update(teacherDTO);
 	}
 
 	@Test
@@ -156,7 +156,7 @@ public class TeacherRecordsControllerTest {
 
 		ServiceException serviceException = new ServiceException("testException");
 
-		when(teacherService.save((TeacherDTO) any())).thenThrow(serviceException);
+		when(teacherService.update((TeacherDTO) any())).thenThrow(serviceException);
 		when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
 		when(courseService.findByIdAsDTO(courseDTO.getId())).thenReturn(courseDTO);
 		when(roleService.findByIdAsDTO(roleDTO.getId())).thenReturn(roleDTO);
@@ -165,6 +165,6 @@ public class TeacherRecordsControllerTest {
 				.param("isEnable", "false") // Add any other request parameters as needed
 				.with(csrf()).flashAttr("teacherDTO", teacherDTO)).andExpect(status().is3xxRedirection());
 
-		verify(teacherService, times(1)).save(teacherDTO);
+		verify(teacherService, times(1)).update(teacherDTO);
 	}
 }

@@ -16,7 +16,7 @@ public interface StudentService {
 
 	Long save(Student student);
 
-	Long save(StudentDTO studentDTO);
+	Long update(StudentDTO studentDTO);
 
 	Student findById(Long id);
 

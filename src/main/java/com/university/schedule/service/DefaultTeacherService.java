@@ -65,7 +65,7 @@ public class DefaultTeacherService implements TeacherService {
 
 	@Override
 	@Transactional
-	public Long save(TeacherDTO teacherDTO) {
+	public Long update(TeacherDTO teacherDTO) {
 		Teacher foundedTeacher = findById(teacherDTO.getId());
 		Teacher teacherToSave = convertToEntity(teacherDTO);
 		teacherToSave.setPassword(foundedTeacher.getPassword());

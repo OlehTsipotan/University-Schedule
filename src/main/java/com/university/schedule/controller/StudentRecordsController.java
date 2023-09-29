@@ -88,7 +88,7 @@ public class StudentRecordsController {
 
 		if (!result.hasErrors()) {
 			studentDTO.setIsEnable(isEnable);
-			studentService.save(studentDTO);
+			studentService.update(studentDTO);
 			redirectAttributes.addFlashAttribute("success", true);
 			return "redirect:/students/update/" + id;
 		}

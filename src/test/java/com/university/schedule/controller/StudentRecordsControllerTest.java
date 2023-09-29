@@ -120,7 +120,7 @@ public class StudentRecordsControllerTest {
 				.andExpect(status().isOk()).andExpect(model().attributeExists("entity"))
 				.andExpect(model().attribute("entity", studentDTO)).andExpect(view().name("studentsUpdateForm"));
 
-		verify(studentService, times(0)).save(studentDTO);
+		verify(studentService, times(0)).update(studentDTO);
 	}
 
 	@Test
@@ -139,14 +139,14 @@ public class StudentRecordsControllerTest {
 
 		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
-		when(studentService.save((StudentDTO) any())).thenThrow(validationException);
+		when(studentService.update((StudentDTO) any())).thenThrow(validationException);
 		when(studentService.findByIdAsDTO(studentId)).thenReturn(studentDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/students/update/{id}", studentId)
 				.param("isEnable", "false") // Add any other request parameters as needed
 				.with(csrf()).flashAttr("studentDTO", studentDTO)).andExpect(status().is3xxRedirection());
 
-		verify(studentService, times(1)).save(studentDTO);
+		verify(studentService, times(1)).update(studentDTO);
 	}
 
 	@Test
@@ -165,13 +165,13 @@ public class StudentRecordsControllerTest {
 
 		ServiceException serviceException = new ServiceException("testException");
 
-		when(studentService.save((StudentDTO) any())).thenThrow(serviceException);
+		when(studentService.update((StudentDTO) any())).thenThrow(serviceException);
 		when(studentService.findByIdAsDTO(studentId)).thenReturn(studentDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/students/update/{id}", studentId)
 				.param("isEnable", "false") // Add any other request parameters as needed
 				.with(csrf()).flashAttr("studentDTO", studentDTO)).andExpect(status().is3xxRedirection());
 
-		verify(studentService, times(1)).save(studentDTO);
+		verify(studentService, times(1)).update(studentDTO);
 	}
 }

@@ -94,7 +94,7 @@ public class TeacherRecordsController {
 
 		if (!result.hasErrors()) {
 			teacherDTO.setIsEnable(isEnable);
-			teacherService.save(teacherDTO);
+			teacherService.update(teacherDTO);
 			redirectAttributes.addFlashAttribute("success", true);
 			return "redirect:/teachers/update/" + id;
 		}

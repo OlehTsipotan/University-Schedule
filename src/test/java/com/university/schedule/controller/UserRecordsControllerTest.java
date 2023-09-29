@@ -38,7 +38,7 @@ public class UserRecordsControllerTest {
 	@Test
 	@WithMockUser(username = "username", authorities = {"VIEW_USERS"})
 	public void getAll_processPage() throws Exception {
-		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
+		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName", null);
 		List<UserDTO> userDTOS = new ArrayList<>();
 		userDTOS.add(new UserDTO(1L, "email 1", "firstName 1", "lastName 1", roleDTO, true));
 
@@ -99,7 +99,7 @@ public class UserRecordsControllerTest {
 				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", userDTO))
 				.andExpect(view().name("usersUpdateForm"));
 
-		verify(userService, times(0)).save(userDTO);
+		verify(userService, times(0)).update(userDTO);
 	}
 
 	@Test
@@ -114,13 +114,13 @@ public class UserRecordsControllerTest {
 		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
 		when(userService.findByIdAsDTO(userId)).thenReturn(userDTO);
-		when(userService.save((UserDTO) any())).thenThrow(validationException);
+		when(userService.update((UserDTO) any())).thenThrow(validationException);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/users/update/{id}", userId)
 				.param("isEnable", "false") // Add any other request parameters as needed
 				.with(csrf()).flashAttr("userDTO", userDTO)).andExpect(status().is3xxRedirection());
 
-		verify(userService, times(1)).save(userDTO);
+		verify(userService, times(1)).update(userDTO);
 	}
 
 	@Test
@@ -134,7 +134,7 @@ public class UserRecordsControllerTest {
 
 		ServiceException serviceException = new ServiceException("testException");
 
-		when(userService.save((UserDTO) any())).thenThrow(serviceException);
+		when(userService.update((UserDTO) any())).thenThrow(serviceException);
 		when(userService.findByIdAsDTO(userId)).thenReturn(userDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/users/update/{id}", userId)

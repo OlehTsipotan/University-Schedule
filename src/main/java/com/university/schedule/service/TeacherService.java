@@ -17,7 +17,7 @@ public interface TeacherService {
 
 	Long save(Teacher teacher);
 
-	Long save(TeacherDTO teacherDTO);
+	Long update(TeacherDTO teacherDTO);
 
 	TeacherDTO findByIdAsDTO(Long id);
 

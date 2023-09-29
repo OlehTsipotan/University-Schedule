@@ -81,7 +81,7 @@ public class DisciplineRecordsControllerTest {
 		when(disciplineService.findByIdAsDTO(disciplineId)).thenReturn(disciplineDTO);
 
 		mockMvc.perform(MockMvcRequestBuilders.post("/disciplines/update/{id}", disciplineId).with(csrf())
-						.flashAttr("disciplineDTO", disciplineDTO)).andExpect(status().is3xxRedirection())
+						.flashAttr("disciplineDTO", disciplineDTO)).andExpect(status().isOk())
 				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", disciplineDTO))
 				.andExpect(view().name("disciplinesUpdateForm"));
 

@@ -23,4 +23,10 @@ public class RoleDTO {
 	private String name;
 
 	private List<AuthorityDTO> authorityDTOS;
+
+	public RoleDTO(Long id, String name){
+		this.id = id;
+		this.name = name;
+	}
+
 }

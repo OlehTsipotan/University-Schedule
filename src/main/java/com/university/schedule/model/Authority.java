@@ -31,7 +31,9 @@ public class Authority {
 	@Size(max = 255)
 	private String name;
 
-	@ManyToMany(mappedBy = "authorities")
+	@ManyToMany
+	@JoinTable(name = "roles_authorities", joinColumns = @JoinColumn(name = "authority_id"),
+	           inverseJoinColumns = @JoinColumn(name = "role_id"))
 	@ToString.Exclude
 	private Set<Role> roles;
 

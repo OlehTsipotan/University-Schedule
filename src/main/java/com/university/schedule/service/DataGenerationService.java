@@ -1,10 +1,14 @@
 package com.university.schedule.service;
 
 import com.university.schedule.model.*;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.flywaydb.core.Flyway;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +24,8 @@ import java.util.Set;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@PropertySource("classpath:sampleData.properties")
+@PropertySources({
+		@PropertySource("classpath:sampleData.properties"), @PropertySource("classpath:application.properties")})
 public class DataGenerationService {
 
 	private final DisciplineService disciplineService;
@@ -77,6 +82,32 @@ public class DataGenerationService {
 
 	@Value("#{'${data.model.names}'.split('${config.separator}')}")
 	private List<String> modelNames;
+
+	@Value("${data.generation.onStartup}")
+	private boolean generationOnStartup;
+
+	private Flyway flyway;
+
+	@Autowired
+	public void setFlyway(Flyway flyway) {
+		this.flyway = flyway;
+	}
+
+	@PostConstruct
+	private void postConstruct() {
+		if (generationOnStartup) {
+			// prepare database for insertion
+			// TODO: extract preparation into separate class
+			clearDatabase();
+			// generation
+			generate();
+		}
+	}
+
+	private void clearDatabase() {
+		flyway.clean();
+		flyway.migrate();
+	}
 
 	public void generate() {
 		// firstly persist non related entities
@@ -157,8 +188,13 @@ public class DataGenerationService {
 		viewRolesSet.add(adminRole);
 		viewRolesSet.add(teacherRole);
 		viewRolesSet.add(studentRole);
+		log.info(viewRolesSet.toString());
 		for (String modelName : modelNames) {
-			authority = Authority.builder().name(String.format("VIEW_%S", modelName)).roles(viewRolesSet).build();
+			String name = String.format("VIEW_%S", modelName);
+			if ("AUTHORITY".equals(modelName)) {
+				name = "VIEW_AUTHORITIES";
+			}
+			authority = Authority.builder().name(name).roles(viewRolesSet).build();
 			authorityService.save(authority);
 		}
 
@@ -166,7 +202,11 @@ public class DataGenerationService {
 		Set<Role> editRolesSet = new HashSet<>();
 		editRolesSet.add(adminRole);
 		for (String modelName : modelNames) {
-			authority = Authority.builder().name(String.format("EDIT_%S", modelName)).roles(editRolesSet).build();
+			String name = String.format("EDIT_%S", modelName);
+			if ("AUTHORITY".equals(modelName)) {
+				name = "EDIT_AUTHORITIES";
+			}
+			authority = Authority.builder().name(name).roles(editRolesSet).build();
 
 			authorityService.save(authority);
 		}

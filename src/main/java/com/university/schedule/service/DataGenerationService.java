@@ -1,10 +1,10 @@
 package com.university.schedule.service;
 
 import com.university.schedule.model.*;
+import com.university.schedule.validation.DataSchemaService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -86,27 +86,21 @@ public class DataGenerationService {
 	@Value("${data.generation.onStartup}")
 	private boolean generationOnStartup;
 
-	private Flyway flyway;
+	private DataSchemaService dataSchemaService;
 
 	@Autowired
-	public void setFlyway(Flyway flyway) {
-		this.flyway = flyway;
+	public void setDataSchemaService(DataSchemaService dataSchemaService) {
+		this.dataSchemaService = dataSchemaService;
 	}
 
 	@PostConstruct
 	private void postConstruct() {
 		if (generationOnStartup) {
 			// prepare database for insertion
-			// TODO: extract preparation into separate class
-			clearDatabase();
+			dataSchemaService.clean();
 			// generation
 			generate();
 		}
-	}
-
-	private void clearDatabase() {
-		flyway.clean();
-		flyway.migrate();
 	}
 
 	public void generate() {

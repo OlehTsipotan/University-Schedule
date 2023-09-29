@@ -74,9 +74,7 @@ public class ClassroomRecordsController {
 	@Secured("EDIT_CLASSROOMS")
 	@PostMapping("/classrooms/update/{id}")
 	public String update(@PathVariable Long id, @Valid @ModelAttribute ClassroomDTO classroomDTO, BindingResult result,
-	                     Model model, RedirectAttributes redirectAttributes,
-	                     @RequestParam("buildingDTO.id") Long selectedBuildingDTOId) {
-		classroomDTO.setBuildingDTO(buildingService.findByIdAsDTO(selectedBuildingDTOId));
+	                     Model model, RedirectAttributes redirectAttributes) {
 		if (!result.hasErrors()) {
 			classroomService.save(classroomDTO);
 			redirectAttributes.addFlashAttribute("success", true);
@@ -102,10 +100,7 @@ public class ClassroomRecordsController {
 	@Secured("INSERT_CLASSROOMS")
 	@PostMapping("/classrooms/insert")
 	public String insert(@Valid @ModelAttribute ClassroomDTO classroomDTO, BindingResult result, Model model,
-	                     RedirectAttributes redirectAttributes,
-	                     @RequestParam("buildingDTO.id") Long selectedBuildingDTOId) {
-
-		classroomDTO.setBuildingDTO(buildingService.findByIdAsDTO(selectedBuildingDTOId));
+	                     RedirectAttributes redirectAttributes) {
 		if (!result.hasErrors()) {
 			Long id = classroomService.save(classroomDTO);
 			redirectAttributes.addFlashAttribute("insertedSuccessId", id);

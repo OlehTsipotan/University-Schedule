@@ -59,7 +59,7 @@
             <div class="form-group row mb-2">
                 <label for="inputBuildingDTO" class="col-sm-2 col-form-label fw-bold">Building</label>
                 <div class="col-sm-10">
-                    <select name="buildingDTO.id" id="inputBuildingDTO" required
+                    <select name="buildingDTO" id="inputBuildingDTO" required
                             th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('buildingDTO') ? 'is-invalid form-select' : 'form-select')}">
                         <option th:each="buildingDTO : ${buildingDTOList}"
                                 th:value="${buildingDTO.getId()}"

@@ -4,8 +4,9 @@ This project is a Java Spring web application for accessing and managing univers
 
 ## Table of Contents
 - [Project Description](#project-description)
+- [Technology Stack](#technology-stack)
 - [How to Install and Run the Project](#how-to-install-and-run-the-project)
-- [How to Use the Project](how-to-use-the-project)
+- [How to Use the Project](#how-to-use-the-project)
 - [Credits](#credits)
 
 ## Project Description

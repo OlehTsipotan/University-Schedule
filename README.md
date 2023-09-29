@@ -47,24 +47,28 @@ Search and filter schedules based on different criteria.
 
 
 ## How to Install and Run the Project
-Prerequisites:
+### Prerequisites:
 
 Java 11 or higher installed.
 PostreSQL database server set up.
-Clone the Repository:
 
-bash
-Copy code
-git clone https://github.com/OlehTsipotan/University-Schedule.git
-Database Configuration:
+### Installing 
+1. Clone the repo
 
-Create a Postgresql database and assign url, username, password to relative env. variable SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD
-Build and Run:
+```sh
+git clone https://github.com/ShaanCoding/ReadME-Generator.git
+```
+2. SetUp env. variables - Create a Postgresql database and assign url, username, password to relative env. variable SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD
 
-bash
-Copy code
+3. Run
+```sh
 cd university-schedule-app
+```
+```sh
 ./mvnw spring-boot:run
+```
+
+4. Have fun!
 The application will be accessible at http://localhost:8080.
 
 ## How to Use the Project

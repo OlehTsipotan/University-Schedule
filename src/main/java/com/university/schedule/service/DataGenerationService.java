@@ -86,6 +86,17 @@ public class DataGenerationService {
 	@Value("${data.generation.onStartup}")
 	private boolean generationOnStartup;
 
+	@Value("${data.user.admin.firstName}")
+	private String adminFirstName;
+	@Value("${data.user.admin.lastName}")
+	private String adminLastName;
+
+	@Value("${data.user.admin.password}")
+	private String adminPassword;
+
+	@Value("${data.user.admin.email}")
+	private String adminEmail;
+
 	private DataSchemaService dataSchemaService;
 
 	@Autowired
@@ -135,11 +146,8 @@ public class DataGenerationService {
 		assignCoursesToGroups();
 		log.info("Courses assigned to Groups");
 
-		persistStudents();
-		log.info("Students Persisted");
-
-		persistTeachers();
-		log.info("Teachers Persisted");
+		persistUsers();
+		log.info("Users Persisted");
 
 		assignCoursesToTeachers();
 		log.info("Courses assigned to Teachers");
@@ -147,9 +155,16 @@ public class DataGenerationService {
 		generateScheduledClass();
 		log.info("Schedule Generated");
 
-		persistUsers();
-		log.info("Users Persisted");
 
+	}
+
+	private void persistUsers() {
+		persistStudents();
+		log.info("Students Persisted");
+		persistTeachers();
+		log.info("Teachers Persisted");
+		persistAdmin();
+		log.info("Admin Persisted");
 	}
 
 	private void persistDisciplines() {
@@ -172,37 +187,42 @@ public class DataGenerationService {
 	}
 
 	private void persistAuthorities() {
-		// VIEW
-		Authority authority;
+		persistViewAuthorities();
+		persistEditAuthorities();
+	}
+
+	private void persistViewAuthorities() {
+		Set<Role> viewRolesSet = new HashSet<>(roleService.findAll());
+		generateAuthorities("VIEW_").forEach(authority -> {
+			authority.setRoles(viewRolesSet);
+			log.info(authority.toString());
+			authorityService.save(authority);
+		});
+	}
+
+	private void persistEditAuthorities() {
 		Role adminRole = roleService.findByName("Admin");
 		Role teacherRole = roleService.findByName("Teacher");
 
-		Set<Role> viewRolesSet = new HashSet<>(roleService.findAll());
-		for (String modelName : modelNames) {
-			String name = String.format("VIEW_%S", modelName);
-			if ("AUTHORITY".equals(modelName)) {
-				name = "VIEW_AUTHORITIES";
-			}
-			authority = Authority.builder().name(name).roles(viewRolesSet).build();
-			authorityService.save(authority);
-		}
-
-		// EDIT
 		Set<Role> editRolesSet = new HashSet<>();
 		editRolesSet.add(adminRole);
-		for (String modelName : modelNames) {
-			String name = String.format("EDIT_%S", modelName);
-			if ("AUTHORITY".equals(modelName)) {
-				name = "EDIT_AUTHORITIES";
-			}
-			authority = Authority.builder().name(name).roles(editRolesSet).build();
-
+		generateAuthorities("EDIT_").forEach(authority -> {
+			authority.setRoles(editRolesSet);
 			authorityService.save(authority);
-		}
+		});
 
-		authority = authorityService.findByName("EDIT_CLASSES");
+		Authority authority = authorityService.findByName("EDIT_CLASSES");
 		authority.setRoles(Set.of(adminRole, teacherRole));
 		authorityService.save(authority);
+	}
+
+	private List<Authority> generateAuthorities(String prefix) {
+		List<Authority> authorities = new ArrayList<>();
+		for (String modelName : modelNames) {
+			String name = String.format("%s%s", prefix, modelName);
+			authorities.add(Authority.builder().name(name).build());
+		}
+		return authorities;
 	}
 
 
@@ -342,9 +362,10 @@ public class DataGenerationService {
 		scheduleGenerator.generate(LocalDate.of(2023, 9, 1), LocalDate.of(2023, 12, 20), dayScheduleItemList);
 	}
 
-	private void persistUsers() {
-		User admin = User.builder().email("admin@admin.com").password(passwordEncoder.encode("adminPassword"))
-				.firstName("Admin").lastName("Admin").role(roleService.findByName("Admin")).isEnable(true).build();
+	private void persistAdmin() {
+		User admin = User.builder().email(adminEmail).password(passwordEncoder.encode(adminPassword))
+				.firstName(adminFirstName).lastName(adminLastName).role(roleService.findByName("Admin")).isEnable(true)
+				.build();
 		userService.save(admin);
 	}
 }

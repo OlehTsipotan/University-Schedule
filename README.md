@@ -61,7 +61,10 @@ PostreSQL database server set up.
 ```sh
 git clone https://github.com/ShaanCoding/ReadME-Generator.git
 ```
-2. SetUp env. variables - Create a Postgresql database and assign url, username, password to relative env. variable SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD
+2. SetUp env. variables - Create a Postgresql database and assign url, username, password to relative env. variable 
+- SPRING_DATASOURCE_URL
+- SPRING_DATASOURCE_USERNAME 
+- SPRING_DATASOURCE_PASSWORD
 
 3. Run
 ```sh
@@ -75,9 +78,15 @@ cd university-schedule-app
 The application will be accessible at http://localhost:8080.
 
 ## How to Use the Project
-Register or Login as user (Student, Teacher) by http://localhost:8080/user/login,
+#### **User**
+Register or Login (Student, Teacher) --> http://localhost:8080/user/login,
 
-Login as admin by http://localhost:8080/admin/login (email: admin@admin.com, password: adminPassword)
+#### **Admin**
+Login as Admin -->  http://localhost:8080/admin/login 
+- email: admin@admin.com
+- password: adminPassword
+
+<u>Change in properties file and turn on data generation</u>
 
 ## Credits
 Oleh Tsipotan - developer (https://www.linkedin.com/in/oleh-tsipotan/)

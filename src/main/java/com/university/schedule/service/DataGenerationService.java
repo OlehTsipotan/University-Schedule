@@ -176,13 +176,8 @@ public class DataGenerationService {
 		Authority authority;
 		Role adminRole = roleService.findByName("Admin");
 		Role teacherRole = roleService.findByName("Teacher");
-		Role studentRole = roleService.findByName("Student");
 
-		Set<Role> viewRolesSet = new HashSet<>();
-		viewRolesSet.add(adminRole);
-		viewRolesSet.add(teacherRole);
-		viewRolesSet.add(studentRole);
-		log.info(viewRolesSet.toString());
+		Set<Role> viewRolesSet = new HashSet<>(roleService.findAll());
 		for (String modelName : modelNames) {
 			String name = String.format("VIEW_%S", modelName);
 			if ("AUTHORITY".equals(modelName)) {
@@ -223,11 +218,12 @@ public class DataGenerationService {
 	}
 
 	private void persistClassTimes() {
-		classTimeService.save(new ClassTime(1, LocalTime.of(8, 30), Duration.ofMinutes(95)));
-		classTimeService.save(new ClassTime(2, LocalTime.of(10, 20), Duration.ofMinutes(95)));
-		classTimeService.save(new ClassTime(3, LocalTime.of(12, 10), Duration.ofMinutes(95)));
-		classTimeService.save(new ClassTime(4, LocalTime.of(14, 50), Duration.ofMinutes(95)));
-		classTimeService.save(new ClassTime(5, LocalTime.of(16, 0), Duration.ofMinutes(95)));
+		Duration duration = Duration.ofMinutes(95);
+		LocalTime firstClassStartTime = LocalTime.of(8, 30);
+
+		for (int i = 1; i <= 5; i++) {
+			classTimeService.save(new ClassTime(i, firstClassStartTime.plusMinutes(duration.toMinutes()), duration));
+		}
 	}
 
 	private void persistGroups() {
@@ -342,10 +338,6 @@ public class DataGenerationService {
 				.build();
 
 		dayScheduleItemList.add(dayScheduleItem);
-
-		dayScheduleItemList.forEach(dayScheduleItem1 -> {
-			log.info(dayScheduleItem1.toString());
-		});
 
 		scheduleGenerator.generate(LocalDate.of(2023, 9, 1), LocalDate.of(2023, 12, 20), dayScheduleItemList);
 	}

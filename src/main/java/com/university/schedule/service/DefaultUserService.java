@@ -64,27 +64,10 @@ public class DefaultUserService implements UserService {
 	@Override
 	@Transactional
 	public Long update(UserDTO userDTO) {
-
-		User foundedUser = findById(userDTO.getId());
-
-		User userToSave = convertToEntity(userDTO);
-
-		if (foundedUser instanceof Student) {
-			Student student = convertToStudentEntity(userDTO);
-			student.setGroup(((Student) foundedUser).getGroup());
-			userToSave = student;
-		} else if (foundedUser instanceof Teacher) {
-			Teacher teacher = convertToTeacherEntity(userDTO);
-			teacher.setCourses(((Teacher) foundedUser).getCourses());
-			userToSave = teacher;
-		}
-
-		userToSave.setPassword(foundedUser.getPassword());
-
-		User finalUserToSave = userToSave;
+		User userToSave = convertToExistingEntity(userDTO);
 		execute(() -> {
-			userEntityValidator.validate(finalUserToSave);
-			userRepository.save(finalUserToSave);
+			userEntityValidator.validate(userToSave);
+			userRepository.save(userToSave);
 		});
 		log.info("saved {}", userToSave);
 		return userToSave.getId();
@@ -137,7 +120,26 @@ public class DefaultUserService implements UserService {
 		return converterService.convert(source, UserDTO.class);
 	}
 
-	private User convertToEntity(UserDTO source) {
+	private User convertToExistingEntity(UserDTO source) {
+		User foundedUser = findById(source.getId());
+
+		User userToSave = convertToEntity(source);
+
+		if (foundedUser instanceof Student) {
+			Student student = convertToStudentEntity(source);
+			student.setGroup(((Student) foundedUser).getGroup());
+			userToSave = student;
+		} else if (foundedUser instanceof Teacher) {
+			Teacher teacher = convertToTeacherEntity(source);
+			teacher.setCourses(((Teacher) foundedUser).getCourses());
+			userToSave = teacher;
+		}
+		userToSave.setPassword(foundedUser.getPassword());
+
+		return userToSave;
+	}
+
+	private User convertToEntity(UserDTO source){
 		return converterService.convert(source, User.class);
 	}
 

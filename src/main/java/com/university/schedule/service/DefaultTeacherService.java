@@ -66,9 +66,7 @@ public class DefaultTeacherService implements TeacherService {
 	@Override
 	@Transactional
 	public Long update(TeacherDTO teacherDTO) {
-		Teacher foundedTeacher = findById(teacherDTO.getId());
-		Teacher teacherToSave = convertToEntity(teacherDTO);
-		teacherToSave.setPassword(foundedTeacher.getPassword());
+		Teacher teacherToSave = convertToExistingEntity(teacherDTO);
 		execute(() -> {
 			teacherEntityValidator.validate(teacherToSave);
 			teacherRepository.save(teacherToSave);
@@ -117,6 +115,13 @@ public class DefaultTeacherService implements TeacherService {
 
 	private Teacher convertToEntity(TeacherDTO source) {
 		return converterService.convert(source, Teacher.class);
+	}
+
+	private Teacher convertToExistingEntity(TeacherDTO teacherDTO) {
+		Teacher foundedTeacher = findById(teacherDTO.getId());
+		Teacher teacherResult = convertToEntity(teacherDTO);
+		teacherResult.setPassword(foundedTeacher.getPassword());
+		return teacherResult;
 	}
 
 	private <T> T execute(DaoSupplier<T> supplier) {

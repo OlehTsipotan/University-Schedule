@@ -1,20 +1,28 @@
 package com.university.schedule.service;
 
+import com.university.schedule.dto.BuildingDTO;
 import com.university.schedule.model.Building;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface BuildingService {
 
-    Long save(Building building);
+	Long save(Building building);
 
-    Building findById(Long id);
+	Long save(BuildingDTO buildingDTO);
 
-    Building findByName(String name);
+	BuildingDTO findByIdAsDTO(Long id);
 
-    Building findByAddress(String address);
+	BuildingDTO findByNameAsDTO(String name);
 
-    List<Building> findAll();
+	BuildingDTO findByAddressAsDTO(String address);
 
-    void deleteById(Long id);
+	List<Building> findAll();
+
+	List<BuildingDTO> findAllAsDTO();
+
+	List<BuildingDTO> findAllAsDTO(Pageable pageable);
+
+	void deleteById(Long id);
 }

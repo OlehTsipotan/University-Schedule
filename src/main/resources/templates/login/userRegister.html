@@ -1,0 +1,140 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content="University schedule web-application "/>
+    <meta name="author" content="Oleh Tsipotan"/>
+    <title>Register</title>
+
+    <link th:href="@{/assets/calendar-days-solid.svg}" rel="icon" type="image/x-icon"/>
+
+    <link th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
+
+</head>
+<body>
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-md-6 offset-md-3">
+            <div th:if="${validationServiceErrors != null}">
+                <div th:each="violation : ${validationServiceErrors}" class="alert alert-warning mt-3"
+                     th:text="${violation}"></div>
+            </div>
+
+            <div th:if="${registrationServiceError != null}">
+                <div class="alert alert-warning mt-3"
+                     th:text="${registrationServiceError}"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="text-center">User Registration</h2>
+                </div>
+                <div class="card-body">
+                    <form
+                            method="post"
+                            role="form"
+                            th:action="@{/user/register}"
+                            th:object="${userRegisterDTO}"
+                            class="form-horizontal"
+                    >
+                        <!--Email Input-->
+                        <div class="form-group mb-3">
+                            <label class="control-label">Email</label>
+                            <input type="email" name="email" id="inputEmail" placeholder="myemail@email.com"
+                                   th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('email') ? 'is-invalid form-control' : 'form-control')}"
+                                   required>
+                            <div th:if="${success}" class="valid-feedback">
+                                Looks good!
+                            </div>
+                            <div th:each="error : ${#fields.errors('email')}"
+                                 class="invalid-feedback"
+                                 th:text=${error}>
+                            </div>
+                        </div>
+                        <!--FirstName Input-->
+                        <div class="form-group mb-3">
+                            <label class="control-label">First Name</label>
+                            <input type="text" name="firstName" id="inputFirstName" placeholder="First Name"
+                                   th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('firstName') ? 'is-invalid form-control' : 'form-control')}"
+                                   required>
+                            <div th:if="${success}" class="valid-feedback">
+                                Looks good!
+                            </div>
+                            <div th:each="error : ${#fields.errors('firstName')}"
+                                 class="invalid-feedback"
+                                 th:text=${error}>
+                            </div>
+                        </div>
+                        <!--LastName Input-->
+                        <div class="form-group mb-3">
+                            <label class="control-label">Last Name</label>
+                            <input type="text" name="lastName" id="inputLastName" placeholder="Last Name"
+                                   th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('lastName') ? 'is-invalid form-control' : 'form-control')}"
+                                   required>
+                            <div th:if="${success}" class="valid-feedback">
+                                Looks good!
+                            </div>
+                            <div th:each="error : ${#fields.errors('lastName')}"
+                                 class="invalid-feedback"
+                                 th:text=${error}>
+                            </div>
+                        </div>
+                        <!-- Role Input -->
+                        <div class="form-group mb-3">
+                            <label class="control-label">Role</label>
+                            <select class="form-select" name="roleDTO.id" id="inputRole" required
+                                    th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('roleDTO') ? 'is-invalid form-select' : 'form-select')}">
+                                <option th:each="roleDTO : ${roleDTOList}" th:value="${roleDTO.getId()}"
+                                        th:text="${roleDTO.getName()}"></option>
+                            </select>
+                            <div th:if="${success}" class="valid-feedback">
+                                Looks good!
+                            </div>
+                            <div th:each="error : ${#fields.errors('roleDTO')}"
+                                 class="invalid-feedback"
+                                 th:text=${error}>
+                            </div>
+                        </div>
+                        <!--Password Input-->
+                        <div class="form-group mb-3">
+                            <label class="control-label">Password</label>
+                            <input type="password" name="password" id="inputPassword" placeholder="Password"
+                                   th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('password') ? 'is-invalid form-control' : 'form-control')}"
+                                   required>
+                            <div th:if="${success}" class="valid-feedback">
+                                Looks good!
+                            </div>
+                            <div th:each="error : ${#fields.errors('password')}"
+                                 class="invalid-feedback"
+                                 th:text=${error}>
+                            </div>
+                        </div>
+                        <!--ConfirmationPassword Input-->
+                        <div class="form-group mb-3">
+                            <label class="control-label">Confirm Password</label>
+                            <input type="password" name="confirmationPassword" id="inputConfirmationPassword"
+                                   placeholder="Confirmation Password"
+                                   th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('confirmationPassword') ? 'is-invalid form-control' : 'form-control')}"
+                                   required>
+                            <div th:if="${success}" class="valid-feedback">
+                                Looks good!
+                            </div>
+                            <div th:each="error : ${#fields.errors('confirmationPassword')}"
+                                 class="invalid-feedback"
+                                 th:text=${error}>
+                            </div>
+                        </div>
+                        <div class="form-group mb-3">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

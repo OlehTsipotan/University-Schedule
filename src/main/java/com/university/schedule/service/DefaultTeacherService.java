@@ -1,13 +1,17 @@
 package com.university.schedule.service;
 
+import com.university.schedule.converter.ConverterService;
+import com.university.schedule.dto.TeacherDTO;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Course;
 import com.university.schedule.model.Teacher;
 import com.university.schedule.repository.TeacherRepository;
-import com.university.schedule.utility.EntityValidator;
+import com.university.schedule.validation.TeacherEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,100 +23,125 @@ import java.util.List;
 @Transactional
 public class DefaultTeacherService implements TeacherService {
 
-    private final TeacherRepository teacherRepository;
+	private final TeacherRepository teacherRepository;
 
-    private final CourseService courseService;
+	private final ConverterService converterService;
 
-    private final EntityValidator entityValidator;
+	private final TeacherEntityValidator teacherEntityValidator;
 
-    @Override
-    public List<Teacher> findAll() {
-        List<Teacher> teachers = execute(() -> teacherRepository.findAll());
-        log.debug("Retrieved All {} Groups", teachers.size());
-        return teachers;
-    }
+	@Override
+	public List<Teacher> findAll() {
+		List<Teacher> teachers = execute(() -> teacherRepository.findAll());
+		log.debug("Retrieved All {} Teachers", teachers.size());
+		return teachers;
+	}
 
-    @Override
-    @Transactional
-    public Long save(Teacher teacher) {
-        entityValidator.validate(teacher);
-        execute(() -> teacherRepository.save(teacher));
-        log.info("saved {}", teacher);
-        return teacher.getId();
-    }
+	@Override
+	public List<TeacherDTO> findAllAsDTO() {
+		List<TeacherDTO> teacherDTOList =
+				execute(() -> teacherRepository.findAll()).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} Teachers", teacherDTOList.size());
+		return teacherDTOList;
+	}
 
-    @Override
-    public Teacher findById(Long id) {
-        Teacher teacher = execute(() -> teacherRepository.findById(id)).orElseThrow(
-                () -> new ServiceException("Teacher not found"));
-        log.debug("Retrieved {}", teacher);
-        return teacher;
-    }
+	@Override
+	public List<TeacherDTO> findAllAsDTO(Pageable pageable) {
+		List<TeacherDTO> teacherDTOList =
+				execute(() -> teacherRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} Teachers", teacherDTOList.size());
+		return teacherDTOList;
+	}
 
-    @Override
-    public Teacher findByEmailAndPassword(String email, String password) {
-        Teacher teacher = execute(() -> teacherRepository.findByEmailAndPassword(email, password)).orElseThrow(
-                () -> new ServiceException("Teacher not found"));
-        log.debug("Retrieved {}", teacher);
-        return teacher;
-    }
+	@Override
+	@Transactional
+	public Long save(Teacher teacher) {
+		execute(() -> {
+			teacherEntityValidator.validate(teacher);
+			teacherRepository.save(teacher);
+		});
+		log.info("saved {}", teacher);
+		return teacher.getId();
+	}
 
-    @Override
-    @Transactional
-    public void deleteById(Long id) {
-        execute(() -> teacherRepository.deleteById(id));
-        log.info("Deleted id = {}", id);
-    }
+	@Override
+	@Transactional
+	public Long update(TeacherDTO teacherDTO) {
+		Teacher foundedTeacher = findById(teacherDTO.getId());
+		Teacher teacherToSave = convertToEntity(teacherDTO);
+		teacherToSave.setPassword(foundedTeacher.getPassword());
+		execute(() -> {
+			teacherEntityValidator.validate(teacherToSave);
+			teacherRepository.save(teacherToSave);
+		});
+		log.info("saved {}", teacherToSave);
+		return teacherToSave.getId();
+	}
 
-    @Override
-    @Transactional
-    public boolean assignToCourse(Long teacherId, Long courseId) {
-        Teacher teacher = teacherRepository.findById(teacherId).orElseThrow(
-                () -> new ServiceException("There is no Teacher with id = " + teacherId));
-        Course course = courseService.findById(courseId);
-        boolean result = teacher.getCourses().add(course);
+	private Teacher findById(Long id) {
+		Teacher teacher = execute(() -> teacherRepository.findById(id)).orElseThrow(
+				() -> new ServiceException("Teacher not found"));
+		log.debug("Retrieved {}", teacher);
+		return teacher;
+	}
 
-        save(teacher);
-        log.info("{} assigned to {} - {}", teacher, course, result);
-        return result;
-    }
+	@Override
+	public TeacherDTO findByIdAsDTO(Long id) {
+		Teacher teacher = execute(() -> teacherRepository.findById(id)).orElseThrow(
+				() -> new ServiceException("Teacher not found"));
+		log.debug("Retrieved {}", teacher);
+		return convertToDTO(teacher);
+	}
 
-    @Override
-    @Transactional
-    public boolean removeFromCourse(Long teacherId, Long courseId) {
-        Teacher teacher = teacherRepository.findById(teacherId).orElseThrow(
-                () -> new ServiceException("There is no Teacher with id = " + teacherId));
-        Course course = courseService.findById(courseId);
-        boolean result = teacher.getCourses().remove(course);
+	@Override
+	@Transactional
+	public void deleteById(Long id) {
+		try {
+			findById(id);
+		} catch (ServiceException e) {
+			throw new DeletionFailedException("There is no Teacher to delete with id = " + id);
+		}
+		execute(() -> teacherRepository.deleteById(id));
+		log.info("Deleted id = {}", id);
+	}
 
-        save(teacher);
-        log.info("{} removed from {} - {}", teacher, course, result);
-        return result;
-    }
+	@Override
+	public List<Teacher> findByCourses(Course course) {
+		List<Teacher> teachers = execute(() -> teacherRepository.findByCourses(course));
+		log.debug("Retrieved All {} Groups", teachers.size());
+		return teachers;
+	}
 
-    private <T> T execute(DaoSupplier<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (DataAccessException e) {
-            throw new ServiceException("DAO operation failed", e);
-        }
-    }
+	private TeacherDTO convertToDTO(Teacher source) {
+		return converterService.convert(source, TeacherDTO.class);
+	}
 
-    private void execute(DaoProcessor processor) {
-        try {
-            processor.process();
-        } catch (DataAccessException e) {
-            throw new ServiceException("DAO operation failed", e);
-        }
-    }
+	private Teacher convertToEntity(TeacherDTO source) {
+		return converterService.convert(source, Teacher.class);
+	}
 
-    @FunctionalInterface
-    public interface DaoSupplier<T> {
-        T get();
-    }
+	private <T> T execute(DaoSupplier<T> supplier) {
+		try {
+			return supplier.get();
+		} catch (DataAccessException e) {
+			throw new ServiceException("DAO operation failed", e);
+		}
+	}
 
-    @FunctionalInterface
-    public interface DaoProcessor {
-        void process();
-    }
+	private void execute(DaoProcessor processor) {
+		try {
+			processor.process();
+		} catch (DataAccessException e) {
+			throw new ServiceException("DAO operation failed", e);
+		}
+	}
+
+	@FunctionalInterface
+	public interface DaoSupplier<T> {
+		T get();
+	}
+
+	@FunctionalInterface
+	public interface DaoProcessor {
+		void process();
+	}
 }

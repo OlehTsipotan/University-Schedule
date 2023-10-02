@@ -1,27 +1,26 @@
 package com.university.schedule.service;
 
+import com.university.schedule.dto.StudentDTO;
 import com.university.schedule.model.Student;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
 public interface StudentService {
 
-    List<Student> findAll();
+	List<Student> findAll();
 
-    List<Student> findAll(Sort sort);
+	List<StudentDTO> findAllAsDTO();
 
-    Page<Student> findAll(Pageable pageable);
+	List<StudentDTO> findAllAsDTO(Pageable pageable);
 
-    Long save(Student student);
+	Long save(Student student);
 
-    Student findById(Long id);
+	Long update(StudentDTO studentDTO);
 
-    Student findByEmailAndPassword(String email, String password);
+	Student findById(Long id);
 
-    List<Student> findByGroupsName(String groupName);
+	StudentDTO findByIdAsDTO(Long id);
 
-    void deleteById(Long id);
+	void deleteById(Long id);
 }

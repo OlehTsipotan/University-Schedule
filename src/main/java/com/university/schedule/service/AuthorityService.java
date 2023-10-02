@@ -1,25 +1,31 @@
 package com.university.schedule.service;
 
+import com.university.schedule.dto.AuthorityDTO;
 import com.university.schedule.model.Authority;
 import com.university.schedule.model.Role;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface AuthorityService {
 
-    Long save(Authority authority);
+	Long save(Authority authority);
 
-    Authority findById(Long id);
+	Long save(AuthorityDTO authorityDTO);
 
-    Authority findByName(String name);
+	Authority findById(Long id);
 
-    List<Authority> findByRole(Role role);
+	AuthorityDTO findByIdAsDTO(Long id);
 
-    List<Authority> findAll();
+	Authority findByName(String name);
 
-    Page<Authority> findAll(Pageable pageable);
+	List<Authority> findByRole(Role role);
 
-    void deleteById(Long id);
+	List<Authority> findAll();
+
+	List<AuthorityDTO> findAllAsDTO();
+
+	List<AuthorityDTO> findAllAsDTO(Pageable pageable);
+
+	void deleteById(Long id);
 }

@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface ClassTimeRepository extends JpaRepository<ClassTime, Long> {
 
-    Optional<ClassTime> findByOrderNumber(Integer order);
+	Optional<ClassTime> findByOrderNumber(Integer order);
 
 }

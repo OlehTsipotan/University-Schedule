@@ -15,15 +15,12 @@
     <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar('ClassTime Update')}"></div>
+<div th:replace="~{fragments/navbar :: navbarWithBackPage('ClassTime Update', '/classtimes')}"></div>
 <div class="container">
     <div class="row">
         <!-- Alerts -->
-        <div th:if="${param.success}">
+        <div th:if="${success}">
             <div class="alert alert-success mt-3">Updated!</div>
-        </div>
-        <div th:if="${serviceError != null}">
-            <div class="alert alert-warning mt-3" th:text="${serviceError}"></div>
         </div>
         <div th:if="${validationServiceErrors != null}">
             <div th:each="violation : ${validationServiceErrors}" class="alert alert-warning mt-3"
@@ -34,8 +31,8 @@
                 method="post"
                 role="form"
                 th:action="@{'/classtimes/update/' + ${entity.getId()}}"
-                class="form-horizontal"
-                th:object="${classTimeUpdateDTO}">
+                class="form-horizontal mt-3"
+                th:object="${classTimeDTO}">
             <!-- static ID input -->
             <div class="form-group row mb-2">
                 <label for="staticId" class="col-sm-2 col-form-label fw-bold">ID</label>
@@ -49,10 +46,10 @@
                 <label for="inputOrderNumber" class="col-sm-2 col-form-label fw-bold">Order Number</label>
                 <div class="col-sm-10">
                     <input type="number" name="orderNumber" id="inputOrderNumber"
-                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('orderNumber') ? 'is-invalid form-control' : 'form-control')}"
+                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('orderNumber') ? 'is-invalid form-control' : 'form-control')}"
                            placeholder="Order Number"
                            th:value="${entity.getOrderNumber()}" required>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
                     <div th:each="error : ${#fields.errors('orderNumber')}"
@@ -66,10 +63,10 @@
                 <label for="inputStartTime" class="col-sm-2 col-form-label fw-bold">Start Time</label>
                 <div class="col-sm-10">
                     <input type="time" name="startTime" id="inputStartTime"
-                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('startTime') ? 'is-invalid form-control' : 'form-control')}"
+                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('startTime') ? 'is-invalid form-control' : 'form-control')}"
                            placeholder="Start Time"
                            th:value="${entity.getStartTime()}" required>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
                     <div th:each="error : ${#fields.errors('startTime')}"
@@ -83,9 +80,9 @@
                 <label for="inputDurationMinutes" class="col-sm-2 col-form-label fw-bold">Duration (Minutes)</label>
                 <div class="col-sm-10">
                     <input type="number" name="durationMinutes" id="inputDurationMinutes" placeholder="Duration"
-                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('durationMinutes') ? 'is-invalid form-control' : 'form-control')}"
+                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('durationMinutes') ? 'is-invalid form-control' : 'form-control')}"
                            th:value="${entity.getDurationMinutes()}" required>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
                     <div th:each="error : ${#fields.errors('durationMinutes')}"

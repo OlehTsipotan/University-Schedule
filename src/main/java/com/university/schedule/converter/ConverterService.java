@@ -14,11 +14,11 @@ import java.util.List;
 @Service
 public class ConverterService extends GenericConversionService {
 
-    @Autowired
-    private List<Converter<?, ?>> _converters;
+	@Autowired
+	private List<Converter<?, ?>> _converters;
 
-    @PostConstruct
-    public void init() {
-        _converters.forEach(this::addConverter);
-    }
+	@PostConstruct
+	public void init() {
+		_converters.forEach(this::addConverter);
+	}
 }

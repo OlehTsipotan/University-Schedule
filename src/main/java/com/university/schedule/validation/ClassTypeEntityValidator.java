@@ -13,31 +13,31 @@ import java.util.Optional;
 @Component
 public class ClassTypeEntityValidator extends EntityValidator<ClassType> {
 
-    private final ClassTypeRepository classTypeRepository;
+	private final ClassTypeRepository classTypeRepository;
 
-    public ClassTypeEntityValidator(ClassTypeRepository classTypeRepository, Validator validator) {
-        super(validator);
-        this.classTypeRepository = classTypeRepository;
-    }
+	public ClassTypeEntityValidator(ClassTypeRepository classTypeRepository, Validator validator) {
+		super(validator);
+		this.classTypeRepository = classTypeRepository;
+	}
 
-    @Override
-    public void validate(ClassType classType) {
-        List<String> violations = new ArrayList<>();
-        try {
-            super.validate(classType);
-        } catch (ValidationException e) {
-            violations = e.getViolations();
-        }
+	@Override
+	public void validate(ClassType classType) {
+		List<String> violations = new ArrayList<>();
+		try {
+			super.validate(classType);
+		} catch (ValidationException e) {
+			violations = e.getViolations();
+		}
 
-        Optional<ClassType> classTypeToCheck = classTypeRepository.findByName(classType.getName());
-        if (classTypeToCheck.isPresent() && !classType.equals(classTypeToCheck.get())) {
-            violations.add(String.format("ClassType with name = %s, already exists.", classType.getName()));
-        }
+		Optional<ClassType> classTypeToCheck = classTypeRepository.findByName(classType.getName());
+		if (classTypeToCheck.isPresent() && !classType.equals(classTypeToCheck.get())) {
+			violations.add(String.format("ClassType with name = %s, already exists.", classType.getName()));
+		}
 
 
-        if (!violations.isEmpty()) {
-            throw new ValidationException("ClassType is not valid", violations);
-        }
+		if (!violations.isEmpty()) {
+			throw new ValidationException("ClassType is not valid", violations);
+		}
 
-    }
+	}
 }

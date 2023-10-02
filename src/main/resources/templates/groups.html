@@ -16,6 +16,12 @@
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar('Groups')}"></div>
+<div th:if="${success}">
+    <div class="alert alert-success mt-3" th:text="${success}"></div>
+</div>
+<div th:if="${insertedSuccessId}">
+    <div class="alert alert-success mt-3" th:text="@{'Inserted Record with ID = ' + ${insertedSuccessId} + '.'}"></div>
+</div>
 <div th:if="${entities.size() > 0}">
     <table class="table table-hover table-bordered table-responsive-md">
         <thead class="thead-light">
@@ -31,20 +37,24 @@
         <tr th:each="entity : ${entities}">
             <th scope="row" th:text="${entity.getId()}"></th>
             <td th:text="${entity.getName()}"></td>
-            <td th:text="${entity.getDisciplineName()}"></td>
+            <td th:text="${entity.getDisciplineDTO().getName()}"></td>
             <td>
-                <span th:each="courseName, iterStat : ${entity.getCourseNames()}"><span
-                        th:text="${courseName}"></span><span th:if="${!iterStat.last}">, </span></span>
+                <span th:each="courseDTO, iterStat : ${entity.getCourseDTOS()}"><span
+                        th:text="${courseDTO.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
             </td>
             <td sec:authorize="hasAuthority('EDIT_GROUPS')" class="static-col">
                 <a th:href="@{'/groups/update/' + ${entity.getId()}}" id="btnUpdate"
-                   title="Delete this Building" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
+                   title="Update this Group" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
                 <a th:href="@{'/groups/delete/' + ${entity.getId()}}" id="btnDelete"
                    title="Delete this Group" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
             </td>
         </tr>
         </tbody>
     </table>
+    <div sec:authorize="hasAuthority('INSERT_GROUPS')" class="sticky-bottom bg-light p-3">
+        <button type="button"
+                class="btn btn-primary"><a class="nav-link" href="/groups/insert">Insert new</a></button>
+    </div>
 </div>
 <div class="" th:unless="${entities.size() > 0}">
     <span>No Groups found!</span>

@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface GroupRepository extends JpaRepository<Group, Long> {
 
-    List<Group> findByDiscipline(Discipline discipline);
+	List<Group> findByDiscipline(Discipline discipline);
 
-    Optional<Group> findByName(String name);
+	Optional<Group> findByName(String name);
 }

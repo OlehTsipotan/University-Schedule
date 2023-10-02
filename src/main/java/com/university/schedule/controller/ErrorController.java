@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class ErrorController {
 
-    @GetMapping("/accessDenied")
-    public String accessDenied(Model model){
-        model.addAttribute("message", "Access Denied");
-        return "error";
-    }
+	@GetMapping("/accessDenied")
+	public String accessDenied(Model model) {
+		model.addAttribute("message", "Access Denied");
+		return "error";
+	}
 }

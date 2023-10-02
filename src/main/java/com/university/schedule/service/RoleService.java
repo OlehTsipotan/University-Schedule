@@ -1,22 +1,30 @@
 package com.university.schedule.service;
 
+import com.university.schedule.dto.RoleDTO;
 import com.university.schedule.model.Role;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface RoleService {
 
-    List<Role> findAll();
+	List<Role> findAll();
 
-    Page<Role> findAll(Pageable pageable);
+	List<RoleDTO> findAllAsDTO();
 
-    Role findByName(String name);
+	List<RoleDTO> findAllForRegistrationAsDTO();
 
-    Long save(Role role);
+	List<RoleDTO> findAllAsDTO(Pageable pageable);
 
-    Role findById(Long id);
+	Role findByName(String name);
 
-    void deleteById(Long id);
+	Long save(Role role);
+
+	Long save(RoleDTO roleDTO);
+
+	Role findById(Long id);
+
+	RoleDTO findByIdAsDTO(Long id);
+
+	void deleteById(Long id);
 }

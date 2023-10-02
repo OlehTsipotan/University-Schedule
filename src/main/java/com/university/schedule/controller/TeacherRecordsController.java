@@ -1,23 +1,23 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.dto.CourseDTO;
+import com.university.schedule.dto.RoleDTO;
 import com.university.schedule.dto.TeacherDTO;
-import com.university.schedule.dto.TeacherUpdateDTO;
-import com.university.schedule.exception.ServiceException;
-import com.university.schedule.exception.ValidationException;
-import com.university.schedule.model.*;
-import com.university.schedule.pageable.OffsetBasedPageRequest;
-import com.university.schedule.service.*;
+import com.university.schedule.service.CourseService;
+import com.university.schedule.service.RoleService;
+import com.university.schedule.service.TeacherService;
+import com.university.schedule.utility.PaginationSortingUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -27,93 +27,85 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TeacherRecordsController {
 
-    private static final String UPDATE_FORM_TEMPLATE = "teachersUpdateForm";
+	private static final String UPDATE_FORM_TEMPLATE = "teachersUpdateForm";
 
-    private final TeacherService teacherService;
+	private final TeacherService teacherService;
 
-    private final TeacherUpdateDTOService teacherUpdateDTOService;
-    private final TeacherDTOService teacherDTOService;
+	private final RoleService roleService;
 
-    private final RoleService roleService;
-
-    private final CourseService courseService;
+	private final CourseService courseService;
 
 
-    @Secured("VIEW_TEACHERS")
-    @GetMapping("/teachers")
-    public String getAll(Model model,
-                         @RequestParam(defaultValue = "100") int limit,
-                         @RequestParam(defaultValue = "0") int offset,
-                         @RequestParam(defaultValue = "id,asc") String[] sort) {
-        String sortField = sort[0];
-        String sortDirection = sort[1];
+	@Secured("VIEW_TEACHERS")
+	@GetMapping("/teachers")
+	public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
+	                     @RequestParam(defaultValue = "0") int offset,
+	                     @RequestParam(defaultValue = "id,asc") String[] sort) {
+		Pageable pageable = PaginationSortingUtility.getPageable(limit, offset, sort);
+		List<TeacherDTO> teacherDTOs = teacherService.findAllAsDTO(pageable);
 
-        Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort.Order order = new Sort.Order(direction, sortField);
+		model.addAttribute("entities", teacherDTOs);
+		model.addAttribute("currentLimit", limit);
+		model.addAttribute("currentOffset", offset);
+		model.addAttribute("sortField", sort[0]);
+		model.addAttribute("sortDirection", sort[1]);
+		model.addAttribute("reverseSortDirection", sort[1].equals("asc") ? "desc" : "asc");
 
-        Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<TeacherDTO> teacherDTOs = teacherDTOService.findAll(pageable);
+		return "teachers";
+	}
 
-        model.addAttribute("teachers", teacherDTOs);
-        model.addAttribute("currentLimit", limit);
-        model.addAttribute("currentOffset", offset);
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("sortDirection", sortDirection);
-        model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
+	@Secured("EDIT_TEACHERS")
+	@GetMapping("/teachers/delete/{id}")
+	public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request,
+	                           RedirectAttributes redirectAttributes) {
+		teacherService.deleteById(id);
 
-        return "teachers";
-    }
+		redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
 
-    @Secured("EDIT_TEACHERS")
-    @GetMapping("/teachers/delete/{id}")
-    public RedirectView delete(@PathVariable(name = "id") Long id,
-                         HttpServletRequest request) {
-        teacherService.deleteById(id);
+		String referer = request.getHeader("Referer");
+		String redirectTo = (referer != null) ? referer : "/teachers";
 
-        String referer = request.getHeader("Referer");
-        String redirectTo = (referer != null) ? referer : "/teachers";
+		return new RedirectView(redirectTo);
+	}
 
-        return new RedirectView(redirectTo);
-    }
+	@Secured("EDIT_TEACHERS")
+	@GetMapping("/teachers/update/{id}")
+	public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, TeacherDTO teacherDTO) {
+		TeacherDTO teacherToDisplay = teacherService.findByIdAsDTO(id);
+		List<CourseDTO> courseDTOList = courseService.findAllAsDTO();
+		List<RoleDTO> roleDTOList = roleService.findAllAsDTO();
+		model.addAttribute("entity", teacherToDisplay);
+		model.addAttribute("courseDTOList", courseDTOList);
+		model.addAttribute("roleDTOList", roleDTOList);
 
-    @Secured("EDIT_TEACHERS")
-    @GetMapping("/teachers/update/{id}")
-    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, TeacherUpdateDTO teacherUpdateDTO) {
-        TeacherUpdateDTO teacherToDisplay = teacherUpdateDTOService.findById(id);
-        List<Course> courses = courseService.findAll();
-        List<Role> roles = roleService.findAll();
-        model.addAttribute("entity", teacherToDisplay);
-        model.addAttribute("courses", courses);
-        model.addAttribute("roles", roles);
+		return UPDATE_FORM_TEMPLATE;
+	}
 
-        return UPDATE_FORM_TEMPLATE;
-    }
+	@Secured("EDIT_TEACHERS")
+	@PostMapping("/teachers/update/{id}")
+	public String update(@PathVariable Long id, @Valid @ModelAttribute TeacherDTO teacherDTO, BindingResult result,
+	                     @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable, Model model,
+	                     RedirectAttributes redirectAttributes) {
 
-    @Secured("EDIT_TEACHERS")
-    @PostMapping("/teachers/update/{id}")
-    public String update(@PathVariable Long id, @Valid @ModelAttribute TeacherUpdateDTO teacherUpdateDTO,
-                         BindingResult result,
-                         @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable, Model model){
+		teacherDTO.setRoleDTO(roleService.findByIdAsDTO(teacherDTO.getRoleDTO().getId()));
+		teacherDTO.setCourseDTOS(
+				teacherDTO.getCourseDTOS().stream().map(courseDTO -> courseService.findByIdAsDTO(courseDTO.getId()))
+						.toList());
 
-        if (!result.hasErrors()) {
-            try {
-                teacherUpdateDTO.setIsEnable(isEnable);
-                teacherUpdateDTOService.save(teacherUpdateDTO);
+		if (!result.hasErrors()) {
+			teacherDTO.setIsEnable(isEnable);
+			teacherService.update(teacherDTO);
+			redirectAttributes.addFlashAttribute("success", true);
+			return "redirect:/teachers/update/" + id;
+		}
 
-                return "redirect:/teachers/update/" + id + "?success";
-            } catch (ValidationException validationException) {
-                model.addAttribute("validationServiceErrors", validationException.getViolations());
-            } catch (ServiceException serviceException) {
-                model.addAttribute("serviceError", serviceException.getMessage());
-            }
-        }
-        TeacherUpdateDTO teacherToDisplay = teacherUpdateDTOService.findById(id);
-        List<Course> courses = courseService.findAll();
-        List<Role> roles = roleService.findAll();
-        model.addAttribute("entity", teacherToDisplay);
-        model.addAttribute("courses", courses);
-        model.addAttribute("roles", roles);
+		TeacherDTO teacherToDisplay = teacherService.findByIdAsDTO(id);
+		List<CourseDTO> courseDTOList = courseService.findAllAsDTO();
+		List<RoleDTO> roleDTOList = roleService.findAllAsDTO();
+		model.addAttribute("entity", teacherToDisplay);
+		model.addAttribute("courseDTOList", courseDTOList);
+		model.addAttribute("roleDTOList", roleDTOList);
 
-        return UPDATE_FORM_TEMPLATE;
-    }
+		return UPDATE_FORM_TEMPLATE;
+	}
 }

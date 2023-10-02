@@ -1,16 +1,16 @@
 package com.university.schedule.service;
 
+import com.university.schedule.converter.ConverterService;
+import com.university.schedule.dto.ClassTypeDTO;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.ClassType;
 import com.university.schedule.repository.ClassTypeRepository;
 import com.university.schedule.validation.ClassTypeEntityValidator;
-import com.university.schedule.validation.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,96 +20,122 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
-public class DefaultClassTypeService implements ClassTypeService{
+public class DefaultClassTypeService implements ClassTypeService {
 
-    private final ClassTypeRepository classTypeRepository;
+	private final ClassTypeRepository classTypeRepository;
 
-    private final ClassTypeEntityValidator classTypeEntityValidator;
+	private final ConverterService converterService;
+
+	private final ClassTypeEntityValidator classTypeEntityValidator;
 
 
-    @Override
-    @Transactional
-    public Long save(ClassType classType) {
-        execute(() -> {
-            classTypeEntityValidator.validate(classType);
-            classTypeRepository.save(classType);
-        });
-        log.info("saved {}", classType);
-        return classType.getId();
-    }
+	@Override
+	@Transactional
+	public Long save(ClassTypeDTO classTypeDTO) {
+		ClassType classType = convertToEntity(classTypeDTO);
+		execute(() -> {
+			classTypeEntityValidator.validate(classType);
+			classTypeRepository.save(classType);
+		});
+		log.info("saved {}", classType);
+		return classType.getId();
+	}
 
-    @Override
-    public ClassType findById(Long id) {
-        ClassType classType = execute(() -> classTypeRepository.findById(id)).orElseThrow(
-                () -> new ServiceException("ClassType not found"));
-        log.debug("Retrieved {}", classType);
-        return classType;
-    }
+	@Override
+	@Transactional
+	public Long save(ClassType classType) {
+		execute(() -> {
+			classTypeEntityValidator.validate(classType);
+			classTypeRepository.save(classType);
+		});
+		log.info("saved {}", classType);
+		return classType.getId();
+	}
 
-    @Override
-    public ClassType findByName(String name) {
-        ClassType classType = execute(() -> classTypeRepository.findByName(name)).orElseThrow(
-                () -> new ServiceException("ClassType not found"));
-        log.debug("Retrieved {}", classType);
-        return classType;
-    }
+	@Override
+	public ClassTypeDTO findByIdAsDTO(Long id) {
+		ClassType classType = execute(() -> classTypeRepository.findById(id)).orElseThrow(
+				() -> new ServiceException("ClassType not found"));
+		log.debug("Retrieved {}", classType);
+		return convertToDTO(classType);
+	}
 
-    @Override
-    public List<ClassType> findAll() {
-        List<ClassType> classTypes = execute(() -> classTypeRepository.findAll());
-        log.debug("Retrieved All {} ClassTypes", classTypes.size());
-        return classTypes;
-    }
+	private ClassType findById(Long id) {
+		ClassType classType = execute(() -> classTypeRepository.findById(id)).orElseThrow(
+				() -> new ServiceException("ClassType not found"));
+		log.debug("Retrieved {}", classType);
+		return classType;
+	}
 
-    @Override
-    public List<ClassType> findAll(Sort sort) {
-        List<ClassType> classTypes = execute(() -> classTypeRepository.findAll(sort));
-        log.debug("Retrieved All {} ClassTypes", classTypes.size());
-        return classTypes;
-    }
+	@Override
+	public ClassType findByName(String name) {
+		ClassType classType = execute(() -> classTypeRepository.findByName(name)).orElseThrow(
+				() -> new ServiceException("ClassType not found"));
+		log.debug("Retrieved {}", classType);
+		return classType;
+	}
 
-    @Override
-    public Page<ClassType> findAll(Pageable pageable) {
-        Page<ClassType> classTypes = execute(() -> classTypeRepository.findAll(pageable));
-        log.debug("Retrieved All {} ClassTypes", classTypes.getTotalElements());
-        return classTypes;
-    }
+	@Override
+	public List<ClassTypeDTO> findAllAsDTO() {
+		List<ClassTypeDTO> classTypeDTOList =
+				execute(() -> classTypeRepository.findAll()).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} ClassTypes", classTypeDTOList.size());
+		return classTypeDTOList;
+	}
 
-    @Override
-    @Transactional
-    public void deleteById(Long id) {
-        try{
-            findById(id);
-        } catch (ServiceException e){
-            throw new ServiceException("There is no ClassType to delete with id = "+ id);
-        }
-        execute(() -> classTypeRepository.deleteById(id));
-        log.info("Deleted id = {}", id);
-    }
 
-    private <T> T execute(DaoSupplier<T> supplier) {
-        try {
-            return supplier.get();
-        } catch (DataAccessException e) {
-            throw new ServiceException("DAO operation failed", e);
-        }
-    }
+	@Override
+	public List<ClassTypeDTO> findAllAsDTO(Pageable pageable) {
+		List<ClassTypeDTO> classTypeDTOList =
+				execute(() -> classTypeRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} ClassTypes", classTypeDTOList.size());
+		return classTypeDTOList;
+	}
 
-    private void execute(DaoProcessor processor) {
-        try {
-            processor.process();
-        } catch (DataAccessException e) {
-            throw new ServiceException("DAO operation failed", e);
-        }
-    }
+	@Override
+	@Transactional
+	public void deleteById(Long id) {
+		try {
+			findById(id);
+		} catch (ServiceException e) {
+			throw new DeletionFailedException("There is no ClassType to delete with id = " + id);
+		}
+		execute(() -> classTypeRepository.deleteById(id));
+		log.info("Deleted id = {}", id);
+	}
 
-    @FunctionalInterface
-    public interface DaoSupplier<T> {
-        T get();
-    }
 
-    @FunctionalInterface
-    public interface DaoProcessor {
-        void process();
-    }
+	private ClassTypeDTO convertToDTO(ClassType classType) {
+		return converterService.convert(classType, ClassTypeDTO.class);
+	}
+
+	private ClassType convertToEntity(ClassTypeDTO classTypeDTO) {
+		return converterService.convert(classTypeDTO, ClassType.class);
+	}
+
+	private <T> T execute(DaoSupplier<T> supplier) {
+		try {
+			return supplier.get();
+		} catch (DataAccessException e) {
+			throw new ServiceException("DAO operation failed", e);
+		}
+	}
+
+	private void execute(DaoProcessor processor) {
+		try {
+			processor.process();
+		} catch (DataAccessException e) {
+			throw new ServiceException("DAO operation failed", e);
+		}
+	}
+
+	@FunctionalInterface
+	public interface DaoSupplier<T> {
+		T get();
+	}
+
+	@FunctionalInterface
+	public interface DaoProcessor {
+		void process();
+	}
 }

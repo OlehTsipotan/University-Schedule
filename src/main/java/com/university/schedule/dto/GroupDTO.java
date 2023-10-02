@@ -1,5 +1,7 @@
 package com.university.schedule.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
@@ -8,15 +10,20 @@ import java.util.List;
 @Setter
 @ToString
 @Builder
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 public class GroupDTO {
 
-    private Long id;
+	private Long id;
 
-    private String name;
+	@NotBlank(message = "Group name must not be blank")
+	@Size(max = 255)
+	private String name;
 
-    private String disciplineName;
+	@EqualsAndHashCode.Exclude
+	private DisciplineDTO disciplineDTO;
 
-    private List<String> courseNames;
+	@EqualsAndHashCode.Exclude
+	private List<CourseDTO> courseDTOS;
 }

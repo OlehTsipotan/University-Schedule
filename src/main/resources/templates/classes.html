@@ -17,6 +17,12 @@
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar('Classes')}"></div>
+<div th:if="${success}">
+    <div class="alert alert-success mt-3" th:text="${success}"></div>
+</div>
+<div th:if="${insertedSuccessId}">
+    <div class="alert alert-success mt-3" th:text="@{'Inserted Record with ID = ' + ${insertedSuccessId} + '.'}"></div>
+</div>
 <div th:if="${entities.size() > 0}">
     <table class="table table-hover table-bordered table-responsive-md">
         <thead class="thead-light">
@@ -36,26 +42,30 @@
         <tbody>
         <tr th:each="entity : ${entities}">
             <th scope="row" th:text="${entity.getId()}"></th>
-            <td th:text="${entity.getCourseName()}"></td>
-            <td th:text="${entity.getTeacherFullName()}"></td>
+            <td th:text="${entity.getCourseDTO().getName()}"></td>
+            <td th:text="${entity.getTeacherDTO().getFullName()}"></td>
             <td>
-                <span th:each="name, iterStat : ${entity.getGroupNames()}"><span
-                        th:text="${name}"></span><span th:if="${!iterStat.last}">, </span></span>
+                <span th:each="groupDTO, iterStat : ${entity.getGroupDTOS()}"><span
+                        th:text="${groupDTO.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
             </td>
             <td th:text="${entity.getDate()}"></td>
-            <td th:text="${entity.getClassTimeOrderNumber()}"></td>
-            <td th:text="${entity.getClassTypeName()}"></td>
-            <td th:text="${entity.getClassroomName()}"></td>
-            <td th:text="${entity.getClassroomBuildingName()}"></td>
+            <td th:text="${entity.getClassTimeDTO().getOrderNumber()}"></td>
+            <td th:text="${entity.getClassTypeDTO().getName()}"></td>
+            <td th:text="${entity.getClassroomDTO().getName()}"></td>
+            <td th:text="${entity.getClassroomDTO().getBuildingDTO().getName()}"></td>
             <td sec:authorize="hasAuthority('EDIT_CLASSES')" class="static-col">
                 <a th:href="@{'/classes/update/' + ${entity.getId()}}" id="btnUpdate"
-                   title="Delete this Building" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
+                   title="Update this Class" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
                 <a th:href="@{'/classes/delete/' + ${entity.getId()}}" id="btnDelete"
                    title="Delete this Class" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
             </td>
         </tr>
         </tbody>
     </table>
+    <div sec:authorize="hasAuthority('INSERT_CLASSES')" class="sticky-bottom bg-light p-3">
+        <button type="button"
+                class="btn btn-primary"><a class="nav-link" href="/classes/insert">Insert new</a></button>
+    </div>
 </div>
 <div class="" th:unless="${entities.size() > 0}">
     <span>No Classes found!</span>

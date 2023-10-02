@@ -16,16 +16,18 @@
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar('Users')}"></div>
+<div th:if="${success}">
+    <div class="alert alert-success mt-3" th:text="${success}"></div>
+</div>
 <div th:if="${entities.size() > 0}">
     <table class="table table-hover table-bordered table-responsive-md">
         <thead class="thead-light">
         <tr class="sticky-top">
             <th th:replace="~{fragments/sorting :: sorting('users', 'id','Id')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('users', 'email','Email')}"></th>
-            <th th:replace="~{fragments/sorting :: sorting('users', 'password','Password')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('users', 'firstName','First Name')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('users', 'lastName','Last Name')}"></th>
-            <th>Type</th>
+            <th th:replace="~{fragments/sorting :: sorting('users', 'role','Role')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('users', 'isEnable','isEnable')}"></th>
             <th sec:authorize="hasAuthority('EDIT_USERS')" class="static-col">Actions</th>
         </tr>
@@ -34,17 +36,13 @@
         <tr th:each="entity : ${entities}">
             <th scope="row" th:text="${entity.getId()}"></th>
             <td th:text="${entity.getEmail()}"></td>
-            <td th:text="${entity.getPassword()}"></td>
             <td th:text="${entity.getFirstName()}"></td>
             <td th:text="${entity.getLastName()}"></td>
-            <td>
-                <span th:if="${entity instanceof T(com.university.schedule.model.Student)}">Student</span>
-                <span th:if="${entity instanceof T(com.university.schedule.model.Teacher)}">Teacher</span>
-            </td>
+            <td th:text="${entity.getRoleDTO().getName()}"></td>
             <td th:text="${entity.isEnable()}"></td>
             <td sec:authorize="hasAuthority('EDIT_USERS')" class="static-col">
                 <a th:href="@{'/users/update/' + ${entity.getId()}}" id="btnUpdate"
-                   title="Delete this Building" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
+                   title="Update this User" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
                 <a th:href="@{'/users/delete/' + ${entity.getId()}}" id="btnDelete"
                    title="Delete this User" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
             </td>

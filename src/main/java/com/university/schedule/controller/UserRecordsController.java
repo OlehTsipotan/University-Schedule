@@ -1,29 +1,21 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.dto.UserUpdateDTO;
-import com.university.schedule.exception.ServiceException;
-import com.university.schedule.exception.ValidationException;
-import com.university.schedule.model.Course;
-import com.university.schedule.model.Role;
-import com.university.schedule.model.Teacher;
-import com.university.schedule.model.User;
-import com.university.schedule.pageable.OffsetBasedPageRequest;
+import com.university.schedule.dto.RoleDTO;
+import com.university.schedule.dto.UserDTO;
 import com.university.schedule.service.RoleService;
 import com.university.schedule.service.UserService;
-import com.university.schedule.service.UserUpdateDTOService;
-import com.university.schedule.validation.UpdateValidation;
+import com.university.schedule.utility.PaginationSortingUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -33,85 +25,70 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserRecordsController {
 
-    private final UserService userService;
+	private static final String UPDATE_FORM_TEMPLATE = "usersUpdateForm";
+	private final UserService userService;
+	private final RoleService roleService;
 
-    private final UserUpdateDTOService userUpdateDTOService;
+	@Secured("VIEW_USERS")
+	@GetMapping("/users")
+	public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
+	                     @RequestParam(defaultValue = "0") int offset,
+	                     @RequestParam(defaultValue = "id,asc") String[] sort) {
+		Pageable pageable = PaginationSortingUtility.getPageable(limit, offset, sort);
+		List<UserDTO> userDTOList = userService.findAllAsDTO(pageable);
 
-    private final RoleService roleService;
+		model.addAttribute("entities", userDTOList);
+		model.addAttribute("currentLimit", limit);
+		model.addAttribute("currentOffset", offset);
+		model.addAttribute("sortField", sort[0]);
+		model.addAttribute("sortDirection", sort[1]);
+		model.addAttribute("reverseSortDirection", sort[1].equals("asc") ? "desc" : "asc");
 
-    private static final String UPDATE_FORM_TEMPLATE = "usersUpdateForm";
+		return "users";
+	}
 
-    @Secured("VIEW_USERS")
-    @GetMapping("/users")
-    public String getAll(Model model,
-                         @RequestParam(defaultValue = "100") int limit,
-                         @RequestParam(defaultValue = "0") int offset,
-                         @RequestParam(defaultValue = "id,asc") String[] sort) {
-        String sortField = sort[0];
-        String sortDirection = sort[1];
+	@Secured("EDIT_USERS")
+	@GetMapping("/users/delete/{id}")
+	public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request,
+	                           RedirectAttributes redirectAttributes) {
+		userService.deleteById(id);
+		redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
 
-        Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort.Order order = new Sort.Order(direction, sortField);
+		String referer = request.getHeader("Referer");
+		String redirectTo = (referer != null) ? referer : "/users";
 
-        Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<User> users = userService.findAll(pageable).toList();
+		return new RedirectView(redirectTo);
+	}
 
-        model.addAttribute("entities", users);
-        model.addAttribute("currentLimit", limit);
-        model.addAttribute("currentOffset", offset);
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("sortDirection", sortDirection);
-        model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
+	@Secured("EDIT_USERS")
+	@GetMapping("/users/update/{id}")
+	public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, UserDTO userDTO) {
+		UserDTO userDTOToDisplay = userService.findByIdAsDTO(id);
+		List<RoleDTO> roleDTOList = roleService.findAllAsDTO();
+		model.addAttribute("entity", userDTOToDisplay);
+		model.addAttribute("roleDTOList", roleDTOList);
 
-        return "users";
-    }
+		return UPDATE_FORM_TEMPLATE;
+	}
 
-    @Secured("EDIT_USERS")
-    @GetMapping("/users/delete/{id}")
-    public RedirectView delete(@PathVariable(name = "id") Long id,
-                         HttpServletRequest request) {
-        userService.deleteById(id);
+	@Secured("EDIT_USERS")
+	@PostMapping("/users/update/{id}")
+	public String update(@PathVariable Long id, @Valid @ModelAttribute UserDTO userDTO, BindingResult result,
+	                     @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable, Model model,
+	                     RedirectAttributes redirectAttributes) {
+		userDTO.setRoleDTO(roleService.findByIdAsDTO(userDTO.getRoleDTO().getId()));
+		if (!result.hasErrors()) {
+			userDTO.setIsEnable(isEnable);
+			userService.update(userDTO);
+			redirectAttributes.addFlashAttribute("success", true);
+			return "redirect:/users/update/" + id;
+		}
 
-        String referer = request.getHeader("Referer");
-        String redirectTo = (referer != null) ? referer : "/users";
+		UserDTO userDTOToDisplay = userService.findByIdAsDTO(id);
+		List<RoleDTO> roleDTOList = roleService.findAllAsDTO();
+		model.addAttribute("entity", userDTOToDisplay);
+		model.addAttribute("roleDTOList", roleDTOList);
 
-        return new RedirectView(redirectTo);
-    }
-
-    @Secured("EDIT_USERS")
-    @GetMapping("/users/update/{id}")
-    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, UserUpdateDTO userUpdateDTO) {
-        UserUpdateDTO userToDisplay = userUpdateDTOService.findById(id);
-        List<Role> roles = roleService.findAll();
-        model.addAttribute("entity", userToDisplay);
-        model.addAttribute("roles", roles);
-
-        return UPDATE_FORM_TEMPLATE;
-    }
-
-    @Secured("EDIT_USERS")
-    @PostMapping("/users/update/{id}")
-    public String update(@PathVariable Long id, @Valid @ModelAttribute UserUpdateDTO userUpdateDTO,
-                         BindingResult result,
-                         @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable, Model model){
-
-        if (!result.hasErrors()) {
-            try {
-                userUpdateDTO.setIsEnable(isEnable);
-                userUpdateDTOService.save(userUpdateDTO);
-                return "redirect:/users/update/" + id + "?success";
-            } catch (ValidationException validationException) {
-                model.addAttribute("validationServiceErrors", validationException.getViolations());
-            } catch (ServiceException serviceException) {
-                model.addAttribute("serviceError", serviceException.getMessage());
-            }
-        }
-
-        UserUpdateDTO userToDisplay = userUpdateDTOService.findById(id);
-        List<Role> roles = roleService.findAll();
-        model.addAttribute("entity", userToDisplay);
-        model.addAttribute("roles", roles);
-
-        return UPDATE_FORM_TEMPLATE;
-    }
+		return UPDATE_FORM_TEMPLATE;
+	}
 }

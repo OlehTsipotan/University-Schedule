@@ -9,11 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
-    Optional<Course> findByName(String name);
+	Optional<Course> findByName(String name);
 
-    List<Course> findByTeachers(Teacher teacher);
+	List<Course> findByTeachers(Teacher teacher);
 
-    List<Course> findByGroupsName(String groupName);
+	List<Course> findByGroupsName(String groupName);
 
-    List<Course> findByGroups(Group group);
+	List<Course> findByGroups(Group group);
 }

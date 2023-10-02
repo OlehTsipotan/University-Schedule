@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
@@ -15,16 +15,13 @@
     <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
 </head>
 <body>
-<div th:replace="~{fragments/navbar :: navbar('Discipline Update')}"></div>
+<div th:replace="~{fragments/navbar :: navbarWithBackPage('Discipline Update', '/disciplines')}"></div>
 <div class="container">
     <div class="row">
 
         <!-- Alerts -->
-        <div th:if="${param.success}">
+        <div th:if="${success}">
             <div class="alert alert-success mt-3">Updated!</div>
-        </div>
-        <div th:if="${serviceError != null}">
-            <div class="alert alert-warning mt-3" th:text="${serviceError}"></div>
         </div>
         <div th:if="${validationServiceErrors != null}">
             <div th:each="violation : ${validationServiceErrors}" class="alert alert-warning mt-3"
@@ -35,8 +32,8 @@
                 method="post"
                 role="form"
                 th:action="@{'/disciplines/update/' + ${entity.getId()}}"
-                class="form-horizontal"
-                th:object="${discipline}">
+                class="form-horizontal mt-3"
+                th:object="${disciplineDTO}">
 
             <!-- static ID input -->
             <div class="form-group row mb-2">
@@ -52,9 +49,9 @@
                 <label for="inputName" class="col-sm-2 col-form-label fw-bold">Name</label>
                 <div class="col-sm-10">
                     <input type="text" name="name" id="inputName" placeholder="Name"
-                           th:class="${param.success != null ? 'is-valid form-control' : (#fields.hasErrors('name') ? 'is-invalid form-control' : 'form-control')}"
+                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('name') ? 'is-invalid form-control' : 'form-control')}"
                            th:value="${entity.getName()}" required>
-                    <div th:if="${param.success}" class="valid-feedback">
+                    <div th:if="${success}" class="valid-feedback">
                         Looks good!
                     </div>
                     <div th:each="error : ${#fields.errors('name')}"

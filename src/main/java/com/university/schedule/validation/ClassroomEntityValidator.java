@@ -13,33 +13,33 @@ import java.util.Optional;
 @Component
 public class ClassroomEntityValidator extends EntityValidator<Classroom> {
 
-    private final ClassroomRepository classroomRepository;
+	private final ClassroomRepository classroomRepository;
 
-    public ClassroomEntityValidator(ClassroomRepository classroomRepository, Validator validator) {
-        super(validator);
-        this.classroomRepository = classroomRepository;
-    }
+	public ClassroomEntityValidator(ClassroomRepository classroomRepository, Validator validator) {
+		super(validator);
+		this.classroomRepository = classroomRepository;
+	}
 
-    @Override
-    public void validate(Classroom classroom) {
-        List<String> violations = new ArrayList<>();
-        try {
-            super.validate(classroom);
-        } catch (ValidationException e) {
-            violations = e.getViolations();
-        }
+	@Override
+	public void validate(Classroom classroom) {
+		List<String> violations = new ArrayList<>();
+		try {
+			super.validate(classroom);
+		} catch (ValidationException e) {
+			violations = e.getViolations();
+		}
 
-        Optional<Classroom> classroomToCheck = classroomRepository.findByNameAndBuilding(
-                classroom.getName(), classroom.getBuilding());
-        if (classroomToCheck.isPresent() && !classroom.equals(classroomToCheck.get())) {
-            violations.add(String.format("Classroom with name = %s and %s, already exists.",
-                    classroom.getName(), classroom.getBuilding()));
-        }
+		Optional<Classroom> classroomToCheck =
+				classroomRepository.findByNameAndBuilding(classroom.getName(), classroom.getBuilding());
+		if (classroomToCheck.isPresent() && !classroom.equals(classroomToCheck.get())) {
+			violations.add(String.format("Classroom with name = %s and %s, already exists.", classroom.getName(),
+					classroom.getBuilding()));
+		}
 
 
-        if (!violations.isEmpty()) {
-            throw new ValidationException("Classroom is not valid", violations);
-        }
+		if (!violations.isEmpty()) {
+			throw new ValidationException("Classroom is not valid", violations);
+		}
 
-    }
+	}
 }

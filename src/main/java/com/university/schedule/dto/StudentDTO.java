@@ -5,27 +5,15 @@ import lombok.*;
 @Getter
 @Setter
 @ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class StudentDTO {
+public class StudentDTO extends UserDTO {
 
-    private Long id;
+	private GroupDTO groupDTO;
 
-    private String email;
-
-    private String password;
-
-    private String firstName;
-
-    private String lastName;
-
-    private String groupName;
-
-    @Getter(AccessLevel.NONE)
-    private Boolean isEnable;
-
-    public Boolean isEnable(){
-        return this.isEnable;
-    }
+	public StudentDTO(Long id, String email, String firstName, String lastName, RoleDTO roleDTO, Boolean isEnable,
+	                  GroupDTO groupDTO) {
+		super(id, email, firstName, lastName, roleDTO, isEnable);
+		this.groupDTO = groupDTO;
+	}
 }

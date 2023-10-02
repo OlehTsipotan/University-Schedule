@@ -2,6 +2,7 @@ package com.university.schedule.dto;
 
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -12,15 +13,21 @@ import java.util.List;
 @NoArgsConstructor
 public class ScheduledClassDTO {
 
-    private Long id;
-    private String courseName;
-    private String teacherFullName;
-    private List<String> groupNames;
-    private String date;
-    private Integer classTimeOrderNumber;
-    private String classTypeName;
-    private String classroomName;
-    private String classroomBuildingName;
+	private Long id;
+
+	private CourseDTO courseDTO;
+
+	private TeacherDTO teacherDTO;
+
+	private ClassroomDTO classroomDTO;
+
+	private ClassTimeDTO classTimeDTO;
+
+	private LocalDate date;
+
+	private ClassTypeDTO classTypeDTO;
+
+	private List<GroupDTO> groupDTOS;
 
 }
 

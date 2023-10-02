@@ -7,27 +7,16 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class TeacherDTO {
+public class TeacherDTO extends UserDTO {
 
-    private Long id;
+	private List<CourseDTO> courseDTOS;
 
-    private String email;
+	public TeacherDTO(Long id, String email, String firstName, String lastName, RoleDTO roleDTO, Boolean isEnable,
+	                  List<CourseDTO> courseDTOS) {
+		super(id, email, firstName, lastName, roleDTO, isEnable);
+		this.courseDTOS = courseDTOS;
+	}
 
-    private String password;
-
-    private String firstName;
-
-    private String lastName;
-
-    private List<String> courseNames;
-
-    @Getter(AccessLevel.NONE)
-    private Boolean isEnable;
-
-    public Boolean isEnable(){
-        return this.isEnable;
-    }
 }

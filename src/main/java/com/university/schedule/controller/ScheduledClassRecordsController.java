@@ -1,27 +1,19 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.dto.ClassTimeDTO;
-import com.university.schedule.dto.ClassroomDTO;
-import com.university.schedule.dto.ScheduledClassDTO;
-import com.university.schedule.exception.ServiceException;
-import com.university.schedule.exception.ValidationException;
-import com.university.schedule.converter.ClassTimeEntityToClassTimeDTOConverter;
-import com.university.schedule.converter.ClassroomEntityToClassroomDTOConverter;
-import com.university.schedule.converter.ScheduledClassEntityToScheduledClassDTOConverter;
-import com.university.schedule.model.*;
-import com.university.schedule.pageable.OffsetBasedPageRequest;
+import com.university.schedule.dto.*;
 import com.university.schedule.service.*;
+import com.university.schedule.utility.PaginationSortingUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
@@ -30,109 +22,167 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class ScheduledClassRecordsController {
-    private static final String UPDATE_FORM_TEMPLATE = "classesUpdateForm";
-    private final ScheduledClassService scheduledClassService;
-    private final ScheduledClassDTOService scheduledClassDTOService;
-    private final ClassroomDTOService classroomDTOService;
-    private final ClassTimeDTOService classTimeDTOService;
-    private final CourseService courseService;
-    private final TeacherService teacherService;
-    private final ClassTypeService classTypeService;
-    private final GroupService groupService;
+	private static final String UPDATE_FORM_TEMPLATE = "classesUpdateForm";
 
-    @Secured("VIEW_CLASSES")
-    @GetMapping("/classes")
-    public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
-                         @RequestParam(defaultValue = "0") int offset,
-                         @RequestParam(defaultValue = "id,asc") String[] sort) {
-        String sortField = sort[0];
-        String sortDirection = sort[1];
+	private static final String INSERT_FORM_TEMPLATE = "classesInsertForm";
 
-        Sort.Direction direction = sortDirection.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-        Sort.Order order = new Sort.Order(direction, sortField);
+	private final ClassroomService classroomService;
+	private final ClassTimeService classTimeService;
+	private final ScheduledClassService scheduledClassService;
+	private final CourseService courseService;
+	private final TeacherService teacherService;
+	private final ClassTypeService classTypeService;
+	private final GroupService groupService;
 
-        Pageable pageable = OffsetBasedPageRequest.of(limit, offset, Sort.by(order));
-        List<ScheduledClassDTO> scheduledClassDTOs = scheduledClassDTOService.findAll(pageable);
+	@Secured("VIEW_CLASSES")
+	@GetMapping("/classes")
+	public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
+	                     @RequestParam(defaultValue = "0") int offset,
+	                     @RequestParam(defaultValue = "id,asc") String[] sort) {
+		Pageable pageable = PaginationSortingUtility.getPageable(limit, offset, sort);
+		List<ScheduledClassDTO> scheduledClassDTOs = scheduledClassService.findAllAsDTO(pageable);
 
-        model.addAttribute("entities", scheduledClassDTOs);
-        model.addAttribute("currentLimit", limit);
-        model.addAttribute("currentOffset", offset);
-        model.addAttribute("sortField", sortField);
-        model.addAttribute("sortDirection", sortDirection);
-        model.addAttribute("reverseSortDirection", sortDirection.equals("asc") ? "desc" : "asc");
+		model.addAttribute("entities", scheduledClassDTOs);
+		model.addAttribute("currentLimit", limit);
+		model.addAttribute("currentOffset", offset);
+		model.addAttribute("sortField", sort[0]);
+		model.addAttribute("sortDirection", sort[1]);
+		model.addAttribute("reverseSortDirection", sort[1].equals("asc") ? "desc" : "asc");
 
-        return "classes";
-    }
+		return "classes";
+	}
 
-    @Secured("EDIT_CLASSES")
-    @GetMapping("/classes/delete/{id}")
-    public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request) {
-        scheduledClassService.deleteById(id);
+	@Secured("EDIT_CLASSES")
+	@GetMapping("/classes/delete/{id}")
+	public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request,
+	                           RedirectAttributes redirectAttributes) {
+		scheduledClassService.deleteById(id);
 
-        String referer = request.getHeader("Referer");
-        String redirectTo = (referer != null) ? referer : "/classes";
+		redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
+		String referer = request.getHeader("Referer");
+		String redirectTo = (referer != null) ? referer : "/classes";
 
-        return new RedirectView(redirectTo);
-    }
+		return new RedirectView(redirectTo);
+	}
 
-    @Secured("EDIT_CLASSES")
-    @GetMapping("/classes/update/{id}")
-    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, ScheduledClass scheduledClass) {
-        ScheduledClass scheduledClassToDisplay = scheduledClassService.findById(id);
+	@Secured("EDIT_CLASSES")
+	@GetMapping("/classes/update/{id}")
+	public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, ScheduledClassDTO scheduledClassDTO) {
+		ScheduledClassDTO scheduledClassDTOToDisplay = scheduledClassService.findByIdAsDTO(id);
 
-        List<Course> courses = courseService.findAll();
-        List<Teacher> teachers = teacherService.findAll();
-        List<ClassroomDTO> classroomDTOs = classroomDTOService.findAll();
-        List<ClassTimeDTO> classTimeDTOs = classTimeDTOService.findAll();
-        List<ClassType> classTypes = classTypeService.findAll();
-        List<Group> groups = groupService.findAll();
+		List<CourseDTO> courseDTOList = courseService.findAllAsDTO();
+		List<TeacherDTO> teacherDTOList = teacherService.findAllAsDTO();
+		List<ClassroomDTO> classroomDTOList = classroomService.findAllAsDTO();
+		List<ClassTimeDTO> classTimeDTOList = classTimeService.findAllAsDTO();
+		List<ClassTypeDTO> classTypeDTOList = classTypeService.findAllAsDTO();
+		List<GroupDTO> groupDTOList = groupService.findAllAsDTO();
 
-        model.addAttribute("entity", scheduledClassToDisplay);
-        model.addAttribute("courses", courses);
-        model.addAttribute("teachers", teachers);
-        model.addAttribute("classrooms", classroomDTOs);
-        model.addAttribute("classtimes", classTimeDTOs);
-        model.addAttribute("classtypes", classTypes);
-        model.addAttribute("groups", groups);
+		model.addAttribute("entity", scheduledClassDTOToDisplay);
+		model.addAttribute("courseDTOList", courseDTOList);
+		model.addAttribute("teacherDTOList", teacherDTOList);
+		model.addAttribute("classroomDTOList", classroomDTOList);
+		model.addAttribute("classTimeDTOList", classTimeDTOList);
+		model.addAttribute("classTypeDTOList", classTypeDTOList);
+		model.addAttribute("groupDTOList", groupDTOList);
 
+		return UPDATE_FORM_TEMPLATE;
+	}
 
-        return UPDATE_FORM_TEMPLATE;
-    }
+	@Secured("EDIT_CLASSES")
+	@PostMapping("/classes/update/{id}")
+	public String update(@PathVariable Long id, @Valid @ModelAttribute ScheduledClassDTO scheduledClassDTO,
+	                     BindingResult result, Model model, RedirectAttributes redirectAttributes) {
+		scheduledClassDTO.setCourseDTO(courseService.findByIdAsDTO(scheduledClassDTO.getCourseDTO().getId()));
+		scheduledClassDTO.setTeacherDTO(teacherService.findByIdAsDTO(scheduledClassDTO.getTeacherDTO().getId()));
+		scheduledClassDTO.setClassroomDTO(classroomService.findByIdAsDTO(scheduledClassDTO.getClassroomDTO().getId()));
+		scheduledClassDTO.setClassTimeDTO(classTimeService.findByIdAsDTO(scheduledClassDTO.getClassTimeDTO().getId()));
+		scheduledClassDTO.setClassTypeDTO(classTypeService.findByIdAsDTO(scheduledClassDTO.getClassTypeDTO().getId()));
+		scheduledClassDTO.setClassTypeDTO(classTypeService.findByIdAsDTO(scheduledClassDTO.getClassTypeDTO().getId()));
+		scheduledClassDTO.setGroupDTOS(
+				scheduledClassDTO.getGroupDTOS().stream().map(groupDTO -> groupService.findByIdAsDTO(groupDTO.getId()))
+						.toList());
 
-    @Secured("EDIT_CLASSES")
-    @PostMapping("/classes/update/{id}")
-    public String update(@PathVariable Long id, @Valid @ModelAttribute ScheduledClass scheduledClass, BindingResult result, Model model) {
+		if (!result.hasErrors()) {
+			scheduledClassService.save(scheduledClassDTO);
+			redirectAttributes.addFlashAttribute("success", true);
+			return "redirect:/classes/update/" + id;
+		}
 
+		ScheduledClassDTO scheduledClassDTOToDisplay = scheduledClassService.findByIdAsDTO(id);
 
-        if (!result.hasErrors()) {
-            try {
-                scheduledClassService.save(scheduledClass);
-                return "redirect:/classes/update/" + id + "?success";
-            } catch (ValidationException validationException) {
-                model.addAttribute("validationServiceErrors", validationException.getViolations());
-            } catch (ServiceException serviceException) {
-                model.addAttribute("serviceError", serviceException.getMessage());
-            }
-        }
+		List<CourseDTO> courseDTOList = courseService.findAllAsDTO();
+		List<TeacherDTO> teacherDTOList = teacherService.findAllAsDTO();
+		List<ClassroomDTO> classroomDTOList = classroomService.findAllAsDTO();
+		List<ClassTimeDTO> classTimeDTOList = classTimeService.findAllAsDTO();
+		List<ClassTypeDTO> classTypeDTOList = classTypeService.findAllAsDTO();
+		List<GroupDTO> groupDTOList = groupService.findAllAsDTO();
 
-        ScheduledClass scheduledClassToDisplay = scheduledClassService.findById(id);
+		model.addAttribute("entity", scheduledClassDTOToDisplay);
+		model.addAttribute("courseDTOList", courseDTOList);
+		model.addAttribute("teacherDTOList", teacherDTOList);
+		model.addAttribute("classroomDTOList", classroomDTOList);
+		model.addAttribute("classTimeDTOList", classTimeDTOList);
+		model.addAttribute("classTypeDTOList", classTypeDTOList);
+		model.addAttribute("groupDTOList", groupDTOList);
 
-        List<Course> courses = courseService.findAll();
-        List<Teacher> teachers = teacherService.findAll();
-        List<ClassroomDTO> classroomDTOs = classroomDTOService.findAll();
-        List<ClassTimeDTO> classTimeDTOs = classTimeDTOService.findAll();
-        List<ClassType> classTypes = classTypeService.findAll();
-        List<Group> groups = groupService.findAll();
+		return UPDATE_FORM_TEMPLATE;
+	}
 
-        model.addAttribute("entity", scheduledClassToDisplay);
-        model.addAttribute("courses", courses);
-        model.addAttribute("teachers", teachers);
-        model.addAttribute("classrooms", classroomDTOs);
-        model.addAttribute("classtimes", classTimeDTOs);
-        model.addAttribute("classtypes", classTypes);
-        model.addAttribute("groups", groups);
+	@Secured("INSERT_CLASSES")
+	@GetMapping("/classes/insert")
+	public String getInsertForm(Model model, ScheduledClassDTO scheduledClassDTO) {
+		List<CourseDTO> courseDTOList = courseService.findAllAsDTO();
+		List<TeacherDTO> teacherDTOList = teacherService.findAllAsDTO();
+		List<ClassroomDTO> classroomDTOList = classroomService.findAllAsDTO();
+		List<ClassTimeDTO> classTimeDTOList = classTimeService.findAllAsDTO();
+		List<ClassTypeDTO> classTypeDTOList = classTypeService.findAllAsDTO();
+		List<GroupDTO> groupDTOList = groupService.findAllAsDTO();
 
+		model.addAttribute("courseDTOList", courseDTOList);
+		model.addAttribute("teacherDTOList", teacherDTOList);
+		model.addAttribute("classroomDTOList", classroomDTOList);
+		model.addAttribute("classTimeDTOList", classTimeDTOList);
+		model.addAttribute("classTypeDTOList", classTypeDTOList);
+		model.addAttribute("groupDTOList", groupDTOList);
+		return INSERT_FORM_TEMPLATE;
+	}
 
-        return UPDATE_FORM_TEMPLATE;
-    }
+	@Secured("INSERT_CLASSES")
+	@PostMapping("/classes/insert")
+	public String insert(@Valid @ModelAttribute ScheduledClassDTO scheduledClassDTO, BindingResult result, Model model,
+	                     RedirectAttributes redirectAttributes) {
+
+		scheduledClassDTO.setCourseDTO(courseService.findByIdAsDTO(scheduledClassDTO.getCourseDTO().getId()));
+		scheduledClassDTO.setTeacherDTO(teacherService.findByIdAsDTO(scheduledClassDTO.getTeacherDTO().getId()));
+		scheduledClassDTO.setClassroomDTO(classroomService.findByIdAsDTO(scheduledClassDTO.getClassroomDTO().getId()));
+		scheduledClassDTO.setClassTimeDTO(classTimeService.findByIdAsDTO(scheduledClassDTO.getClassTimeDTO().getId()));
+		scheduledClassDTO.setClassTypeDTO(classTypeService.findByIdAsDTO(scheduledClassDTO.getClassTypeDTO().getId()));
+		scheduledClassDTO.setClassTypeDTO(classTypeService.findByIdAsDTO(scheduledClassDTO.getClassTypeDTO().getId()));
+		scheduledClassDTO.setGroupDTOS(
+				scheduledClassDTO.getGroupDTOS().stream().map(groupDTO -> groupService.findByIdAsDTO(groupDTO.getId()))
+						.toList());
+
+		if (!result.hasErrors()) {
+			Long id = scheduledClassService.save(scheduledClassDTO);
+			redirectAttributes.addFlashAttribute("insertedSuccessId", id);
+			return "redirect:/classes";
+		}
+
+		List<CourseDTO> courseDTOList = courseService.findAllAsDTO();
+		List<TeacherDTO> teacherDTOList = teacherService.findAllAsDTO();
+		List<ClassroomDTO> classroomDTOList = classroomService.findAllAsDTO();
+		List<ClassTimeDTO> classTimeDTOList = classTimeService.findAllAsDTO();
+		List<ClassTypeDTO> classTypeDTOList = classTypeService.findAllAsDTO();
+		List<GroupDTO> groupDTOList = groupService.findAllAsDTO();
+
+		model.addAttribute("courseDTOList", courseDTOList);
+		model.addAttribute("teacherDTOList", teacherDTOList);
+		model.addAttribute("classroomDTOList", classroomDTOList);
+		model.addAttribute("classTimeDTOList", classTimeDTOList);
+		model.addAttribute("classTypeDTOList", classTypeDTOList);
+		model.addAttribute("groupDTOList", groupDTOList);
+
+		return INSERT_FORM_TEMPLATE;
+
+	}
 }

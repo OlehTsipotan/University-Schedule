@@ -11,10 +11,11 @@ import java.io.IOException;
 
 @Slf4j
 public class CustomAdminAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        log.debug("Logged as admin: {}", authentication.getName());
+	@Override
+	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+	                                    Authentication authentication) throws IOException, ServletException {
+		log.debug("Logged as admin: {}", authentication.getName());
 
-        response.sendRedirect("/admin/dashboard");
-    }
+		response.sendRedirect("/admin/dashboard");
+	}
 }

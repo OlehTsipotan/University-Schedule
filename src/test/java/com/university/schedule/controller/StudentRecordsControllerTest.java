@@ -1,10 +1,13 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.dto.*;
+import com.university.schedule.dto.GroupDTO;
+import com.university.schedule.dto.RoleDTO;
+import com.university.schedule.dto.StudentDTO;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
-import com.university.schedule.model.*;
-import com.university.schedule.service.*;
+import com.university.schedule.service.GroupService;
+import com.university.schedule.service.RoleService;
+import com.university.schedule.service.StudentService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,172 +28,150 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(StudentRecordsController.class)
 public class StudentRecordsControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
-    @MockBean
-    private StudentService studentService;
+	@MockBean
+	private StudentService studentService;
 
-    @MockBean
-    private StudentUpdateDTOService studentUpdateDTOService;
+	@MockBean
+	private GroupService groupService;
 
-    @MockBean
-    private StudentDTOService studentDTOService;
+	@MockBean
+	private RoleService roleService;
 
-    @MockBean
-    private GroupService groupService;
+	@Test
+	@WithMockUser(username = "username", authorities = {"VIEW_STUDENTS"})
+	public void getAll_processPage() throws Exception {
+		GroupDTO groupDTO = new GroupDTO(1L, "groupDTOName", null, null);
+		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
+		// Create a list of StudentDTOs for testing
+		List<StudentDTO> studentDTOs = new ArrayList<>();
+		studentDTOs.add(new StudentDTO(1L, "email 1", "firstName 1", "lastName 1", roleDTO, true, groupDTO));
 
-    @MockBean
-    private RoleService roleService;
+		// Mock the behavior of studentDTOService
+		when(studentService.findAllAsDTO(any(Pageable.class))).thenReturn(studentDTOs);
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"VIEW_STUDENTS"})
-    public void getAll_processPage() throws Exception {
-        // Create a list of StudentDTOs for testing
-        List<StudentDTO> studentDTOs = new ArrayList<>();
-        studentDTOs.add(new StudentDTO(1L, "email 1", "password 1", "firstName 1",
-                "lastName 1", "group 1", true));
-        studentDTOs.add(new StudentDTO(1L, "email 1", "password 1", "firstName 1",
-                "lastName 1", "group 1", true));
+		// Perform a GET request to /students and verify the result
+		mockMvc.perform(MockMvcRequestBuilders.get("/students")).andExpect(status().isOk())
+				.andExpect(view().name("students")).andExpect(
+						model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
+								"reverseSortDirection")).andExpect(model().attribute("entities", studentDTOs));
+	}
 
-        // Mock the behavior of studentDTOService
-        when(studentDTOService.findAll(any(Pageable.class))).thenReturn(studentDTOs);
+	@Test
+	@WithMockUser(username = "username", authorities = {"EDIT_STUDENTS"})
+	public void delete() throws Exception {
+		Long studentId = 1L;
 
-        // Perform a GET request to /students and verify the result
-        mockMvc.perform(MockMvcRequestBuilders.get("/students"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("students"))
-                .andExpect(model().attributeExists("students", "currentLimit", "currentOffset",
-                        "sortField", "sortDirection", "reverseSortDirection"))
-                .andExpect(model().attribute("students", studentDTOs));
-    }
+		mockMvc.perform(MockMvcRequestBuilders.get("/students/delete/{id}", studentId))
+				.andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/students"));
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"EDIT_STUDENTS"})
-    public void delete() throws Exception {
-        Long studentId = 1L;
+		verify(studentService, times(1)).deleteById(studentId);
+	}
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/students/delete/{id}", studentId))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/students"));
+	@Test
+	@WithMockUser(username = "username", authorities = {"EDIT_STUDENTS"})
+	public void getUpdateForm() throws Exception {
+		Long studentId = 1L;
 
-        verify(studentService, times(1)).deleteById(studentId);
-    }
+		GroupDTO groupDTO = new GroupDTO(1L, "groupDTOName", null, null);
+		List<GroupDTO> groupDTOS = List.of(groupDTO);
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"EDIT_STUDENTS"})
-    public void getUpdateForm() throws Exception {
-        Long studentId = 1L;
+		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
+		List<RoleDTO> roleDTOS = List.of(roleDTO);
+		// Create a list of StudentDTOs for testing
+		StudentDTO studentDTO =
+				new StudentDTO(studentId, "email 1", "firstName 1", "lastName 1", roleDTO, true, groupDTO);
 
-        Group group = new Group(1L, "Group A", new Discipline(1L, "Discipline A"));
-        List<Group> groups = new ArrayList<>();
-        groups.add(group);
+		when(studentService.findByIdAsDTO(studentId)).thenReturn(studentDTO);
+		when(groupService.findAllAsDTO()).thenReturn(groupDTOS);
+		when(roleService.findAllAsDTO()).thenReturn(roleDTOS);
 
+		mockMvc.perform(MockMvcRequestBuilders.get("/students/update/{id}", studentId)).andExpect(status().isOk())
+				.andExpect(model().attributeExists("entity", "groupDTOList", "roleDTOList"))
+				.andExpect(view().name("studentsUpdateForm")).andExpect(model().attribute("entity", studentDTO))
+				.andExpect(model().attribute("groupDTOList", groupDTOS))
+				.andExpect(model().attribute("roleDTOList", roleDTOS));
 
-        Role role = new Role(1L, "Role A");
-        List<Role> roles = new ArrayList<>();
-        roles.add(role);
+		verify(studentService, times(1)).findByIdAsDTO(studentId);
+		verify(groupService, times(1)).findAllAsDTO();
+		verify(roleService, times(1)).findAllAsDTO();
+	}
 
-        StudentUpdateDTO studentUpdateDTO = new StudentUpdateDTO(1L, "email 1", "firstName 1",
-                "lastName 1", group, role, true);
+	@Test
+	@WithMockUser(username = "username", authorities = {"EDIT_STUDENTS"})
+	public void update_whenNotValidStudentUpdateDTO_emptyField_thenProcessForm() throws Exception {
+		Long studentId = 1L;
 
-        when(studentUpdateDTOService.findById(studentId)).thenReturn(studentUpdateDTO);
-        when(groupService.findAll()).thenReturn(groups);
-        when(roleService.findAll()).thenReturn(roles);
+		GroupDTO groupDTO = new GroupDTO(1L, "groupDTOName", null, null);
+		List<GroupDTO> groupDTOS = List.of(groupDTO);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/students/update/{id}", studentId))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("entity", "groups", "roles"))
-                .andExpect(view().name("studentsUpdateForm"))
-                .andExpect(model().attribute("entity", studentUpdateDTO))
-                .andExpect(model().attribute("groups", groups))
-                .andExpect(model().attribute("roles", roles));
+		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
+		List<RoleDTO> roleDTOS = List.of(roleDTO);
+		// Create a list of StudentDTOs for testing
+		StudentDTO studentDTO = new StudentDTO(studentId, "email 1", "firstName 1", "", roleDTO, true, groupDTO);
 
-        verify(studentUpdateDTOService, times(1)).findById(studentId);
-        verify(groupService, times(1)).findAll();
-        verify(roleService, times(1)).findAll();
-    }
+		when(studentService.findByIdAsDTO(studentId)).thenReturn(studentDTO);
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"EDIT_STUDENTS"})
-    public void update_whenNotValidStudentUpdateDTO_emptyField_thenProcessForm() throws Exception {
-        Long studentId = 1L;
+		mockMvc.perform(MockMvcRequestBuilders.post("/students/update/{id}", studentId)
+						.param("isEnable", "false") // Add any other request parameters as needed
+						.with(csrf()).flashAttr("studentDTO", studentDTO).flashAttr("groupDTOList", groupDTOS))
+				.andExpect(status().isOk()).andExpect(model().attributeExists("entity"))
+				.andExpect(model().attribute("entity", studentDTO)).andExpect(view().name("studentsUpdateForm"));
 
-        Group group = new Group(1L, "Group A", new Discipline(1L, "Discipline A"));
+		verify(studentService, times(0)).update(studentDTO);
+	}
 
-        Role role = new Role(1L, "Role A");
+	@Test
+	@WithMockUser(username = "username", authorities = {"EDIT_STUDENTS"})
+	public void update_whenStudentUpdateDTOServiceThrowValidationException_thenProcessForm() throws Exception {
+		Long studentId = 1L;
 
-        StudentUpdateDTO studentUpdateDTO = new StudentUpdateDTO(1L, "", "firstName 1",
-                "lastName 1", group, role, true);
+		GroupDTO groupDTO = new GroupDTO(1L, "groupDTOName", null, null);
+		List<GroupDTO> groupDTOS = List.of(groupDTO);
 
-        when(studentUpdateDTOService.findById(studentId)).thenReturn(studentUpdateDTO);
+		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
+		List<RoleDTO> roleDTOS = List.of(roleDTO);
+		// Create a list of StudentDTOs for testing
+		StudentDTO studentDTO =
+				new StudentDTO(studentId, "email 1", "firstName 1", "lastName 1", roleDTO, true, groupDTO);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/students/update/{id}", studentId)
-                        .param("isEnable", "false") // Add any other request parameters as needed
-                        .with(csrf())
-                        .flashAttr("studentUpdateDTO", studentUpdateDTO))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("entity"))
-                .andExpect(model().attribute("entity", studentUpdateDTO))
-                .andExpect(view().name("studentsUpdateForm"));
-    }
+		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"EDIT_STUDENTS"})
-    public void update_whenStudentUpdateDTOServiceThrowValidationException_thenProcessForm() throws Exception {
-        Long studentId = 1L;
+		when(studentService.update((StudentDTO) any())).thenThrow(validationException);
+		when(studentService.findByIdAsDTO(studentId)).thenReturn(studentDTO);
 
-        Group group = new Group(1L, "Group A", new Discipline(1L, "Discipline A"));
+		mockMvc.perform(MockMvcRequestBuilders.post("/students/update/{id}", studentId)
+				.param("isEnable", "false") // Add any other request parameters as needed
+				.with(csrf()).flashAttr("studentDTO", studentDTO)).andExpect(status().is3xxRedirection());
 
-        Role role = new Role(1L, "Role A");
+		verify(studentService, times(1)).update(studentDTO);
+	}
 
-        StudentUpdateDTO studentUpdateDTO = new StudentUpdateDTO(1L, "email 1", "firstName 1",
-                "lastName 1", group, role, true);
+	@Test
+	@WithMockUser(username = "username", authorities = {"EDIT_STUDENTS"})
+	public void update_whenStudentUpdateDTOServiceThrowServiceException_thenProcessForm() throws Exception {
+		Long studentId = 1L;
 
-        ValidationException validationException = new ValidationException("testException", List.of("myError"));
+		GroupDTO groupDTO = new GroupDTO(1L, "groupDTOName", null, null);
+		List<GroupDTO> groupDTOS = List.of(groupDTO);
 
-        when(studentUpdateDTOService.save(any())).thenThrow(validationException);
-        when(studentUpdateDTOService.findById(studentId)).thenReturn(studentUpdateDTO);
+		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
+		List<RoleDTO> roleDTOS = List.of(roleDTO);
+		// Create a list of StudentDTOs for testing
+		StudentDTO studentDTO =
+				new StudentDTO(studentId, "email 1", "firstName 1", "lastName 1", roleDTO, true, groupDTO);
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/students/update/{id}", studentId)
-                        .param("isEnable", "false") // Add any other request parameters as needed
-                        .with(csrf())
-                        .flashAttr("studentUpdateDTO", studentUpdateDTO))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("validationServiceErrors"))
-                .andExpect(model().attribute("validationServiceErrors", validationException.getViolations()))
-                .andExpect(model().attributeExists("entity"))
-                .andExpect(model().attribute("entity", studentUpdateDTO))
-                .andExpect(view().name("studentsUpdateForm"));
+		ServiceException serviceException = new ServiceException("testException");
 
-        verify(studentUpdateDTOService, times(1)).save(studentUpdateDTO);
-    }
+		when(studentService.update((StudentDTO) any())).thenThrow(serviceException);
+		when(studentService.findByIdAsDTO(studentId)).thenReturn(studentDTO);
 
-    @Test
-    @WithMockUser(username = "username", authorities = {"EDIT_STUDENTS"})
-    public void update_whenStudentUpdateDTOServiceThrowServiceException_thenProcessForm() throws Exception {
-        Long studentId = 1L;
+		mockMvc.perform(MockMvcRequestBuilders.post("/students/update/{id}", studentId)
+				.param("isEnable", "false") // Add any other request parameters as needed
+				.with(csrf()).flashAttr("studentDTO", studentDTO)).andExpect(status().is3xxRedirection());
 
-        Group group = new Group(1L, "Group A", new Discipline(1L, "Discipline A"));
-
-        Role role = new Role(1L, "Role A");
-
-        StudentUpdateDTO studentUpdateDTO = new StudentUpdateDTO(1L, "email 1", "firstName 1",
-                "lastName 1", group, role, true);
-
-        ServiceException serviceException = new ServiceException("testException");
-
-        when(studentUpdateDTOService.save(any())).thenThrow(serviceException);
-        when(studentUpdateDTOService.findById(studentId)).thenReturn(studentUpdateDTO);
-
-        mockMvc.perform(MockMvcRequestBuilders.post("/students/update/{id}", studentId)
-                        .param("isEnable", "false") // Add any other request parameters as needed
-                        .with(csrf())
-                        .flashAttr("studentUpdateDTO", studentUpdateDTO))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("serviceError"))
-                .andExpect(model().attribute("serviceError", serviceException.getMessage()))
-                .andExpect(model().attribute("entity", studentUpdateDTO))
-                .andExpect(view().name("studentsUpdateForm"));
-    }
+		verify(studentService, times(1)).update(studentDTO);
+	}
 }

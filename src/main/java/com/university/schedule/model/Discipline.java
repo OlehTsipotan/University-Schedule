@@ -19,36 +19,36 @@ import java.util.Objects;
 @Table(name = "disciplines")
 public class Discipline {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "discipline_generator")
-    @SequenceGenerator(name = "discipline_generator", sequenceName = "disciplines_seq", allocationSize = 1)
-    @Column(name = "discipline_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "discipline_generator")
+	@SequenceGenerator(name = "discipline_generator", sequenceName = "disciplines_seq", allocationSize = 1)
+	@Column(name = "discipline_id")
+	private Long id;
 
-    @NonNull
-    @NotBlank(message = "Discipline name must not be blank")
-    @Size(max = 255)
-    private String name;
+	@NonNull
+	@NotBlank(message = "Discipline name must not be blank")
+	@Size(max = 255)
+	private String name;
 
-    @OneToMany(mappedBy = "discipline")
-    @ToString.Exclude
-    private List<Group> groups;
+	@OneToMany(mappedBy = "discipline")
+	@ToString.Exclude
+	private List<Group> groups;
 
-    public Discipline(@NonNull Long id, @NonNull String name){
-        this.id = id;
-        this.name = name;
-    }
+	public Discipline(@NonNull Long id, @NonNull String name) {
+		this.id = id;
+		this.name = name;
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Discipline that = (Discipline) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+		Discipline that = (Discipline) o;
+		return getId() != null && Objects.equals(getId(), that.getId());
+	}
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return getClass().hashCode();
+	}
 }

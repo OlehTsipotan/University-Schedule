@@ -16,43 +16,44 @@
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar('Teachers')}"></div>
-<div th:if="${teachers.size() > 0}">
+<div th:if="${success}">
+    <div class="alert alert-success mt-3" th:text="${success}"></div>
+</div>
+<div th:if="${entities.size() > 0}">
     <table class="table table-hover table-bordered table-responsive-md">
         <thead class="thead-light">
         <tr class="sticky-top">
             <th th:replace="~{fragments/sorting :: sorting('teachers', 'id','Id')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('teachers', 'email','Email')}"></th>
-            <th th:replace="~{fragments/sorting :: sorting('teachers', 'password','Password')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('teachers', 'firstName','FirstName')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('teachers', 'lastName','LastName')}"></th>
-            <th>Courses</th>
+            <th th:replace="~{fragments/sorting :: sorting('teachers', 'courses','Courses')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('teachers', 'isEnable','isEnable')}"></th>
             <th sec:authorize="hasAuthority('EDIT_TEACHERS')" class="static-col">Actions</th>
         </tr>
         </thead>
         <tbody>
-        <tr th:each="teacher : ${teachers}">
-            <th scope="row" th:text="${teacher.getId()}"></th>
-            <td th:text="${teacher.getEmail()}"></td>
-            <td th:text="${teacher.getPassword()}"></td>
-            <td th:text="${teacher.getFirstName()}"></td>
-            <td th:text="${teacher.getLastName()}"></td>
+        <tr th:each="entity : ${entities}">
+            <th scope="row" th:text="${entity.getId()}"></th>
+            <td th:text="${entity.getEmail()}"></td>
+            <td th:text="${entity.getFirstName()}"></td>
+            <td th:text="${entity.getLastName()}"></td>
             <td>
-                <span th:each="courseName, iterStat : ${teacher.getCourseNames()}"><span
-                        th:text="${courseName}"></span><span th:if="${!iterStat.last}">, </span></span>
+                <span th:each="courseDTO, iterStat : ${entity.getCourseDTOS()}"><span
+                        th:text="${courseDTO.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
             </td>
-            <td th:text="${teacher.isEnable()}"></td>
+            <td th:text="${entity.isEnable()}"></td>
             <td sec:authorize="hasAuthority('EDIT_TEACHERS')" class="static-col">
-                <a th:href="@{'/teachers/update/' + ${teacher.getId()}}" id="btnUpdate"
-                   title="Delete this Building" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
-                <a th:href="@{'/teachers/delete/' + ${teacher.getId()}}" id="btnDelete"
+                <a th:href="@{'/teachers/update/' + ${entity.getId()}}" id="btnUpdate"
+                   title="Update this Teacher" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
+                <a th:href="@{'/teachers/delete/' + ${entity.getId()}}" id="btnDelete"
                    title="Delete this Teacher" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
             </td>
         </tr>
         </tbody>
     </table>
 </div>
-<div class="" th:unless="${teachers.size() > 0}">
+<div class="" th:unless="${entities.size() > 0}">
     <span>No Teachers found!</span>
 </div>
 <div th:replace="~{fragments/footer}"></div>

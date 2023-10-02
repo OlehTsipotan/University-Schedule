@@ -27,6 +27,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BuildingRecordsController.class)
+@ComponentScan("com.university.schedule.formatter")
 public class BuildingRecordsControllerTest {
 
 	@Autowired

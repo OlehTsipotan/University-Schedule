@@ -13,11 +13,10 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class StringToAuthorityDTOFormatter implements Formatter<AuthorityDTO> {
 
-	private final AuthorityService authorityService;
 
 	@Override
 	public AuthorityDTO parse(String text, Locale locale) throws ParseException {
-		return authorityService.findByIdAsDTO(Long.parseLong(text));
+		return AuthorityDTO.builder().id(Long.parseLong(text)).build();
 	}
 
 	@Override

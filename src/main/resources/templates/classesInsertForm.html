@@ -34,7 +34,7 @@
             <div class="form-group row mb-2">
                 <label for="inputCourse" class="col-sm-2 col-form-label fw-bold">Course</label>
                 <div class="col-sm-10">
-                    <select name="courseDTO" id="inputCourse" required
+                    <select name="courseDTO.id" id="inputCourse" required
                             th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('courseDTO') ? 'is-invalid form-select' : 'form-select')}">
                         <option th:each="courseDTO : ${courseDTOList}" th:value="${courseDTO.getId()}"
                                 th:text="${courseDTO.getName()}"></option>
@@ -53,7 +53,7 @@
             <div class="form-group row mb-2">
                 <label for="inputTeacher" class="col-sm-2 col-form-label fw-bold">Teacher</label>
                 <div class="col-sm-10">
-                    <select name="teacherDTO" id="inputTeacher" required
+                    <select name="teacherDTO.id" id="inputTeacher" required
                             th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('teacherDTO') ? 'is-invalid form-select' : 'form-select')}">
                         <option th:each="teacherDTO : ${teacherDTOList}" th:value="${teacherDTO.getId()}"
                                 th:text="${teacherDTO.getFullName()}"></option>
@@ -72,7 +72,7 @@
             <div class="form-group row mb-2">
                 <label for="inputClassroom" class="col-sm-2 col-form-label fw-bold">Classroom</label>
                 <div class="col-sm-10">
-                    <select name="classroomDTO" id="inputClassroom" required
+                    <select name="classroomDTO.id" id="inputClassroom" required
                             th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('classroomDTO') ? 'is-invalid form-select' : 'form-select')}">
                         <option th:each="classroomDTO : ${classroomDTOList}" th:value="${classroomDTO.getId()}"
                                 th:text="${classroomDTO.getName() + ', ' + classroomDTO.getBuildingDTO().getName()}"></option>
@@ -91,7 +91,7 @@
             <div class="form-group row mb-2">
                 <label for="inputClassTime" class="col-sm-2 col-form-label fw-bold">Class Time</label>
                 <div class="col-sm-10">
-                    <select name="classTimeDTO" id="inputClassTime" required
+                    <select name="classTimeDTO.id" id="inputClassTime" required
                             th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('classTimeDTO') ? 'is-invalid form-select' : 'form-select')}">
                         <option th:each="classTimeDTO : ${classTimeDTOList}" th:value="${classTimeDTO.getId()}"
                                 th:text="@{${classTimeDTO.getOrderNumber()} + ', ' + ${classTimeDTO.getStartTime()} + ' for ' + ${classTimeDTO.getDurationMinutes()} + 'min.'}"
@@ -128,7 +128,7 @@
             <div class="form-group row mb-2">
                 <label for="inputClassType" class="col-sm-2 col-form-label fw-bold">Class Type</label>
                 <div class="col-sm-10">
-                    <select name="classTypeDTO" id="inputClassType" required
+                    <select name="classTypeDTO.id" id="inputClassType" required
                             th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('classTypeDTO') ? 'is-invalid form-select' : 'form-select')}">
                         <option th:each="classTypeDTO : ${classTypeDTOList}" th:value="${classTypeDTO.getId()}"
                                 th:text="${classTypeDTO.getName()}"

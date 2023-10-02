@@ -25,6 +25,10 @@ public class DefaultGroupService implements GroupService {
 
 	private final GroupRepository groupRepository;
 
+	private final DisciplineService disciplineService;
+
+	private final CourseService courseService;
+
 	private final ConverterService converterService;
 
 	private final GroupEntityValidator groupEntityValidator;
@@ -67,7 +71,6 @@ public class DefaultGroupService implements GroupService {
 	@Transactional
 	public Long save(GroupDTO groupDTO) {
 		Group group = convertToEntity(groupDTO);
-		group.getCourses().forEach(course -> log.info(course.toString()));
 		execute(() -> {
 			groupEntityValidator.validate(group);
 			groupRepository.save(group);
@@ -115,7 +118,16 @@ public class DefaultGroupService implements GroupService {
 	}
 
 	private Group convertToEntity(GroupDTO groupDTO) {
+		assignFields(groupDTO);
 		return converterService.convert(groupDTO, Group.class);
+	}
+
+	private void assignFields(GroupDTO groupDTO){
+		groupDTO.setDisciplineDTO(disciplineService.findByIdAsDTO(groupDTO.getDisciplineDTO().getId()));
+		groupDTO.setCourseDTOS(
+				groupDTO.getCourseDTOS().stream().map(courseDTO -> courseService.findByIdAsDTO(courseDTO.getId()))
+						.toList());
+
 	}
 
 

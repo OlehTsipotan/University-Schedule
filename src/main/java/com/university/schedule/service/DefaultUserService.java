@@ -25,8 +25,12 @@ import java.util.List;
 public class DefaultUserService implements UserService {
 
 	private final UserRepository userRepository;
+
 	private final UserEntityValidator userEntityValidator;
+
 	private final ConverterService converterService;
+
+	private final RoleService roleService;
 
 	@Override
 	public List<User> findAll() {
@@ -139,8 +143,13 @@ public class DefaultUserService implements UserService {
 		return userToSave;
 	}
 
-	private User convertToEntity(UserDTO source){
+	private User convertToEntity(UserDTO source) {
+		assignFields(source);
 		return converterService.convert(source, User.class);
+	}
+
+	private void assignFields(UserDTO userDTO) {
+		userDTO.setRoleDTO(roleService.findByIdAsDTO(userDTO.getRoleDTO().getId()));
 	}
 
 	private Student convertToStudentEntity(UserDTO source) {

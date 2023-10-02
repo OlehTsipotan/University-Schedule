@@ -2,10 +2,11 @@ package com.university.schedule.dto;
 
 import lombok.*;
 
-@Builder
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
 public class StudentDTO extends UserDTO {
 
 	private GroupDTO groupDTO;

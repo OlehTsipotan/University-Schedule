@@ -1,39 +1,24 @@
 package com.university.schedule.service;
 
-import com.university.schedule.model.*;
+import com.university.schedule.dto.ScheduledClassDTO;
+import com.university.schedule.model.ScheduledClass;
+import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 public interface ScheduledClassService {
 
-    Long save(ScheduledClass ScheduledClass);
+	Long save(ScheduledClass ScheduledClass);
 
-    ScheduledClass findById(Long id);
+	Long save(ScheduledClassDTO ScheduledClassDTO);
 
-    List<ScheduledClass> findByDateBetweenAndGroup(LocalDate startDate, LocalDate endDate, Group group);
+	ScheduledClassDTO findByIdAsDTO(Long id);
 
-    List<ScheduledClass> findByDateBetweenAndGroupAndCourse(LocalDate startDate, LocalDate endDate, Group group, Course course);
+	List<ScheduledClass> findAll();
 
-    List<ScheduledClass> findByDateBetweenAndGroupAndCourseAndClassType(LocalDate startDate, LocalDate endDate, Group group, Course course, ClassType classType);
+	List<ScheduledClassDTO> findAllAsDTO();
 
-    List<ScheduledClass> findByDateBetweenAndGroupAndClassType(LocalDate startDate, LocalDate endDate, Group group, ClassType classType);
+	List<ScheduledClassDTO> findAllAsDTO(Pageable pageable);
 
-
-    List<ScheduledClass> findByDateBetweenAndTeacher(LocalDate startDate, LocalDate endDate, Teacher teacher);
-
-    List<ScheduledClass> findByDateBetweenAndTeacherAndGroup(LocalDate startDate, LocalDate endDate, Teacher teacher, Group group);
-
-    List<ScheduledClass> findByDateBetweenAndTeacherAndGroupAndCourse(LocalDate startDate, LocalDate endDate, Teacher teacher, Group group, Course course);
-
-    List<ScheduledClass> findByDateBetweenAndTeacherAndGroupAndCourseAndClassType(LocalDate startDate, LocalDate endDate, Teacher teacher, Group group, Course course, ClassType classType);
-
-    List<ScheduledClass> findByDateBetweenAndTeacherAndCourse(LocalDate startDate, LocalDate endDate, Teacher teacher, Course course);
-
-    List<ScheduledClass> findByDateBetweenAndTeacherAndCourseAndClassType(LocalDate startDate, LocalDate endDate, Teacher teacher, Course course, ClassType classType);
-
-    List<ScheduledClass> findAll();
-
-    void deleteById(Long id);
+	void deleteById(Long id);
 }

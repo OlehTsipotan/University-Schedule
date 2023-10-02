@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content="University schedule web-application "/>
+    <meta name="author" content="Oleh Tsipotan"/>
+    <title>Classes Records</title>
+
+    <link th:href="@{/styles/main.css}" rel="stylesheet"/>
+
+    <link th:href="@{/assets/calendar-days-solid.svg}" rel="icon" type="image/x-icon"/>
+    <link th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
+
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar('Classes')}"></div>
+<div th:if="${success}">
+    <div class="alert alert-success mt-3" th:text="${success}"></div>
+</div>
+<div th:if="${insertedSuccessId}">
+    <div class="alert alert-success mt-3" th:text="@{'Inserted Record with ID = ' + ${insertedSuccessId} + '.'}"></div>
+</div>
+<div th:if="${entities.size() > 0}">
+    <table class="table table-hover table-bordered table-responsive-md">
+        <thead class="thead-light">
+        <tr class="sticky-top">
+            <th th:replace="~{fragments/sorting :: sorting('classes', 'id','Id')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classes', 'course','Course')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classes', 'teacher','Teacher')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classes', 'groups','Groups')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classes', 'date','Date (yyyy-mm-dd)')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classes', 'classTime','Order')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classes', 'classType','Type')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classes', 'classroom','Classroom Name')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classes', 'classroomBuilding','Building Name')}"></th>
+            <th sec:authorize="hasAuthority('EDIT_CLASSES')" class="static-col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entity : ${entities}">
+            <th scope="row" th:text="${entity.getId()}"></th>
+            <td th:text="${entity.getCourseDTO().getName()}"></td>
+            <td th:text="${entity.getTeacherDTO().getFullName()}"></td>
+            <td>
+                <span th:each="groupDTO, iterStat : ${entity.getGroupDTOS()}"><span
+                        th:text="${groupDTO.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
+            </td>
+            <td th:text="${entity.getDate()}"></td>
+            <td th:text="${entity.getClassTimeDTO().getOrderNumber()}"></td>
+            <td th:text="${entity.getClassTypeDTO().getName()}"></td>
+            <td th:text="${entity.getClassroomDTO().getName()}"></td>
+            <td th:text="${entity.getClassroomDTO().getBuildingDTO().getName()}"></td>
+            <td sec:authorize="hasAuthority('EDIT_CLASSES')" class="static-col">
+                <a th:href="@{'/classes/update/' + ${entity.getId()}}" id="btnUpdate"
+                   title="Update this Class" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
+                <a th:href="@{'/classes/delete/' + ${entity.getId()}}" id="btnDelete"
+                   title="Delete this Class" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div sec:authorize="hasAuthority('INSERT_CLASSES')" class="sticky-bottom bg-light p-3">
+        <button type="button"
+                class="btn btn-primary"><a class="nav-link" href="/classes/insert">Insert new</a></button>
+    </div>
+</div>
+<div class="" th:unless="${entities.size() > 0}">
+    <span>No Classes found!</span>
+</div>
+<div th:replace="~{fragments/footer}"></div>
+</body>
+</html>

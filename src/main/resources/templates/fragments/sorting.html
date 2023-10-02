@@ -1,0 +1,6 @@
+<th xmlns:th="http://www.thymeleaf.org" th:class="${field == 'id' ? 'static-col' : ''}" scope="col" th:fragment="sorting(entity, field, label)">
+  <a th:class="nav-link"
+     th:href="@{'/' + ${entity} + '?' + 'limit=' + ${currentLimit} + '&offset=' + ${currentOffset} + ${sortField != null ? '&sort=' + field + ',' + (sortField == field ? reverseSortDirection : sortDirection) : ''}}">
+    [[${label}]]
+  </a>
+</th>

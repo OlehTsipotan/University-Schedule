@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content="University schedule web-application "/>
+    <meta name="author" content="Oleh Tsipotan"/>
+    <title>Class insert</title>
+
+    <link th:href="@{/styles/main.css}" rel="stylesheet"/>
+
+    <link th:href="@{/assets/calendar-days-solid.svg}" rel="icon" type="image/x-icon"/>
+    <link th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbarWithBackPage('Class Insert', '/classes')}"></div>
+<div class="container">
+    <div class="row">
+        <div th:if="${validationServiceErrors != null}">
+            <div th:each="violation : ${validationServiceErrors}" class="alert alert-warning mt-3"
+                 th:text="${violation}"></div>
+        </div>
+
+        <form
+                method="post"
+                role="form"
+                th:action="@{'/classes/insert'}"
+                class="form-horizontal mt-3"
+                th:object="${scheduledClassDTO}">
+
+            <!-- Course select Input -->
+            <div class="form-group row mb-2">
+                <label for="inputCourse" class="col-sm-2 col-form-label fw-bold">Course</label>
+                <div class="col-sm-10">
+                    <select name="courseDTO.id" id="inputCourse" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('courseDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="courseDTO : ${courseDTOList}" th:value="${courseDTO.getId()}"
+                                th:text="${courseDTO.getName()}"></option>
+                    </select>
+                    <div th:if="${success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('courseDTO')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher select Input -->
+            <div class="form-group row mb-2">
+                <label for="inputTeacher" class="col-sm-2 col-form-label fw-bold">Teacher</label>
+                <div class="col-sm-10">
+                    <select name="teacherDTO.id" id="inputTeacher" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('teacherDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="teacherDTO : ${teacherDTOList}" th:value="${teacherDTO.getId()}"
+                                th:text="${teacherDTO.getFullName()}"></option>
+                    </select>
+                    <div th:if="${success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('teacherDTO')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classroom select Input-->
+            <div class="form-group row mb-2">
+                <label for="inputClassroom" class="col-sm-2 col-form-label fw-bold">Classroom</label>
+                <div class="col-sm-10">
+                    <select name="classroomDTO.id" id="inputClassroom" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('classroomDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="classroomDTO : ${classroomDTOList}" th:value="${classroomDTO.getId()}"
+                                th:text="${classroomDTO.getName() + ', ' + classroomDTO.getBuildingDTO().getName()}"></option>
+                    </select>
+                    <div th:if="${success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('classroomDTO')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ClassTime select Input -->
+            <div class="form-group row mb-2">
+                <label for="inputClassTime" class="col-sm-2 col-form-label fw-bold">Class Time</label>
+                <div class="col-sm-10">
+                    <select name="classTimeDTO.id" id="inputClassTime" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('classTimeDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="classTimeDTO : ${classTimeDTOList}" th:value="${classTimeDTO.getId()}"
+                                th:text="@{${classTimeDTO.getOrderNumber()} + ', ' + ${classTimeDTO.getStartTime()} + ' for ' + ${classTimeDTO.getDurationMinutes()} + 'min.'}"
+                        ></option>
+                    </select>
+                    <div th:if="${success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('classTimeDTO')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date Input -->
+            <div class="form-group row mb-2">
+                <label for="inputDate" class="col-sm-2 col-form-label fw-bold">Date</label>
+                <div class="col-sm-10">
+                    <input type="date" name="date" id="inputDate" placeholder="Date"
+                           th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('date') ? 'is-invalid form-control' : 'form-control')}"
+                           required>
+                </div>
+                <div th:if="${success}" class="valid-feedback">
+                    Looks good!
+                </div>
+                <div th:each="error : ${#fields.errors('date')}"
+                     class="invalid-feedback"
+                     th:text=${error}>
+                </div>
+            </div>
+
+            <!-- ClassType select input -->
+            <div class="form-group row mb-2">
+                <label for="inputClassType" class="col-sm-2 col-form-label fw-bold">Class Type</label>
+                <div class="col-sm-10">
+                    <select name="classTypeDTO.id" id="inputClassType" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('classTypeDTO') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="classTypeDTO : ${classTypeDTOList}" th:value="${classTypeDTO.getId()}"
+                                th:text="${classTypeDTO.getName()}"
+                        ></option>
+                    </select>
+                    <div th:if="${success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('classTypeDTO')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Groups select input -->
+            <div class="form-group row mb-2">
+                <label for="inputGroup" class="col-sm-2 col-form-label fw-bold">Groups</label>
+                <div class="col-sm-10">
+                    <select multiple name="groupDTOS" id="inputGroup" required
+                            th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('groupDTOS') ? 'is-invalid form-select' : 'form-select')}">
+                        <option th:each="groupDTO : ${groupDTOList}" th:value="${groupDTO.getId()}"
+                                th:text="${groupDTO.getName()}"
+                        ></option>
+                    </select>
+                    <div th:if="${success}" class="valid-feedback">
+                        Looks good!
+                    </div>
+                    <div th:each="error : ${#fields.errors('groupDTOS')}"
+                         class="invalid-feedback"
+                         th:text=${error}>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+</html>

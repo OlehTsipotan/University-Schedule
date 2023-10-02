@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content="University schedule web-application "/>
+    <meta name="author" content="Oleh Tsipotan"/>
+    <title>ClassTimes Records</title>
+
+    <link th:href="@{/styles/main.css}" rel="stylesheet"/>
+
+    <link th:href="@{/assets/calendar-days-solid.svg}" rel="icon" type="image/x-icon"/>
+    <link th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}" rel="stylesheet"/>
+    <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
+</head>
+<body>
+<div th:replace="~{fragments/navbar :: navbar('ClassTimes')}"></div>
+<div th:if="${success}">
+    <div class="alert alert-success mt-3" th:text="${success}"></div>
+</div>
+<div th:if="${insertedSuccessId}">
+    <div class="alert alert-success mt-3" th:text="@{'Inserted Record with ID = ' + ${insertedSuccessId} + '.'}"></div>
+</div>
+<div th:if="${entities.size() > 0}">
+    <table class="table table-hover table-bordered table-responsive-md">
+        <thead class="thead-light">
+        <tr class="sticky-top">
+            <th th:replace="~{fragments/sorting :: sorting('classtimes', 'id','Id')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classtimes', 'orderNumber','Order')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classtimes', 'startTime','Start Time (hh:mm)')}"></th>
+            <th th:replace="~{fragments/sorting :: sorting('classtimes', 'duration','Duration Minutes')}"></th>
+            <th sec:authorize="hasAuthority('EDIT_CLASSTIMES')" class="static-col">Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="entity : ${entities}">
+            <th scope="row" th:text="${entity.getId()}"></th>
+            <td th:text="${entity.getOrderNumber()}"></td>
+            <td th:text="${entity.getStartTime()}"></td>
+            <td th:text="${entity.getDurationMinutes()}"></td>
+            <td sec:authorize="hasAuthority('EDIT_CLASSTIMES')" class="static-col">
+                <a th:href="@{'/classtimes/update/' + ${entity.getId()}}" id="btnUpdate"
+                   title="Delete this Building" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
+                <a th:href="@{'/classtimes/delete/' + ${entity.getId()}}" id="btnDelete"
+                   title="Delete this ClassTime" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <div sec:authorize="hasAuthority('INSERT_CLASSTIMES')" class="sticky-bottom bg-light p-3">
+        <button type="button"
+                class="btn btn-primary"><a class="nav-link" href="/classtimes/insert">Insert new</a></button>
+    </div>
+</div>
+<div class="" th:unless="${entities.size() > 0}">
+    <span>No ClassTimes found!</span>
+</div>
+<div th:replace="~{fragments/footer}"></div>
+</body>
+</html>

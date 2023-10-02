@@ -1,0 +1,2 @@
+ALTER TABLE users
+ADD COLUMN is_enable BOOLEAN NOT NULL DEFAULT true;

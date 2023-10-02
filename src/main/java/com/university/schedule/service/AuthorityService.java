@@ -11,8 +11,6 @@ public interface AuthorityService {
 
 	Long save(Authority authority);
 
-	Long save(AuthorityDTO authorityDTO);
-
 	Authority findById(Long id);
 
 	AuthorityDTO findByIdAsDTO(Long id);

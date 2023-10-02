@@ -4,13 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Getter
-@Setter
-@ToString
 @Builder
-@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class ClassroomDTO {
 
 	private Long id;

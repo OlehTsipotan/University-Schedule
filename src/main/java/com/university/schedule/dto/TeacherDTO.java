@@ -4,11 +4,10 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class TeacherDTO extends UserDTO {
 
 	private List<CourseDTO> courseDTOS;

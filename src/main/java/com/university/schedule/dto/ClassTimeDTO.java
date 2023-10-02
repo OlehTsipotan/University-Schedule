@@ -6,12 +6,10 @@ import lombok.*;
 
 import java.time.LocalTime;
 
-@Getter
-@Setter
-@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class ClassTimeDTO {
 
 	private Long id;

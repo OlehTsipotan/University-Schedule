@@ -1,6 +1,5 @@
 package com.university.schedule.service;
 
-import com.university.schedule.dto.ScheduledClassDTO;
 import com.university.schedule.exception.ScheduleGenerationException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.*;
@@ -73,7 +72,7 @@ public class ScheduleGeneratorTest {
 	                                                                                               String disciplineName)
 			throws ScheduleGenerationException {
 
-		Mockito.doThrow(ServiceException.class).when(scheduledClassService).save((ScheduledClassDTO) any());
+		Mockito.doThrow(ServiceException.class).when(scheduledClassService).save((ScheduledClass) any());
 		Mockito.doNothing().when(scheduleValidator).validate(any(), any(), any());
 
 		Discipline discipline = new Discipline("DisciplineName");
@@ -99,6 +98,6 @@ public class ScheduleGeneratorTest {
 
 		assertThrows(ServiceException.class, () -> scheduleGenerator.generate(startDate, endDate, dayScheduleItemList));
 		Mockito.verify(scheduleValidator).validate(startDate, endDate, dayScheduleItemList);
-		Mockito.verify(scheduledClassService).save((ScheduledClassDTO) any());
+		Mockito.verify(scheduledClassService).save((ScheduledClass) any());
 	}
 }

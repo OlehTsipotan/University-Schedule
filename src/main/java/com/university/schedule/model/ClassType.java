@@ -13,7 +13,6 @@ import java.util.Objects;
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "class_types")
 @Entity
 public class ClassType {
@@ -24,10 +23,13 @@ public class ClassType {
 	@Column(name = "class_type_id")
 	private Long id;
 
-	@NonNull
 	@NotBlank(message = "ClassType name must not be blank")
 	@Size(max = 255)
 	private String name;
+
+	public ClassType(String name){
+		this.name = name;
+	}
 
 	@Override
 	public boolean equals(Object o) {

@@ -14,7 +14,6 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Entity
 @Builder
 @Table(name = "buildings")
@@ -26,12 +25,10 @@ public class Building {
 	@Column(name = "building_id")
 	private Long id;
 
-	@NonNull
 	@NotBlank(message = "Building name must not be blank")
 	@Size(max = 255)
 	private String name;
 
-	@NonNull
 	@NotBlank(message = "Building address must not be blank")
 	@Size(max = 255)
 	private String address;
@@ -40,8 +37,13 @@ public class Building {
 	@ToString.Exclude
 	private List<Classroom> classrooms;
 
-	public Building(@NonNull Long id, @NonNull String name, @NonNull String address) {
+	public Building(Long id, String name, String address) {
 		this.id = id;
+		this.name = name;
+		this.address = address;
+	}
+
+	public Building(String name, String address) {
 		this.name = name;
 		this.address = address;
 	}

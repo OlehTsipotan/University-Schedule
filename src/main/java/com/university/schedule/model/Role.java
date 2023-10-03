@@ -15,7 +15,6 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Entity
 @Table(name = "roles")
 public class Role {
@@ -26,7 +25,6 @@ public class Role {
 	@Column(name = "role_id")
 	private Long id;
 
-	@NonNull
 	@NotBlank(message = "Role name must not be blank")
 	@Size(max = 255)
 	private String name;
@@ -41,8 +39,12 @@ public class Role {
 	@ToString.Exclude
 	private Set<Authority> authorities;
 
-	public Role(@NonNull Long id, @NonNull String name) {
+	public Role(Long id, String name) {
 		this.id = id;
+		this.name = name;
+	}
+
+	public Role(String name) {;
 		this.name = name;
 	}
 

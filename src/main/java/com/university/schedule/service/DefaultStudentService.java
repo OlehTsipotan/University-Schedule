@@ -113,13 +113,7 @@ public class DefaultStudentService implements StudentService {
 	}
 
 	private Student convertToEntity(StudentDTO source) {
-		assignFields(source);
 		return converterService.convert(source, Student.class);
-	}
-
-	private void assignFields(StudentDTO studentDTO) {
-		studentDTO.setRoleDTO(roleService.findByIdAsDTO(studentDTO.getRoleDTO().getId()));
-		studentDTO.setGroupDTO(groupService.findByIdAsDTO(studentDTO.getGroupDTO().getId()));
 	}
 
 	private Student convertToExistingEntity(StudentDTO studentDTO) {

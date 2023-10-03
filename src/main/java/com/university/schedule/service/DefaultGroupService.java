@@ -118,18 +118,8 @@ public class DefaultGroupService implements GroupService {
 	}
 
 	private Group convertToEntity(GroupDTO groupDTO) {
-		assignFields(groupDTO);
 		return converterService.convert(groupDTO, Group.class);
 	}
-
-	private void assignFields(GroupDTO groupDTO){
-		groupDTO.setDisciplineDTO(disciplineService.findByIdAsDTO(groupDTO.getDisciplineDTO().getId()));
-		groupDTO.setCourseDTOS(
-				groupDTO.getCourseDTOS().stream().map(courseDTO -> courseService.findByIdAsDTO(courseDTO.getId()))
-						.toList());
-
-	}
-
 
 	private <T> T execute(DaoSupplier<T> supplier) {
 		try {

@@ -14,7 +14,6 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Entity
 @Builder
 @Table(name = "authorities")
@@ -26,7 +25,6 @@ public class Authority {
 	@Column(name = "authority_id")
 	private Long id;
 
-	@NonNull
 	@NotBlank(message = "Authority name must not be blank")
 	@Size(max = 255)
 	private String name;

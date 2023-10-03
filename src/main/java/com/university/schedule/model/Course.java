@@ -18,7 +18,6 @@ import java.util.Set;
 @Table(name = "courses")
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 public class Course {
 
 	@Id
@@ -27,7 +26,6 @@ public class Course {
 	@Column(name = "course_id")
 	private Long id;
 
-	@NonNull
 	@NotBlank(message = "Course name must not be blank")
 	@Size(max = 255)
 	private String name;
@@ -40,8 +38,12 @@ public class Course {
 	@ToString.Exclude
 	private Set<Group> groups = new HashSet<>();
 
-	public Course(@NonNull Long id, @NonNull String name) {
+	public Course(Long id, String name) {
 		this.id = id;
+		this.name = name;
+	}
+
+	public Course(String name) {
 		this.name = name;
 	}
 

@@ -19,6 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -170,6 +171,7 @@ public class ScheduledClassRepositoryTest {
         LocalDate date2 = LocalDate.of(2023, 5, 2);
         LocalDate date3 = LocalDate.of(2023, 5, 3);
         ClassType classType = new ClassType(classTypeName);
+        Set<Group> groups = new HashSet<>();
 
         entityManager.persist(course);
         entityManager.persist(teacher);
@@ -183,6 +185,7 @@ public class ScheduledClassRepositoryTest {
                 .classTime(classTime)
                 .date(date1)
                 .classType(classType)
+                .groups(groups)
                 .build();
 
         ScheduledClass scheduledClassToSave2 = ScheduledClass.builder()
@@ -192,6 +195,7 @@ public class ScheduledClassRepositoryTest {
                 .classTime(classTime)
                 .date(date2)
                 .classType(classType)
+                .groups(groups)
                 .build();
 
         ScheduledClass scheduledClassToSave3 = ScheduledClass.builder()
@@ -201,6 +205,7 @@ public class ScheduledClassRepositoryTest {
                 .classTime(classTime)
                 .date(date3)
                 .classType(classType)
+                .groups(groups)
                 .build();
 
         entityManager.persist(scheduledClassToSave1);

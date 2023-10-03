@@ -285,8 +285,7 @@ public class DataGenerationService {
 			teacher = new Teacher(String.format("%s.%s.%s@%s", teachersFirstNames.get(i).toLowerCase(),
 					teachersLastNames.get(i).toLowerCase(), "teacher", emailDomain),
 					passwordEncoder.encode(String.format("%d%s", i, teachersFirstNames.get(i))),
-					teachersFirstNames.get(i), teachersLastNames.get(i));
-			teacher.setRole(roleService.findByName("Teacher"));
+					teachersFirstNames.get(i), teachersLastNames.get(i), roleService.findByName("Teacher"));
 			teacherService.save(teacher);
 		}
 	}
@@ -319,8 +318,7 @@ public class DataGenerationService {
 			student = new Student(String.format("%s.%s%d@%s", studentsFirstNames.get(i).toLowerCase(),
 					studentsLastNames.get(i).toLowerCase(), i, emailDomain),
 					passwordEncoder.encode(studentsPasswords.get(i)), studentsFirstNames.get(i),
-					studentsLastNames.get(i));
-			student.setRole(roleService.findByName("Student"));
+					studentsLastNames.get(i), roleService.findByName("Student"));
 			student.setGroup(groups.get(i % groups.size()));
 			studentService.save(student);
 		}

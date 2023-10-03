@@ -25,8 +25,12 @@ public class Student extends User {
 				user.isEnable(), user.getRole());
 	}
 
-	public Student(String email, String password, String firstName, String lastName) {
-		super(email, password, firstName, lastName, true);
+	public Student(String email, String password, String firstName, String lastName, Role role){
+		super(email, password, firstName, lastName, role);
+	}
+
+	public Student(String email, String password, String firstName, String lastName){
+		super(email, password, firstName, lastName);
 	}
 
 	@Override

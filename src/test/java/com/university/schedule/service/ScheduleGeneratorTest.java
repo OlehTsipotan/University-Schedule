@@ -73,7 +73,7 @@ public class ScheduleGeneratorTest {
 	                                                                                               String disciplineName)
 			throws ScheduleGenerationException {
 
-		Mockito.doThrow(ServiceException.class).when(scheduledClassService).save((ScheduledClassDTO) any());
+		Mockito.doThrow(ServiceException.class).when(scheduledClassService).save((ScheduledClass) any());
 		Mockito.doNothing().when(scheduleValidator).validate(any(), any(), any());
 
 		Discipline discipline = new Discipline("DisciplineName");
@@ -95,10 +95,12 @@ public class ScheduleGeneratorTest {
 				DayScheduleItem.builder().course(course).teacher(teacher).classTime(classTime).dayOfWeek(dayOfWeek)
 						.classType(classType).groups(Set.of(group)).classroom(classroom).build();
 
+		System.out.printf(dayScheduleItem.toString());
+
 		dayScheduleItemList.add(dayScheduleItem);
 
 		assertThrows(ServiceException.class, () -> scheduleGenerator.generate(startDate, endDate, dayScheduleItemList));
 		Mockito.verify(scheduleValidator).validate(startDate, endDate, dayScheduleItemList);
-		Mockito.verify(scheduledClassService).save((ScheduledClassDTO) any());
+		Mockito.verify(scheduledClassService).save((ScheduledClass) any());
 	}
 }

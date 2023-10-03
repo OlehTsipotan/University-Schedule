@@ -76,6 +76,7 @@ public class ClassroomRecordsController {
 	public String update(@PathVariable Long id, @Valid @ModelAttribute ClassroomDTO classroomDTO, BindingResult result,
 	                     Model model, RedirectAttributes redirectAttributes) {
 		if (!result.hasErrors()) {
+			log.info(classroomDTO.toString());
 			classroomService.save(classroomDTO);
 			redirectAttributes.addFlashAttribute("success", true);
 			return "redirect:/classrooms/update/" + id;

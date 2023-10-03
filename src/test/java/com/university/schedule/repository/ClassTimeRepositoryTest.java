@@ -133,7 +133,7 @@ public class ClassTimeRepositoryTest {
 
 		ClassTime classTime;
 		List<ClassTime> ownClassTimeList = new ArrayList<>();
-		for (int order = 0; order < amount; order++) {
+		for (int order = 1; order < amount; order++) {
 			// Creating instance to save
 			classTime = new ClassTime(order, time, duration);
 			// Saving

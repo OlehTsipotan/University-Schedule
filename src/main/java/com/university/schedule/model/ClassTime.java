@@ -5,7 +5,10 @@ import com.university.schedule.validation.ClassDuration;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.Hibernate;
 
 import java.time.Duration;
@@ -17,7 +20,6 @@ import java.util.Objects;
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "class_times")
 public class ClassTime {
 
@@ -30,20 +32,23 @@ public class ClassTime {
 	@Column(name = "order_number")
 	@Positive(message = "ClassTime orderNumber must be greater than zero")
 	@NotNull(message = "ClassTime orderNumber must not be null")
-	@NonNull
 	private Integer orderNumber;
 
 	@Column(name = "start_time")
-	@NonNull
 	@NotNull(message = "ClassTime startTime must not be null")
 	private LocalTime startTime;
 
 	@Column(name = "duration_minutes")
-	@NonNull
 	@NotNull(message = "ClassTime duration must not be null")
 	@ClassDuration
 	@Convert(converter = DurationAttributeConverter.class)
 	private Duration duration;
+
+	public ClassTime(Integer orderNumber, LocalTime startTime, Duration duration) {
+		this.orderNumber = orderNumber;
+		this.startTime = startTime;
+		this.duration = duration;
+	}
 
 
 	@Override

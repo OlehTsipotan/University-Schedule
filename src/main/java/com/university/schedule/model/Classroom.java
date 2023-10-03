@@ -14,7 +14,6 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Builder
 @Entity
 @Table(name = "classrooms", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "building_id"})})
@@ -26,16 +25,19 @@ public class Classroom {
 	@Column(name = "classroom_id")
 	private Long id;
 
-	@NonNull
 	@NotBlank(message = "Classroom name must not be blank")
 	@Size(max = 255)
 	private String name;
 
 	@ManyToOne
 	@JoinColumn(name = "building_id")
-	@NonNull
 	@NotNull(message = "Classroom building must not be null")
 	private Building building;
+
+	public Classroom(String name, Building building){
+		this.name = name;
+		this.building = building;
+	}
 
 	@Override
 	public boolean equals(Object o) {

@@ -118,15 +118,7 @@ public class DefaultTeacherService implements TeacherService {
 	}
 
 	private Teacher convertToEntity(TeacherDTO source) {
-		assignField(source);
 		return converterService.convert(source, Teacher.class);
-	}
-
-	private void assignField(TeacherDTO teacherDTO) {
-		teacherDTO.setRoleDTO(roleService.findByIdAsDTO(teacherDTO.getRoleDTO().getId()));
-		teacherDTO.setCourseDTOS(
-				teacherDTO.getCourseDTOS().stream().map(courseDTO -> courseService.findByIdAsDTO(courseDTO.getId()))
-						.toList());
 	}
 
 	private Teacher convertToExistingEntity(TeacherDTO teacherDTO) {

@@ -14,7 +14,6 @@ import java.util.*;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Entity
 @Table(name = "groups")
 public class Group {
@@ -25,28 +24,32 @@ public class Group {
 	@Column(name = "group_id")
 	private Long id;
 
-	@NonNull
 	@NotBlank(message = "Group name must not be blank")
 	@Size(max = 255)
 	private String name;
 
 	@ManyToOne
 	@JoinColumn(name = "discipline_id")
-	@NonNull
 	@NotNull(message = "Group discipline must not be null")
 	private Discipline discipline;
 
 	@OneToMany(mappedBy = "group")
 	@ToString.Exclude
 	private List<Student> students = new ArrayList<>();
+
 	@ManyToMany
 	@JoinTable(name = "groups_courses", joinColumns = @JoinColumn(name = "group_id"),
 	           inverseJoinColumns = @JoinColumn(name = "course_id"))
 	@ToString.Exclude
 	private Set<Course> courses = new HashSet<>();
 
-	public Group(@NonNull Long id, @NonNull String name, @NonNull Discipline discipline) {
+	public Group(Long id, String name, Discipline discipline) {
 		this.id = id;
+		this.name = name;
+		this.discipline = discipline;
+	}
+
+	public Group(String name, Discipline discipline) {
 		this.name = name;
 		this.discipline = discipline;
 	}

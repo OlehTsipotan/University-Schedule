@@ -28,9 +28,14 @@ public class Teacher extends User {
 				user.isEnable(), user.getRole());
 	}
 
-	public Teacher(String email, String password, String firstName, String lastName) {
-		super(email, password, firstName, lastName, true);
+	public Teacher(String email, String password, String firstName, String lastName, Role role){
+		super(email, password, firstName, lastName, role);
 	}
+
+	public Teacher(String email, String password, String firstName, String lastName){
+		super(email, password, firstName, lastName);
+	}
+
 
 	@Override
 	public boolean equals(Object o) {

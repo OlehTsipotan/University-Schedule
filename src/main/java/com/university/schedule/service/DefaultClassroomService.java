@@ -119,12 +119,7 @@ public class DefaultClassroomService implements ClassroomService {
 	}
 
 	private Classroom convertToEntity(ClassroomDTO classroomDTO) {
-		assignFields(classroomDTO);
 		return converterService.convert(classroomDTO, Classroom.class);
-	}
-
-	private void assignFields(ClassroomDTO classroomDTO){
-		classroomDTO.setBuildingDTO(buildingService.findByIdAsDTO(classroomDTO.getBuildingDTO().getId()));
 	}
 
 	private <T> T execute(DaoSupplier<T> supplier) {

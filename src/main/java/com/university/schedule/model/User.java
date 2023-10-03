@@ -14,7 +14,6 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "users")
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -26,23 +25,19 @@ public class User {
 	@Column(name = "user_id")
 	private Long id;
 
-	@NonNull
 	@NotBlank(message = "User email must not be blank")
 	@Size(max = 255)
 	private String email;
 
-	@NonNull
 	@NotBlank(message = "User password must not be blank")
 	@Size(max = 255)
 	private String password;
 
-	@NonNull
 	@Column(name = "first_name")
 	@NotBlank(message = "User firstName must not be blank")
 	@Size(max = 255)
 	private String firstName;
 
-	@NonNull
 	@Column(name = "last_name")
 	@NotBlank(message = "User lastName must not be blank")
 	@Size(max = 255)
@@ -52,29 +47,36 @@ public class User {
 	@JoinColumn(name = "role_id")
 	private Role role;
 
-	@NonNull
 	@Column(name = "is_enable")
 	@Getter(AccessLevel.NONE)
 	private Boolean isEnable;
 
-	public User(Long id, @NonNull String email, @NonNull String password, @NonNull String firstName,
-	            @NonNull String lastName, @NonNull Role role) {
+	public User(Long id, String email, String password, String firstName, String lastName, Role role) {
 		this(id, email, password, firstName, lastName, true, role);
 	}
 
-	public User(@NonNull String email, @NonNull String password, @NonNull String firstName, @NonNull String lastName) {
-		this(email, password, firstName, lastName, true);
+	public User(Long id, String email, String password, String firstName, String lastName, Boolean isEnable,
+	            Role role) {
+		this(email, password, firstName, lastName, isEnable, role);
+		this.id = id;
 	}
 
-	public User(Long id, @NonNull String email, @NonNull String password, @NonNull String firstName,
-	            @NonNull String lastName, @NonNull Boolean isEnable, @NonNull Role role) {
-		this.id = id;
+	public User(String email, String password, String firstName, String lastName, Role role) {
+		this(email, password, firstName, lastName, true, role);
+	}
+
+	public User(String email, String password, String firstName, String lastName, Boolean isEnable, Role role) {
+		this(email, password, firstName, lastName);
+		this.role = role;
+		this.isEnable = isEnable;
+	}
+
+	public User(String email, String password, String firstName, String lastName) {
 		this.email = email;
 		this.password = password;
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.isEnable = isEnable;
-		this.role = role;
+		this.isEnable = true;
 	}
 
 	public Boolean isEnable() {

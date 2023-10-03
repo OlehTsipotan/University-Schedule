@@ -17,7 +17,6 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@RequiredArgsConstructor
 @Table(name = "scheduled_classes")
 public class ScheduledClass {
 
@@ -29,13 +28,11 @@ public class ScheduledClass {
 
 	@ManyToOne
 	@JoinColumn(name = "course_id")
-	@NonNull
 	@NotNull(message = "ScheduledClass course must not be null")
 	private Course course;
 
 	@ManyToOne
 	@JoinColumn(name = "teacher_id")
-	@NonNull
 	@NotNull(message = "ScheduledClass teacher must not be null")
 	private Teacher teacher;
 
@@ -45,12 +42,10 @@ public class ScheduledClass {
 
 	@ManyToOne
 	@JoinColumn(name = "class_time_id")
-	@NonNull
 	@NotNull(message = "ScheduledClass classTime must not be null")
 	private ClassTime classTime;
 
 	@Column(name = "class_date")
-	@NonNull
 	@NotNull(message = "ScheduledClass date must not be null")
 	private LocalDate date;
 
@@ -65,6 +60,27 @@ public class ScheduledClass {
 	@ToString.Exclude
 	@NotNull(message = "ScheduledClass groups (Set) must not be null")
 	private Set<Group> groups = new HashSet<>();
+
+	public ScheduledClass(Long id, Course course, Teacher teacher, ClassTime classTime, LocalDate date,
+	                      ClassType classType, Set<Group> groups) {
+		this.id = id;
+		this.course = course;
+		this.teacher = teacher;
+		this.classTime = classTime;
+		this.date = date;
+		this.classType = classType;
+		this.groups = groups;
+	}
+
+	public ScheduledClass(Course course, Teacher teacher, ClassTime classTime, LocalDate date, ClassType classType,
+	                      Set<Group> groups) {
+		this.course = course;
+		this.teacher = teacher;
+		this.classTime = classTime;
+		this.date = date;
+		this.classType = classType;
+		this.groups = groups;
+	}
 
 	@Override
 	public boolean equals(Object o) {

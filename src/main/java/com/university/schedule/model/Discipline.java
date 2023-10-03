@@ -14,7 +14,6 @@ import java.util.Objects;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Entity
 @Table(name = "disciplines")
 public class Discipline {
@@ -25,7 +24,6 @@ public class Discipline {
 	@Column(name = "discipline_id")
 	private Long id;
 
-	@NonNull
 	@NotBlank(message = "Discipline name must not be blank")
 	@Size(max = 255)
 	private String name;
@@ -34,8 +32,12 @@ public class Discipline {
 	@ToString.Exclude
 	private List<Group> groups;
 
-	public Discipline(@NonNull Long id, @NonNull String name) {
+	public Discipline(Long id, String name) {
 		this.id = id;
+		this.name = name;
+	}
+
+	public Discipline(String name) {
 		this.name = name;
 	}
 

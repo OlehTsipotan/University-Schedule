@@ -4,7 +4,6 @@ import com.university.schedule.converter.ConverterService;
 import com.university.schedule.dto.ScheduledClassDTO;
 import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
-import com.university.schedule.model.ClassTime;
 import com.university.schedule.model.ScheduledClass;
 import com.university.schedule.repository.ScheduledClassRepository;
 import com.university.schedule.validation.ScheduledClassEntityValidator;
@@ -109,19 +108,7 @@ public class DefaultScheduledClassService implements ScheduledClassService {
 	}
 
 	private ScheduledClass convertToEntity(ScheduledClassDTO source) {
-		assignFields(source);
 		return converterService.convert(source, ScheduledClass.class);
-	}
-
-	private void assignFields(ScheduledClassDTO scheduledClassDTO){
-		scheduledClassDTO.setCourseDTO(courseService.findByIdAsDTO(scheduledClassDTO.getCourseDTO().getId()));
-		scheduledClassDTO.setTeacherDTO(teacherService.findByIdAsDTO(scheduledClassDTO.getTeacherDTO().getId()));
-		scheduledClassDTO.setClassroomDTO(classroomService.findByIdAsDTO(scheduledClassDTO.getClassroomDTO().getId()));
-		scheduledClassDTO.setClassTimeDTO(classTimeService.findByIdAsDTO(scheduledClassDTO.getClassTimeDTO().getId()));
-		scheduledClassDTO.setClassTypeDTO(classTypeService.findByIdAsDTO(scheduledClassDTO.getClassTypeDTO().getId()));
-		scheduledClassDTO.setGroupDTOS(
-				scheduledClassDTO.getGroupDTOS().stream().map(groupDTO -> groupService.findByIdAsDTO(groupDTO.getId()))
-						.toList());
 	}
 
 	@Override

@@ -1,7 +1,5 @@
 package com.university.schedule.service;
 
-import com.university.schedule.exception.ScheduleGenerationConflictException;
-import com.university.schedule.exception.ScheduleGenerationDateException;
 import com.university.schedule.exception.ScheduleGenerationException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.DayScheduleItem;
@@ -54,20 +52,8 @@ public class ScheduleGenerator {
 	 * @param dayScheduleItems The list of DayScheduleItems containing information about the classes to schedule.
 	 * @throws ServiceException If there are conflicts in the dayScheduleItems or the start/end dates are invalid.
 	 */
-	public void generate(LocalDate startDate, LocalDate endDate, List<DayScheduleItem> dayScheduleItems)
-			throws ServiceException {
-		// from different ScheduleGenerationExceptions - different ServiceExceptions. For right error processing on UI
-		try {
-			scheduleValidator.validate(startDate, endDate, dayScheduleItems);
-		} catch (ScheduleGenerationException e) {
-			if (e instanceof ScheduleGenerationDateException) {
-				throw new ServiceException(e);
-			} else if (e instanceof ScheduleGenerationConflictException) {
-				throw new ServiceException(e);
-			} else {
-				throw new ServiceException(e);
-			}
-		}
+	public void generate(LocalDate startDate, LocalDate endDate, List<DayScheduleItem> dayScheduleItems) {
+		scheduleValidator.validate(startDate, endDate, dayScheduleItems);
 
 		ScheduledClass scheduledClass;
 		try {

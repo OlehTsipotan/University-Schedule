@@ -83,9 +83,6 @@ public class StudentRecordsController {
 	                     @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable, Model model,
 	                     RedirectAttributes redirectAttributes) {
 
-		studentDTO.setRoleDTO(roleService.findByIdAsDTO(studentDTO.getRoleDTO().getId()));
-		studentDTO.setGroupDTO(groupService.findByIdAsDTO(studentDTO.getGroupDTO().getId()));
-
 		if (!result.hasErrors()) {
 			studentDTO.setIsEnable(isEnable);
 			studentService.update(studentDTO);

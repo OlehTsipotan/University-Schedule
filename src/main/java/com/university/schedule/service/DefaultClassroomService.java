@@ -29,6 +29,8 @@ public class DefaultClassroomService implements ClassroomService {
 
 	private final ConverterService converterService;
 
+	private final BuildingService buildingService;
+
 	@Override
 	@Transactional
 	public Long save(Classroom classroom) {
@@ -51,6 +53,8 @@ public class DefaultClassroomService implements ClassroomService {
 		log.info("saved {}", classroom);
 		return classroom.getId();
 	}
+
+
 
 	@Override
 	public ClassroomDTO findByIdAsDTO(Long id) {
@@ -115,7 +119,12 @@ public class DefaultClassroomService implements ClassroomService {
 	}
 
 	private Classroom convertToEntity(ClassroomDTO classroomDTO) {
+		assignFields(classroomDTO);
 		return converterService.convert(classroomDTO, Classroom.class);
+	}
+
+	private void assignFields(ClassroomDTO classroomDTO){
+		classroomDTO.setBuildingDTO(buildingService.findByIdAsDTO(classroomDTO.getBuildingDTO().getId()));
 	}
 
 	private <T> T execute(DaoSupplier<T> supplier) {

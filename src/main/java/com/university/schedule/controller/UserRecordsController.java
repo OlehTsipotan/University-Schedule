@@ -76,7 +76,6 @@ public class UserRecordsController {
 	public String update(@PathVariable Long id, @Valid @ModelAttribute UserDTO userDTO, BindingResult result,
 	                     @RequestParam(name = "isEnable", defaultValue = "false") Boolean isEnable, Model model,
 	                     RedirectAttributes redirectAttributes) {
-		userDTO.setRoleDTO(roleService.findByIdAsDTO(userDTO.getRoleDTO().getId()));
 		if (!result.hasErrors()) {
 			userDTO.setIsEnable(isEnable);
 			userService.update(userDTO);

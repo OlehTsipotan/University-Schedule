@@ -5,12 +5,10 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class ScheduledClassDTO {
 
 	private Long id;

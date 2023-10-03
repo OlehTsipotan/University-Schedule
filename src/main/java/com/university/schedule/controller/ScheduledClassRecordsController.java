@@ -92,15 +92,6 @@ public class ScheduledClassRecordsController {
 	@PostMapping("/classes/update/{id}")
 	public String update(@PathVariable Long id, @Valid @ModelAttribute ScheduledClassDTO scheduledClassDTO,
 	                     BindingResult result, Model model, RedirectAttributes redirectAttributes) {
-		scheduledClassDTO.setCourseDTO(courseService.findByIdAsDTO(scheduledClassDTO.getCourseDTO().getId()));
-		scheduledClassDTO.setTeacherDTO(teacherService.findByIdAsDTO(scheduledClassDTO.getTeacherDTO().getId()));
-		scheduledClassDTO.setClassroomDTO(classroomService.findByIdAsDTO(scheduledClassDTO.getClassroomDTO().getId()));
-		scheduledClassDTO.setClassTimeDTO(classTimeService.findByIdAsDTO(scheduledClassDTO.getClassTimeDTO().getId()));
-		scheduledClassDTO.setClassTypeDTO(classTypeService.findByIdAsDTO(scheduledClassDTO.getClassTypeDTO().getId()));
-		scheduledClassDTO.setClassTypeDTO(classTypeService.findByIdAsDTO(scheduledClassDTO.getClassTypeDTO().getId()));
-		scheduledClassDTO.setGroupDTOS(
-				scheduledClassDTO.getGroupDTOS().stream().map(groupDTO -> groupService.findByIdAsDTO(groupDTO.getId()))
-						.toList());
 
 		if (!result.hasErrors()) {
 			scheduledClassService.save(scheduledClassDTO);
@@ -151,16 +142,6 @@ public class ScheduledClassRecordsController {
 	@PostMapping("/classes/insert")
 	public String insert(@Valid @ModelAttribute ScheduledClassDTO scheduledClassDTO, BindingResult result, Model model,
 	                     RedirectAttributes redirectAttributes) {
-
-		scheduledClassDTO.setCourseDTO(courseService.findByIdAsDTO(scheduledClassDTO.getCourseDTO().getId()));
-		scheduledClassDTO.setTeacherDTO(teacherService.findByIdAsDTO(scheduledClassDTO.getTeacherDTO().getId()));
-		scheduledClassDTO.setClassroomDTO(classroomService.findByIdAsDTO(scheduledClassDTO.getClassroomDTO().getId()));
-		scheduledClassDTO.setClassTimeDTO(classTimeService.findByIdAsDTO(scheduledClassDTO.getClassTimeDTO().getId()));
-		scheduledClassDTO.setClassTypeDTO(classTypeService.findByIdAsDTO(scheduledClassDTO.getClassTypeDTO().getId()));
-		scheduledClassDTO.setClassTypeDTO(classTypeService.findByIdAsDTO(scheduledClassDTO.getClassTypeDTO().getId()));
-		scheduledClassDTO.setGroupDTOS(
-				scheduledClassDTO.getGroupDTOS().stream().map(groupDTO -> groupService.findByIdAsDTO(groupDTO.getId()))
-						.toList());
 
 		if (!result.hasErrors()) {
 			Long id = scheduledClassService.save(scheduledClassDTO);

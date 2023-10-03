@@ -74,7 +74,6 @@ public class DefaultRoleService implements RoleService {
 	@Transactional
 	public Long save(RoleDTO roleDTO) {
 		Role role = convertToEntity(roleDTO);
-		log.info("SERVICE: " + role.getAuthorities().toString());
 		execute(() -> {
 			roleEntityValidator.validate(role);
 			roleRepository.save(role);

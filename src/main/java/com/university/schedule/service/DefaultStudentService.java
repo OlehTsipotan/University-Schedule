@@ -25,6 +25,10 @@ public class DefaultStudentService implements StudentService {
 
 	private final StudentRepository studentRepository;
 
+	private final RoleService roleService;
+
+	private final GroupService groupService;
+
 	private final ConverterService converterService;
 
 	private final StudentEntityValidator studentEntityValidator;
@@ -66,9 +70,7 @@ public class DefaultStudentService implements StudentService {
 	@Override
 	@Transactional
 	public Long update(StudentDTO studentDTO) {
-		Student foundedStudent = findById(studentDTO.getId());
-		Student studentToSave = convertToEntity(studentDTO);
-		studentToSave.setPassword(foundedStudent.getPassword());
+		Student studentToSave = convertToExistingEntity(studentDTO);
 		execute(() -> {
 			studentEntityValidator.validate(studentToSave);
 			studentRepository.save(studentToSave);
@@ -111,7 +113,20 @@ public class DefaultStudentService implements StudentService {
 	}
 
 	private Student convertToEntity(StudentDTO source) {
+		assignFields(source);
 		return converterService.convert(source, Student.class);
+	}
+
+	private void assignFields(StudentDTO studentDTO) {
+		studentDTO.setRoleDTO(roleService.findByIdAsDTO(studentDTO.getRoleDTO().getId()));
+		studentDTO.setGroupDTO(groupService.findByIdAsDTO(studentDTO.getGroupDTO().getId()));
+	}
+
+	private Student convertToExistingEntity(StudentDTO studentDTO) {
+		Student foundedStudent = findById(studentDTO.getId());
+		Student studentResult = convertToEntity(studentDTO);
+		studentResult.setPassword(foundedStudent.getPassword());
+		return studentResult;
 	}
 
 	private <T> T execute(DaoSupplier<T> supplier) {

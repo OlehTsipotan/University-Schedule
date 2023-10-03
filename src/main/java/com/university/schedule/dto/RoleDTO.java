@@ -6,13 +6,10 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
-@ToString
 @Builder
-@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class RoleDTO {
 
 	private Long id;

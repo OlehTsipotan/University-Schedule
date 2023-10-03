@@ -1,6 +1,6 @@
 package com.university.schedule.exception;
 
-public class ScheduleGenerationException extends Exception {
+public class ScheduleGenerationException extends ServiceException {
 
 	public ScheduleGenerationException(String errorMessage) {
 		super(errorMessage);

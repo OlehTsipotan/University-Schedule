@@ -83,11 +83,6 @@ public class GroupRecordsController {
 	public String update(@PathVariable Long id, @Valid @ModelAttribute GroupDTO groupDTO, BindingResult result,
 	                     Model model, RedirectAttributes redirectAttributes) {
 
-		groupDTO.setDisciplineDTO(disciplineService.findByIdAsDTO(groupDTO.getDisciplineDTO().getId()));
-		groupDTO.setCourseDTOS(
-				groupDTO.getCourseDTOS().stream().map(courseDTO -> courseService.findByIdAsDTO(courseDTO.getId()))
-						.toList());
-
 		if (!result.hasErrors()) {
 			groupService.save(groupDTO);
 			redirectAttributes.addFlashAttribute("success", true);
@@ -118,11 +113,6 @@ public class GroupRecordsController {
 	@PostMapping("/groups/insert")
 	public String insert(@Valid @ModelAttribute GroupDTO groupDTO, BindingResult result, Model model,
 	                     RedirectAttributes redirectAttributes) {
-
-		groupDTO.setDisciplineDTO(disciplineService.findByIdAsDTO(groupDTO.getDisciplineDTO().getId()));
-		groupDTO.setCourseDTOS(
-				groupDTO.getCourseDTOS().stream().map(courseDTO -> courseService.findByIdAsDTO(courseDTO.getId()))
-						.toList());
 
 		if (!result.hasErrors()) {
 			Long id = groupService.save(groupDTO);

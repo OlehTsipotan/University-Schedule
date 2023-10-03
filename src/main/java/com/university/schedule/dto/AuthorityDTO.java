@@ -2,15 +2,15 @@ package com.university.schedule.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
-@Setter
-@ToString
 @Builder
-@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class AuthorityDTO {
 
 	private Long id;

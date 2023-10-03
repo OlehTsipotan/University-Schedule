@@ -86,9 +86,6 @@ public class RoleRecordsController {
 	public String update(@PathVariable Long id, @Valid @ModelAttribute RoleDTO roleDTO, BindingResult result,
 	                     Model model, RedirectAttributes redirectAttributes) {
 
-		roleDTO.setAuthorityDTOS(roleDTO.getAuthorityDTOS().stream()
-				.map(authorityDTO -> authorityService.findByIdAsDTO(authorityDTO.getId())).toList());
-
 		if (!result.hasErrors()) {
 			roleService.save(roleDTO);
 			redirectAttributes.addFlashAttribute("success", true);
@@ -107,9 +104,6 @@ public class RoleRecordsController {
 	@PostMapping("/roles/insert")
 	public String insert(@Valid @ModelAttribute RoleDTO roleDTO, BindingResult result, Model model,
 	                     RedirectAttributes redirectAttributes) {
-
-		roleDTO.setAuthorityDTOS(roleDTO.getAuthorityDTOS().stream()
-				.map(authorityDTO -> authorityService.findByIdAsDTO(authorityDTO.getId())).toList());
 
 		if (!result.hasErrors()) {
 			Long id = roleService.save(roleDTO);

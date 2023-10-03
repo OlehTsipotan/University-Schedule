@@ -40,17 +40,6 @@ public class DefaultAuthorityService implements AuthorityService {
 		return authority.getId();
 	}
 
-	@Override
-	@Transactional
-	public Long save(AuthorityDTO authorityDTO) {
-		Authority authority = convertToEntity(authorityDTO);
-		execute(() -> {
-			authorityEntityValidator.validate(authority);
-			authorityRepository.save(authority);
-		});
-		log.info("saved {}", authority);
-		return authority.getId();
-	}
 
 	@Override
 	public Authority findById(Long id) {

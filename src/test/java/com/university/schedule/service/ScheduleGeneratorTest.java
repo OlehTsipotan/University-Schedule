@@ -1,6 +1,5 @@
 package com.university.schedule.service;
 
-import com.university.schedule.dto.ScheduledClassDTO;
 import com.university.schedule.exception.ScheduleGenerationException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.*;
@@ -94,8 +93,6 @@ public class ScheduleGeneratorTest {
 		DayScheduleItem dayScheduleItem =
 				DayScheduleItem.builder().course(course).teacher(teacher).classTime(classTime).dayOfWeek(dayOfWeek)
 						.classType(classType).groups(Set.of(group)).classroom(classroom).build();
-
-		System.out.printf(dayScheduleItem.toString());
 
 		dayScheduleItemList.add(dayScheduleItem);
 

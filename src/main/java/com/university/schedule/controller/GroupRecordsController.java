@@ -34,7 +34,7 @@ public class GroupRecordsController {
 	private final DisciplineService disciplineService;
 	private final CourseService courseService;
 
-	@Secured("EDIT_GROUPS")
+	@Secured("VIEW_GROUPS")
 	@GetMapping("/groups")
 	public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
 	                     @RequestParam(defaultValue = "0") int offset,

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -51,6 +52,52 @@ public class ScheduledClassRecordsController {
 
 		return "classes";
 	}
+
+	@Secured("VIEW_SCHEDULE")
+	@GetMapping("/schedule")
+	public String getSchedule(Model model, Principal principal, ScheduleFilterItem scheduleFilterItem) {
+
+		scheduleFilterItem = ScheduleFilterItem.builder().email(principal.getName()).build();
+
+		List<ScheduledClassDTO> scheduledClassDTOs =
+				scheduledClassService.findAllAsDTOByScheduleFilterItem(scheduleFilterItem);
+
+		List<TeacherDTO> teacherDTOS = teacherService.findAllAsDTO();
+		List<GroupDTO> groupDTOS = groupService.findAllAsDTO();
+		List<ClassTypeDTO> classTypeDTOS = classTypeService.findAllAsDTO();
+
+		model.addAttribute("entities", scheduledClassDTOs);
+		model.addAttribute("teacherDTOS", teacherDTOS);
+		model.addAttribute("groupDTOS", groupDTOS);
+		model.addAttribute("classTypeDTOS", classTypeDTOS);
+
+		return "schedule";
+	}
+
+	@Secured("VIEW_SCHEDULE")
+	@PostMapping("/schedule")
+	public String getScheduleFilter(Model model, Principal principal,
+	                                @ModelAttribute ScheduleFilterItem scheduleFilterItem) {
+
+		scheduleFilterItem.setEmail(principal.getName());
+
+		List<ScheduledClassDTO> scheduledClassDTOs =
+				scheduledClassService.findAllAsDTOByScheduleFilterItem(scheduleFilterItem);
+
+		List<TeacherDTO> teacherDTOS = teacherService.findAllAsDTO();
+		List<GroupDTO> groupDTOS = groupService.findAllAsDTO();
+		List<ClassTypeDTO> classTypeDTOS = classTypeService.findAllAsDTO();
+
+		model.addAttribute("entities", scheduledClassDTOs);
+		model.addAttribute("teacherDTOS", teacherDTOS);
+		model.addAttribute("groupDTOS", groupDTOS);
+		model.addAttribute("classTypeDTOS", classTypeDTOS);
+		model.addAttribute("scheduleFilterItem", scheduleFilterItem);
+		model.addAttribute("filtered", true);
+
+		return "schedule";
+	}
+
 
 	@Secured("EDIT_CLASSES")
 	@GetMapping("/classes/delete/{id}")
@@ -93,6 +140,7 @@ public class ScheduledClassRecordsController {
 	public String update(@PathVariable Long id, @Valid @ModelAttribute ScheduledClassDTO scheduledClassDTO,
 	                     BindingResult result, Model model, RedirectAttributes redirectAttributes) {
 
+		log.info(scheduledClassDTO.toString());
 		if (!result.hasErrors()) {
 			scheduledClassService.save(scheduledClassDTO);
 			redirectAttributes.addFlashAttribute("success", true);

@@ -1,14 +1,17 @@
 <nav xmlns:th="http://www.thymeleaf.org" th:fragment="navbar(pageName)"
      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-        <span th:text = ${pageName} class="navbar-brand"></span>
+        <span th:text=${pageName} class="navbar-brand"></span>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" aria-current="page" href="/welcome">Home</a></li>
-                <li sec:authorize="hasRole('ADMIN')" class="nav-item"><a class="nav-link" aria-current="page" href="/admin/dashboard">Dashboard</a></li>
+                <li sec:authorize="hasAuthority('VIEW_WELCOME')" class="nav-item"><a class="nav-link"
+                                                                                     aria-current="page"
+                                                                                     href="/welcome">Home</a></li>
+                <li sec:authorize="hasRole('ADMIN')" class="nav-item"><a class="nav-link" aria-current="page"
+                                                                         href="/admin/dashboard">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link" aria-current="page" href="/logout">Logout</a></li>
             </ul>
         </div>
@@ -16,17 +19,20 @@
 </nav>
 <nav xmlns:th="http://www.thymeleaf.org" th:fragment="navbarWithBackPage(pageName, backPageUrl)"
      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a th:href= ${backPageUrl} id="" title="Update this Teacher" class="ms-4 fa-solid fa-arrow-left nav-link"
+    <a th:href=${backPageUrl} id="" title="Update this Teacher" class="ms-4 fa-solid fa-arrow-left nav-link"
        style="color: #ffffff"></a>
     <div class="container">
-        <span th:text = ${pageName} class="navbar-brand"></span>
+        <span th:text=${pageName} class="navbar-brand"></span>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
                 aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link" aria-current="page" href="/welcome">Home</a></li>
-                <li sec:authorize="hasRole('ADMIN')" class="nav-item"><a class="nav-link" aria-current="page" href="/admin/dashboard">Dashboard</a></li>
+                <li sec:authorize="hasAuthority('VIEW_WELCOME')" class="nav-item"><a class="nav-link"
+                                                                                     aria-current="page"
+                                                                                     href="/welcome">Home</a></li>
+                <li sec:authorize="hasRole('ADMIN')" class="nav-item"><a class="nav-link" aria-current="page"
+                                                                         href="/admin/dashboard">Dashboard</a></li>
                 <li class="nav-item"><a class="nav-link" aria-current="page" href="/logout">Logout</a></li>
             </ul>
         </div>

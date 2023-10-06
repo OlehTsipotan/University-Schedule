@@ -4,6 +4,7 @@ import com.university.schedule.dto.CourseDTO;
 import com.university.schedule.dto.GroupDTO;
 import com.university.schedule.model.Course;
 import com.university.schedule.model.Group;
+import org.modelmapper.Condition;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -26,8 +27,10 @@ public class GroupDTOToGroupEntityConverter implements Converter<GroupDTO, Group
 				courseDTOSet -> courseDTOSet.getSource().stream().map(courseDTOToCourseEntityConverter::convert)
 						.collect(Collectors.toSet());
 
+		Condition notNull = ctx -> ctx.getSource() != null;
+
 		modelMapper.typeMap(GroupDTO.class, Group.class).addMappings(modelMapper -> {
-			modelMapper.using(coursesListConverter).map(GroupDTO::getCourseDTOS, Group::setCourses);
+			modelMapper.when(notNull).using(coursesListConverter).map(GroupDTO::getCourseDTOS, Group::setCourses);
 		});
 	}
 

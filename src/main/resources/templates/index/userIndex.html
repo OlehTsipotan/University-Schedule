@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
@@ -37,54 +37,66 @@
     <div class="container px-lg-5">
         <!-- Page Features-->
         <div class="row gx-lg-5">
-            <div sec:authorize="hasAuthority('VIEW_TEACHERS')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'Teachers',
-                text='Representing of real-world university teacher. Email, Password, First and Last names.',
-                iconClassName='fa-solid fa-chalkboard-user')}"></div>
-            <div sec:authorize="hasAuthority('VIEW_STUDENTS')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'Students',
-                text='Representing of real-world university student. Email, Password, Group, First and Last names.',
-                iconClassName='fa-solid fa-graduation-cap')}"></div>
-            <div sec:authorize="hasAuthority('VIEW_USERS')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'Users',
-                text='All Teachers and Students are also Users. Contains common Email and Password fields.',
-                iconClassName='fa-solid fa-user')}"></div>
-            <div sec:authorize="hasAuthority('VIEW_BUILDINGS')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'Buildings',
-                text='Replies that indicate buildings address and name. For displaying in schedule.',
-                iconClassName='fa-solid fa-building-columns')}"></div>
-            <div sec:authorize="hasAuthority('VIEW_CLASSROOMS')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'Classrooms',
-                text='Representing rooms in Buildings for conducting classes. Displaying room names.',
-                iconClassName='fa-solid fa-door-open')}"></div>
-            <div sec:authorize="hasAuthority('VIEW_COURSES')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'Courses',
-                text='Representing teaching subjects for groups. Related to Groups and Teachers.',
-                iconClassName='fa-solid fa-book-open')}"></div>
-            <div sec:authorize="hasAuthority('VIEW_GROUPS')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'Groups',
-                text='Representing Student group. Classes are formed based on Group, not a Student.',
-                iconClassName='fa-solid fa-people-group')}"></div>
-            <div sec:authorize="hasAuthority('VIEW_DISCIPLINES')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'Disciplines',
-                text='Each group has their field. Discipline representing this field.',
-                iconClassName='fa-solid fa-bookmark')}"></div>
-            <div sec:authorize="hasAuthority('VIEW_CLASSTYPES')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'ClassTypes',
-                text='Representing type of Class, like lecture, lab, seminar.',
-                iconClassName='fa-solid fa-person-chalkboard')}"></div>
-            <div sec:authorize="hasAuthority('VIEW_CLASSTIMES')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'ClassTimes',
-                text='Representing only time schedule of classes, their order.',
-                iconClassName='fa-solid fa-clock')}"></div>
-            <div sec:authorize="hasAuthority('VIEW_CLASSES')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'Classes',
-                text='Main schedule items',
-                iconClassName='fa-solid fa-calendar-days')}"></div>
-            <div sec:authorize="hasAuthority('VIEW_ROLES')" th:replace="~{fragments/entityCardColumn.html :: formColumn(
-                entityName = 'Roles',
-                text='User roles inside whole system',
-                iconClassName='fa-solid fa-masks-theater')}"></div>
+            <div sec:authorize="hasAuthority('VIEW_SCHEDULE')" class="col-lg-6 col-xxl-12 mb-5">
+                <a class="nav-link hoverable" href="/schedule">
+                    <div class="card bg-light border-0 h-100">
+                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
+                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i
+                                    class="fa-solid fa-calendar-days"></i></div>
+                            <h2 class="fs-4 fw-bold">My Schedule</h2>
+                            <p class="mb-0">Representing of real-world university schedule. Only Relative to you.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div sec:authorize="hasAuthority('VIEW_COURSES')" class="col-lg-6 col-xxl-4 mb-5">
+                <a class="nav-link hoverable" href="/courses">
+                    <div class="card bg-light border-0 h-100">
+                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
+                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i
+                                    class="fa-solid fa-chalkboard-user"></i></div>
+                            <h2 class="fs-4 fw-bold">Courses</h2>
+                            <p class="mb-0">Display all relative to you Courses</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div sec:authorize="hasAuthority('VIEW_CLASSTIMES')" class="col-lg-6 col-xxl-4 mb-5">
+                <a class="nav-link hoverable" href="/classtimes">
+                    <div class="card bg-light border-0 h-100">
+                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
+                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i
+                                    class="fa-solid fa-clock"></i></div>
+                            <h2 class="fs-4 fw-bold">Time Order</h2>
+                            <p class="mb-0">Display when classes starts.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div sec:authorize="hasAuthority('VIEW_BUILDINGS')" class="col-lg-6 col-xxl-4 mb-5">
+                <a class="nav-link hoverable" href="/buildings">
+                    <div class="card bg-light border-0 h-100">
+                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
+                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i
+                                    class="fa-solid fa-chalkboard-user"></i></div>
+                            <h2 class="fs-4 fw-bold">Time Order</h2>
+                            <p class="mb-0">Representing of real-world university Buildings.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div sec:authorize="hasAuthority('VIEW_STUDENTS')" class="col-lg-6 col-xxl-12 mb-5">
+                <a class="nav-link hoverable" href="/students">
+                    <div class="card bg-light border-0 h-100">
+                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
+                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i
+                                    class="fa-solid fa-people-group"></i></div>
+                            <h2 class="fs-4 fw-bold">My Group</h2>
+                            <p class="mb-0">Display all students that have the same group with you.</p>
+                        </div>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 </section>

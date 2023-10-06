@@ -25,6 +25,6 @@ public class AdminController {
 	public String getDashboard(Model model, Principal principal) {
 		String userFullName = userService.findByEmail(principal.getName()).getFullName();
 		model.addAttribute("userFullName", userFullName);
-		return "adminDashboard";
+		return "index/adminDashboard";
 	}
 }

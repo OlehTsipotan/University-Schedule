@@ -79,9 +79,17 @@ public class DataGenerationService {
 	private List<String> buildingsAddresses;
 	@Value("#{'${data.roles.names}'.split('${config.separator}')}")
 	private List<String> rolesNames;
+	@Value("#{'${data.authorities}'.split('${config.separator}')}")
+	private List<String> authoritiesNames;
 
-	@Value("#{'${data.model.names}'.split('${config.separator}')}")
-	private List<String> modelNames;
+	@Value("#{'${data.authorities.student}'.split('${config.separator}')}")
+	private List<String> studentAuthorities;
+
+	@Value("#{'${data.authorities.admin}'.split('${config.separator}')}")
+	private List<String> adminAuthorities;
+
+	@Value("#{'${data.authorities.teacher}'.split('${config.separator}')}")
+	private List<String> teacherAuthorities;
 
 	@Value("${data.generation.onStartup}")
 	private boolean generationOnStartup;
@@ -119,11 +127,11 @@ public class DataGenerationService {
 		persistDisciplines();
 		log.info("Disciplines Persisted");
 
-		persistRoles();
-		log.info("Roles Persisted");
-
 		persistAuthorities();
 		log.info("Authorities Persisted");
+
+		persistRoles();
+		log.info("Roles Persisted");
 
 		persistClassTypes();
 		log.info("ClassTypes Persisted");
@@ -183,46 +191,42 @@ public class DataGenerationService {
 	}
 
 	private void persistRoles() {
-		rolesNames.forEach(name -> roleService.save(new Role(name)));
+		persistStudentRole();
+		persistAdminRole();
+		persistTeacherRole();
+	}
+
+	private void persistStudentRole() {
+		Set<Authority> authorities = new HashSet<>();
+		for (String authorityName : studentAuthorities) {
+			authorities.add(authorityService.findByName(authorityName));
+		}
+		Role role = new Role("Student", authorities);
+		roleService.save(role);
+	}
+
+	private void persistAdminRole() {
+		Set<Authority> authorities = new HashSet<>();
+		for (String authorityName : adminAuthorities) {
+			authorities.add(authorityService.findByName(authorityName));
+		}
+		Role role = new Role("Admin", authorities);
+		roleService.save(role);
+	}
+
+	private void persistTeacherRole() {
+		Set<Authority> authorities = new HashSet<>();
+		for (String authorityName : teacherAuthorities) {
+			authorities.add(authorityService.findByName(authorityName));
+		}
+		Role role = new Role("Teacher", authorities);
+		roleService.save(role);
 	}
 
 	private void persistAuthorities() {
-		persistViewAuthorities();
-		persistEditAuthorities();
-	}
-
-	private void persistViewAuthorities() {
-		Set<Role> viewRolesSet = new HashSet<>(roleService.findAll());
-		generateAuthorities("VIEW_").forEach(authority -> {
-			authority.setRoles(viewRolesSet);
-			log.info(authority.toString());
-			authorityService.save(authority);
-		});
-	}
-
-	private void persistEditAuthorities() {
-		Role adminRole = roleService.findByName("Admin");
-		Role teacherRole = roleService.findByName("Teacher");
-
-		Set<Role> editRolesSet = new HashSet<>();
-		editRolesSet.add(adminRole);
-		generateAuthorities("EDIT_").forEach(authority -> {
-			authority.setRoles(editRolesSet);
-			authorityService.save(authority);
-		});
-
-		Authority authority = authorityService.findByName("EDIT_CLASSES");
-		authority.setRoles(Set.of(adminRole, teacherRole));
-		authorityService.save(authority);
-	}
-
-	private List<Authority> generateAuthorities(String prefix) {
-		List<Authority> authorities = new ArrayList<>();
-		for (String modelName : modelNames) {
-			String name = String.format("%s%s", prefix, modelName);
-			authorities.add(Authority.builder().name(name).build());
+		for (String authorityName : authoritiesNames) {
+			authorityService.save(new Authority(authorityName));
 		}
-		return authorities;
 	}
 
 

@@ -104,7 +104,7 @@
         </div>
     </div>
 </div>
-<div th:if="${scheduledClassDTOS.size() > 0}" class="ms-2 mt-5">
+<div th:if="${scheduledClassDTOS.size() > 0}" class="mt-2">
     <div class="row">
         <div class="schedule-table">
             <table class="table table-bordered table-hover" style="table-layout: fixed;">
@@ -128,10 +128,12 @@
                              th:each="scheduledClassDTO : ${scheduledClassDTOS}"
                              th:if="${scheduledClassDTO.getDate().isEqual(date) and scheduledClassDTO.getClassTimeDTO().getOrderNumber() == classTimeDTO.getOrderNumber()}">
                             <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                                <h2 class="fs-4 fw-bold mt-1"
+                                <h2 class="fs-5 fw-bold mt-1"
                                     th:text="${scheduledClassDTO.getCourseDTO().getName()}"></h2>
-                                <p class="mb-0" th:text="${scheduledClassDTO.getTeacherDTO().getFullName()}"></p>
-                                <p class="mb-0"
+                                <p class="mb-0 fw-bold"
+                                   th:text="${scheduledClassDTO.getTeacherDTO().getFullName()}"></p>
+                                <p class="mb-0" th:text="${scheduledClassDTO.getClassTypeDTO().getName()}"></p>
+                                <p class="mb-1"
                                    th:text="${scheduledClassDTO.getClassroomDTO().getName()} + ', ' + ${scheduledClassDTO.getClassroomDTO().getBuildingDTO().getName()}"></p>
                                 <span th:each="groupDTO, iterStat : ${scheduledClassDTO.getGroupDTOS()}"><span
                                         th:text="${groupDTO.getName()}"></span><span

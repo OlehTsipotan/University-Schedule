@@ -1,5 +1,6 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.model.User;
 import com.university.schedule.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +21,9 @@ public class WelcomeController {
 	@Secured("VIEW_WELCOME")
 	@GetMapping({"/", "/welcome"})
 	public String welcome(Model model, Principal principal) {
-		String userFullName = userService.findByEmail(principal.getName()).getFullName();
-		model.addAttribute("userFullName", userFullName);
+		User user = userService.findByEmail(principal.getName());
+		model.addAttribute("userFullName", user.getFullName());
+		model.addAttribute("role", user.getRole().getName());
 		return "index/userIndex";
 	}
 }

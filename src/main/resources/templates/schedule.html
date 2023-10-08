@@ -102,62 +102,50 @@
                 </div>
             </form>
         </div>
-
     </div>
 </div>
-
-
-<div th:if="${success}">
-    <div class="alert alert-success mt-3" th:text="${success}"></div>
-</div>
-<div th:if="${insertedSuccessId}">
-    <div class="alert alert-success mt-3" th:text="@{'Inserted Record with ID = ' + ${insertedSuccessId} + '.'}"></div>
-</div>
-<div th:if="${entities.size() > 0}">
-    <table class="table table-hover table-bordered table-responsive-md">
-        <thead class="thead-light">
-        <tr class="sticky-top">
-            <th>Id</th>
-            <th>Course</th>
-            <th>Teacher</th>
-            <th>Groups</th>
-            <th>Date (yyyy-mm-dd)</th>
-            <th>Order</th>
-            <th>Type</th>
-            <th>Classroom Name</th>
-            <th>Building Name</th>
-            <th sec:authorize="hasAuthority('EDIT_CLASSES')" class="static-col">Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="entity : ${entities}">
-            <th scope="row" th:text="${entity.getId()}"></th>
-            <td th:text="${entity.getCourseDTO().getName()}"></td>
-            <td th:text="${entity.getTeacherDTO().getFullName()}"></td>
-            <td>
-                <span th:each="groupDTO, iterStat : ${entity.getGroupDTOS()}"><span
-                        th:text="${groupDTO.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
-            </td>
-            <td th:text="${entity.getDate()}"></td>
-            <td th:text="${entity.getClassTimeDTO().getOrderNumber()}"></td>
-            <td th:text="${entity.getClassTypeDTO().getName()}"></td>
-            <td th:text="${entity.getClassroomDTO().getName()}"></td>
-            <td th:text="${entity.getClassroomDTO().getBuildingDTO().getName()}"></td>
-            <td sec:authorize="hasAuthority('EDIT_CLASSES')" class="static-col">
-                <a th:href="@{'/classes/update/' + ${entity.getId()}}" id="btnUpdate"
-                   title="Update this Class" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
-                <a th:href="@{'/classes/delete/' + ${entity.getId()}}" id="btnDelete"
-                   title="Delete this Class" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-    <div sec:authorize="hasAuthority('INSERT_CLASSES')" class="sticky-bottom bg-light p-3">
-        <button type="button"
-                class="btn btn-primary"><a class="nav-link" href="/classes/insert">Insert new</a></button>
+<div th:if="${scheduledClassDTOS.size() > 0}" class="ms-2 mt-5">
+    <div class="row">
+        <div class="schedule-table">
+            <table class="table table-bordered table-hover" style="table-layout: fixed;">
+                <thead>
+                <tr>
+                    <th>Schedule</th>
+                    <th th:each="classTimeDTO : ${classTimeDTOS}" th:text="${classTimeDTO.getOrderNumber()}"></th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="date : ${filteredDates}">
+                    <td>
+                        <div>
+                            <span th:text="${#temporals.format(date, 'EEEE')}" class="fs-3"></span>
+                        </div>
+                        <div th:text="${#temporals.format(date, 'd MMMM uuuu')}">
+                        </div>
+                    </td>
+                    <td th:each="classTimeDTO : ${classTimeDTOS}">
+                        <div class="card bg-light border-0 h-100"
+                             th:each="scheduledClassDTO : ${scheduledClassDTOS}"
+                             th:if="${scheduledClassDTO.getDate().isEqual(date) and scheduledClassDTO.getClassTimeDTO().getOrderNumber() == classTimeDTO.getOrderNumber()}">
+                            <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
+                                <h2 class="fs-4 fw-bold mt-1"
+                                    th:text="${scheduledClassDTO.getCourseDTO().getName()}"></h2>
+                                <p class="mb-0" th:text="${scheduledClassDTO.getTeacherDTO().getFullName()}"></p>
+                                <p class="mb-0"
+                                   th:text="${scheduledClassDTO.getClassroomDTO().getName()} + ', ' + ${scheduledClassDTO.getClassroomDTO().getBuildingDTO().getName()}"></p>
+                                <span th:each="groupDTO, iterStat : ${scheduledClassDTO.getGroupDTOS()}"><span
+                                        th:text="${groupDTO.getName()}"></span><span
+                                        th:if="${!iterStat.last}">, </span></span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-<div class="" th:unless="${entities.size() > 0}">
+<div class="" th:unless="${scheduledClassDTOS.size() > 0}">
     <span>No Classes found!</span>
 </div>
 <div th:replace="~{fragments/footer}"></div>

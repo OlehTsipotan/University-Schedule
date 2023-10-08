@@ -1,6 +1,5 @@
 package com.university.schedule.service;
 
-import com.university.schedule.exception.ScheduleGenerationException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.DayScheduleItem;
 import com.university.schedule.model.ScheduledClass;

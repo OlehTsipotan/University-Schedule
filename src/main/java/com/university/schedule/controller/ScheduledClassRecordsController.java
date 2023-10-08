@@ -2,6 +2,7 @@ package com.university.schedule.controller;
 
 import com.university.schedule.dto.*;
 import com.university.schedule.service.*;
+import com.university.schedule.utility.DateUtils;
 import com.university.schedule.utility.PaginationSortingUtility;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -17,6 +18,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -59,17 +61,26 @@ public class ScheduledClassRecordsController {
 
 		scheduleFilterItem = ScheduleFilterItem.builder().email(principal.getName()).build();
 
-		List<ScheduledClassDTO> scheduledClassDTOs =
+		List<ScheduledClassDTO> scheduledClassDTOS =
 				scheduledClassService.findAllAsDTOByScheduleFilterItem(scheduleFilterItem);
 
 		List<TeacherDTO> teacherDTOS = teacherService.findAllAsDTO();
 		List<GroupDTO> groupDTOS = groupService.findAllAsDTO();
 		List<ClassTypeDTO> classTypeDTOS = classTypeService.findAllAsDTO();
+		List<ClassTimeDTO> classTimeDTOS = classTimeService.findAllAsDTO();
+		List<LocalDate> filteredDates =
+				DateUtils.getDatesBetween(scheduleFilterItem.getStartDate(), scheduleFilterItem.getEndDate());
+		LocalDate localDate = LocalDate.now();
+		localDate.getDayOfWeek().toString();
 
-		model.addAttribute("entities", scheduledClassDTOs);
+		model.addAttribute("filteredDates", filteredDates);
+		model.addAttribute("scheduledClassDTOS", scheduledClassDTOS);
 		model.addAttribute("teacherDTOS", teacherDTOS);
 		model.addAttribute("groupDTOS", groupDTOS);
 		model.addAttribute("classTypeDTOS", classTypeDTOS);
+		model.addAttribute("classTimeDTOS", classTimeDTOS);
+
+		model.addAttribute("scheduleFilterItem", scheduleFilterItem);
 
 		return "schedule";
 	}
@@ -81,17 +92,25 @@ public class ScheduledClassRecordsController {
 
 		scheduleFilterItem.setEmail(principal.getName());
 
-		List<ScheduledClassDTO> scheduledClassDTOs =
+		List<ScheduledClassDTO> scheduledClassDTOS =
 				scheduledClassService.findAllAsDTOByScheduleFilterItem(scheduleFilterItem);
 
 		List<TeacherDTO> teacherDTOS = teacherService.findAllAsDTO();
 		List<GroupDTO> groupDTOS = groupService.findAllAsDTO();
 		List<ClassTypeDTO> classTypeDTOS = classTypeService.findAllAsDTO();
+		List<ClassTimeDTO> classTimeDTOS = classTimeService.findAllAsDTO();
 
-		model.addAttribute("entities", scheduledClassDTOs);
+		LocalDate currentDate = scheduleFilterItem.getStartDate();
+		List<LocalDate> filteredDates =
+				DateUtils.getDatesBetween(scheduleFilterItem.getStartDate(), scheduleFilterItem.getEndDate());
+
+		model.addAttribute("filteredDates", filteredDates);
+		model.addAttribute("scheduledClassDTOS", scheduledClassDTOS);
 		model.addAttribute("teacherDTOS", teacherDTOS);
 		model.addAttribute("groupDTOS", groupDTOS);
 		model.addAttribute("classTypeDTOS", classTypeDTOS);
+		model.addAttribute("classTimeDTOS", classTimeDTOS);
+
 		model.addAttribute("scheduleFilterItem", scheduleFilterItem);
 		model.addAttribute("filtered", true);
 

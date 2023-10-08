@@ -25,26 +25,26 @@ public class ScheduleValidator {
 		if (startDate.isAfter(endDate)) {
 			throw new ScheduleGenerationDateException(DATE_EXCEPTION_MSG);
 		}
-		for (DayScheduleItem scheduleItem : dayScheduleItems) {
-			if (hasConflictByGroup(dayScheduleItems, scheduleItem)) {
+		for (DayScheduleItem dayScheduleItem : dayScheduleItems) {
+			if (hasConflictByGroup(dayScheduleItems, dayScheduleItem)) {
 				throw new ScheduleGenerationConflictException(GROUP_CONFLICT_EXCEPTION_MSG);
 			}
-			if (hasConflictByTeacher(dayScheduleItems, scheduleItem)) {
+			if (hasConflictByTeacher(dayScheduleItems, dayScheduleItem)) {
 				throw new ScheduleGenerationConflictException(TEACHER_CONFLICT_EXCEPTION_MSG);
 			}
 		}
 	}
 
 	private boolean hasConflictByGroup(List<DayScheduleItem> dayScheduleItems, DayScheduleItem currentItem) {
-		for (DayScheduleItem scheduleItem : dayScheduleItems) {
-			if (scheduleItem != currentItem && scheduleItem.getDayOfWeek() == currentItem.getDayOfWeek() &&
+		for (DayScheduleItem dayScheduleItem : dayScheduleItems) {
+			if (dayScheduleItem != currentItem && dayScheduleItem.getDayOfWeek() == currentItem.getDayOfWeek() &&
 			    // check Time
-			    scheduleItem.getClassTime().equals(currentItem.getClassTime()) && // check Time
-			    hasCommonGroup(scheduleItem.getGroups(), currentItem.getGroups()) && // check for the same Group
-			    (!scheduleItem.getCourse().equals(currentItem.getCourse()) ||
-			     !scheduleItem.getTeacher().equals(currentItem.getTeacher()) ||
-			     !scheduleItem.getClassroom().equals(currentItem.getClassroom()) ||
-			     !scheduleItem.getClassType().equals(currentItem.getClassType()))) {
+			    dayScheduleItem.getClassTime().equals(currentItem.getClassTime()) && // check Time
+			    hasCommonGroup(dayScheduleItem.getGroups(), currentItem.getGroups()) && // check for the same Group
+			    (!dayScheduleItem.getCourse().equals(currentItem.getCourse()) ||
+			     !dayScheduleItem.getTeacher().equals(currentItem.getTeacher()) ||
+			     !dayScheduleItem.getClassroom().equals(currentItem.getClassroom()) ||
+			     !dayScheduleItem.getClassType().equals(currentItem.getClassType()))) {
 				return true; // Conflicting found
 			}
 		}
@@ -52,15 +52,15 @@ public class ScheduleValidator {
 	}
 
 	private boolean hasConflictByTeacher(List<DayScheduleItem> dayScheduleItems, DayScheduleItem currentItem) {
-		for (DayScheduleItem scheduleItem : dayScheduleItems) {
-			if (scheduleItem != currentItem && scheduleItem.getDayOfWeek() == currentItem.getDayOfWeek() &&
+		for (DayScheduleItem dayScheduleItem : dayScheduleItems) {
+			if (dayScheduleItem != currentItem && dayScheduleItem.getDayOfWeek() == currentItem.getDayOfWeek() &&
 			    // check Time
-			    scheduleItem.getClassTime().equals(currentItem.getClassTime()) && // check Time
-			    scheduleItem.getTeacher().equals(currentItem.getTeacher()) && // check for the same Teacher
-			    (!scheduleItem.getCourse().equals(currentItem.getCourse()) ||
-			     !scheduleItem.getGroups().equals(currentItem.getGroups()) ||
-			     !scheduleItem.getClassroom().equals(currentItem.getClassroom()) ||
-			     !scheduleItem.getClassType().equals(currentItem.getClassType()))) {
+			    dayScheduleItem.getClassTime().equals(currentItem.getClassTime()) && // check Time
+			    dayScheduleItem.getTeacher().equals(currentItem.getTeacher()) && // check for the same Teacher
+			    (!dayScheduleItem.getCourse().equals(currentItem.getCourse()) ||
+			     !dayScheduleItem.getGroups().equals(currentItem.getGroups()) ||
+			     !dayScheduleItem.getClassroom().equals(currentItem.getClassroom()) ||
+			     !dayScheduleItem.getClassType().equals(currentItem.getClassType()))) {
 				return true; // Conflicting found
 			}
 		}

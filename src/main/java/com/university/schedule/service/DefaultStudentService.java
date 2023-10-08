@@ -5,11 +5,13 @@ import com.university.schedule.dto.StudentDTO;
 import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Student;
+import com.university.schedule.model.User;
 import com.university.schedule.repository.StudentRepository;
 import com.university.schedule.validation.StudentEntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,9 +27,7 @@ public class DefaultStudentService implements StudentService {
 
 	private final StudentRepository studentRepository;
 
-	private final RoleService roleService;
-
-	private final GroupService groupService;
+	private final UserService userService;
 
 	private final ConverterService converterService;
 
@@ -52,6 +52,21 @@ public class DefaultStudentService implements StudentService {
 	public List<StudentDTO> findAllAsDTO(Pageable pageable) {
 		List<StudentDTO> studentDTOList =
 				execute(() -> studentRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} Students", studentDTOList.size());
+		return studentDTOList;
+	}
+
+	@Override
+	public List<StudentDTO> findAllAsDTO(String email, Pageable pageable) {
+		Page<Student> studentPage;
+
+		User user = userService.findByEmail(email);
+		if (user instanceof Student student) {
+			studentPage = execute(() -> studentRepository.findByGroup(student.getGroup(), pageable));
+		} else {
+			studentPage = execute(() -> studentRepository.findAll(pageable));
+		}
+		List<StudentDTO> studentDTOList = studentPage.stream().map(this::convertToDTO).toList();
 		log.debug("Retrieved All {} Students", studentDTOList.size());
 		return studentDTOList;
 	}

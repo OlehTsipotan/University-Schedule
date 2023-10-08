@@ -14,6 +14,8 @@ public interface StudentService {
 
 	List<StudentDTO> findAllAsDTO(Pageable pageable);
 
+	List<StudentDTO> findAllAsDTO(String email, Pageable pageable);
+
 	Long save(Student student);
 
 	Long update(StudentDTO studentDTO);

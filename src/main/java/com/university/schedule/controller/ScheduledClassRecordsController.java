@@ -70,8 +70,6 @@ public class ScheduledClassRecordsController {
 		List<ClassTimeDTO> classTimeDTOS = classTimeService.findAllAsDTO();
 		List<LocalDate> filteredDates =
 				DateUtils.getDatesBetween(scheduleFilterItem.getStartDate(), scheduleFilterItem.getEndDate());
-		LocalDate localDate = LocalDate.now();
-		localDate.getDayOfWeek().toString();
 
 		model.addAttribute("filteredDates", filteredDates);
 		model.addAttribute("scheduledClassDTOS", scheduledClassDTOS);
@@ -99,8 +97,6 @@ public class ScheduledClassRecordsController {
 		List<GroupDTO> groupDTOS = groupService.findAllAsDTO();
 		List<ClassTypeDTO> classTypeDTOS = classTypeService.findAllAsDTO();
 		List<ClassTimeDTO> classTimeDTOS = classTimeService.findAllAsDTO();
-
-		LocalDate currentDate = scheduleFilterItem.getStartDate();
 		List<LocalDate> filteredDates =
 				DateUtils.getDatesBetween(scheduleFilterItem.getStartDate(), scheduleFilterItem.getEndDate());
 

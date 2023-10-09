@@ -85,7 +85,7 @@ public class ScheduledClassRecordsController {
 
 	@Secured("VIEW_SCHEDULE")
 	@PostMapping("/schedule")
-	public String getScheduleFilter(Model model, Principal principal,
+	public String getScheduleFiltered(Model model, Principal principal,
 	                                @ModelAttribute ScheduleFilterItem scheduleFilterItem) {
 
 		scheduleFilterItem.setEmail(principal.getName());

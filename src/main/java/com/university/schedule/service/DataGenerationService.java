@@ -246,7 +246,8 @@ public class DataGenerationService {
 		LocalTime firstClassStartTime = LocalTime.of(8, 30);
 
 		for (int i = 1; i <= 5; i++) {
-			classTimeService.save(new ClassTime(i, firstClassStartTime.plusMinutes(duration.toMinutes()), duration));
+			classTimeService.save(new ClassTime(i, firstClassStartTime, duration));
+			firstClassStartTime = firstClassStartTime.plusMinutes(duration.toMinutes());
 		}
 	}
 

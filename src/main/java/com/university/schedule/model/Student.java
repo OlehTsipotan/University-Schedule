@@ -1,11 +1,15 @@
 package com.university.schedule.model;
 
+import com.university.schedule.visitor.UserPageableCourseVisitor;
+import com.university.schedule.visitor.UserPageableStudentVisitor;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -19,6 +23,15 @@ public class Student extends User {
 	@ManyToOne
 	@JoinColumn(name = "group_id")
 	private Group group;
+
+	@Override
+	public List<Course> accept(UserPageableCourseVisitor visitor, Pageable pageable){
+		return visitor.performActionForStudent(this, pageable);
+	}
+
+	public List<Student> accept(UserPageableStudentVisitor visitor, Pageable pageable){
+		return visitor.performActionForStudent(this, pageable);
+	}
 
 	public Student(User user) {
 		super(user.getId(), user.getEmail(), user.getPassword(), user.getFirstName(), user.getLastName(),

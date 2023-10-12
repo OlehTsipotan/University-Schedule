@@ -4,19 +4,20 @@ import com.university.schedule.converter.ConverterService;
 import com.university.schedule.dto.CourseDTO;
 import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
-import com.university.schedule.model.*;
+import com.university.schedule.model.Course;
+import com.university.schedule.model.Group;
+import com.university.schedule.model.Teacher;
+import com.university.schedule.model.User;
 import com.university.schedule.repository.CourseRepository;
 import com.university.schedule.validation.CourseEntityValidator;
+import com.university.schedule.visitor.UserPageableCourseVisitor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -30,6 +31,8 @@ public class DefaultCourseService implements CourseService {
 	private final ConverterService converterService;
 
 	private final CourseEntityValidator courseEntityValidator;
+
+	private final UserPageableCourseVisitor userPageableCourseVisitor;
 
 	private final UserService userService;
 
@@ -105,21 +108,13 @@ public class DefaultCourseService implements CourseService {
 
 	@Override
 	public List<CourseDTO> findAllAsDTO(String email, Pageable pageable) {
-		Page<Course> coursePage;
-
 		User user = userService.findByEmail(email);
-		if (user instanceof Teacher teacher) {
-			coursePage = execute(() -> courseRepository.findByTeachers(teacher, pageable));
-		} else if (user instanceof Student student) {
-			coursePage = execute(() -> courseRepository.findByGroups(student.getGroup(), pageable));
-		} else {
-			coursePage = execute(() -> courseRepository.findAll(pageable));
-		}
-
+		List<Course> coursePage = execute(() -> user.accept(userPageableCourseVisitor, pageable));
 		List<CourseDTO> courseDTOS = coursePage.stream().map(this::convertToDTO).toList();
 		log.debug("Retrieved All {} Courses", courseDTOS.size());
 		return courseDTOS;
 	}
+
 
 	@Override
 	public List<Course> findByTeacher(Teacher teacher) {

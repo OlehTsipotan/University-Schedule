@@ -1,11 +1,15 @@
 package com.university.schedule.model;
 
+import com.university.schedule.visitor.UserPageableCourseVisitor;
+import com.university.schedule.visitor.UserPageableStudentVisitor;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.Hibernate;
+import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.Objects;
 
 
@@ -50,6 +54,14 @@ public class User {
 	@Column(name = "is_enable")
 	@Getter(AccessLevel.NONE)
 	private Boolean isEnable;
+
+	public List<Course> accept(UserPageableCourseVisitor visitor, Pageable pageable){
+		return visitor.performActionForUser(pageable);
+	}
+
+	public List<Student> accept(UserPageableStudentVisitor visitor, Pageable pageable){
+		return visitor.performActionForUser(pageable);
+	}
 
 	public User(Long id, String email, String password, String firstName, String lastName, Role role) {
 		this(id, email, password, firstName, lastName, true, role);

@@ -1,6 +1,5 @@
 package com.university.schedule.config;
 
-import com.university.schedule.handler.CustomAccessDeniedHandler;
 import com.university.schedule.handler.CustomAdminAuthenticationSuccessHandler;
 import com.university.schedule.handler.CustomLogoutSuccessHandler;
 import com.university.schedule.handler.CustomUserAuthenticationSuccessHandler;
@@ -19,7 +18,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 @Configuration
@@ -43,11 +41,6 @@ public class WebSecurityConfig {
 	@Bean
 	public AuthenticationSuccessHandler adminAuthenticationSuccessHandler() {
 		return new CustomAdminAuthenticationSuccessHandler();
-	}
-
-	@Bean
-	public AccessDeniedHandler accessDeniedHandler() {
-		return new CustomAccessDeniedHandler();
 	}
 
 	@Bean
@@ -80,8 +73,7 @@ public class WebSecurityConfig {
 				.securityMatcher("/**").formLogin(login -> login.loginPage("/user/login").usernameParameter("email")
 						.loginProcessingUrl("/user/login").successHandler(customUserAuthenticationSuccessHandler)
 						.permitAll())
-				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(customLogoutSuccessHandler))
-				.exceptionHandling(handler -> handler.accessDeniedHandler(accessDeniedHandler())).build();
+				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(customLogoutSuccessHandler)).build();
 	}
 
 	@Bean
@@ -94,7 +86,6 @@ public class WebSecurityConfig {
 				.securityMatcher("/admin/**").formLogin(
 						login -> login.loginPage("/admin/login").usernameParameter("email")
 								.loginProcessingUrl("/admin/login").successHandler(adminAuthenticationSuccessHandler())
-								.permitAll())
-				.exceptionHandling(handler -> handler.accessDeniedHandler(accessDeniedHandler())).build();
+								.permitAll()).build();
 	}
 }

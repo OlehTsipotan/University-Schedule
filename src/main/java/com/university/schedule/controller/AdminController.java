@@ -3,6 +3,7 @@ package com.university.schedule.controller;
 import com.university.schedule.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ public class AdminController {
 		return "login/adminLogin";
 	}
 
+	@Secured("ROLE_ADMIN")
 	@GetMapping("/admin/dashboard")
 	public String getDashboard(Model model, Principal principal) {
 		String userFullName = userService.findByEmail(principal.getName()).getFullName();

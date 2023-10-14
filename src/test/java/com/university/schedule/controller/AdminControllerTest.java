@@ -32,6 +32,10 @@ public class AdminControllerTest {
 
 	public static final String PASSWORD = "testUserPassword";
 
+	public static final String ROLE_ADMIN = "ROLE_ADMIN";
+
+	public static final String ROLE_TEACHER = "ROLE_TEACHER";
+
 	@Test
 	public void getLogin_happyPath() throws Exception {
 		mockMvc.perform(get("/admin/login"))
@@ -40,7 +44,7 @@ public class AdminControllerTest {
 	}
 
 	@Test
-	@WithMockUser(username = USERNAME, password = PASSWORD, authorities = {"SOME"})
+	@WithMockUser(username = USERNAME, password = PASSWORD, authorities = ROLE_ADMIN)
 	public void getDashboard_happyPath() throws Exception {
 
 		when(userService.findByEmail(USERNAME)).thenReturn(user);
@@ -50,6 +54,15 @@ public class AdminControllerTest {
 				.andExpect(status().is2xxSuccessful())
 				.andExpect(model().attribute("userFullName", "userFullName"))
 				.andExpect(view().name("index/adminDashboard"));
+	}
+
+	@Test
+	@WithMockUser(username = USERNAME, password = PASSWORD, authorities = ROLE_TEACHER)
+	public void getDashboard_accessDenied_wrongAuthority() throws Exception {
+		mockMvc.perform(get("/admin/dashboard"))
+				.andExpect(status().is2xxSuccessful())
+				.andExpect(model().attributeExists("exceptionMessage"))
+				.andExpect(view().name("error"));
 	}
 
 

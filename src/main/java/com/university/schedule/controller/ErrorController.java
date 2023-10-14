@@ -13,7 +13,7 @@ public class ErrorController {
 
 	@GetMapping("/accessDenied")
 	public String accessDenied(Model model) {
-		model.addAttribute("message", "Access Denied");
+		model.addAttribute("exceptionMessage", "Access Denied");
 		return "error";
 	}
 }

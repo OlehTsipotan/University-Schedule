@@ -1,19 +1,14 @@
 package com.university.schedule.controller;
 
-import com.university.schedule.dto.AuthorityDTO;
 import com.university.schedule.dto.RoleDTO;
 import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.service.AuthorityService;
 import com.university.schedule.service.RoleService;
-import com.university.schedule.utility.PaginationSortingUtility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,9 +16,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,11 +56,10 @@ public class RoleRecordsControllerTest {
 		when(roleService.findAllAsDTO(any())).thenReturn(roleDTOList);
 
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.get("/roles"))
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(view().name("roles"))
-				.andExpect(model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection", "reverseSortDirection"))
-				.andExpect(model().attribute("entities", roleDTOList));
+		mockMvc.perform(MockMvcRequestBuilders.get("/roles")).andExpect(status().is2xxSuccessful())
+				.andExpect(view().name("roles")).andExpect(
+						model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
+								"reverseSortDirection")).andExpect(model().attribute("entities", roleDTOList));
 
 		verify(roleService, times(1)).findAllAsDTO(any());
 	}
@@ -83,15 +74,15 @@ public class RoleRecordsControllerTest {
 		roleDTOList.add(new RoleDTO(1L, "Role A"));
 		roleDTOList.add(new RoleDTO(2L, "Role B"));
 
-		when(roleService.findAllAsDTO(argThat(pageable -> pageable.getOffset() == offset && pageable.getPageSize() == limit)))
-				.thenReturn(roleDTOList);
+		when(roleService.findAllAsDTO(
+				argThat(pageable -> pageable.getOffset() == offset && pageable.getPageSize() == limit))).thenReturn(
+				roleDTOList);
 
 		// Act and Assert
 		mockMvc.perform(MockMvcRequestBuilders.get(String.format("/roles?offset=%d&limit=%d", offset, limit)))
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(view().name("roles"))
-				.andExpect(model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection", "reverseSortDirection"))
-				.andExpect(model().attribute("entities", roleDTOList));
+				.andExpect(status().is2xxSuccessful()).andExpect(view().name("roles")).andExpect(
+						model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
+								"reverseSortDirection")).andExpect(model().attribute("entities", roleDTOList));
 
 		verify(roleService, times(1)).findAllAsDTO(
 				argThat(pageable -> pageable.getOffset() == offset && pageable.getPageSize() == limit));
@@ -104,8 +95,7 @@ public class RoleRecordsControllerTest {
 		Long roleId = 1L;
 
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.get("/roles/delete/{id}", roleId))
-				.andExpect(status().is3xxRedirection())
+		mockMvc.perform(MockMvcRequestBuilders.get("/roles/delete/{id}", roleId)).andExpect(status().is3xxRedirection())
 				.andExpect(redirectedUrl("/roles"));
 
 		verify(roleService, times(1)).deleteById(roleId);
@@ -122,10 +112,8 @@ public class RoleRecordsControllerTest {
 		doThrow(new DeletionFailedException(exceptionMessage)).when(roleService).deleteById(roleId);
 
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.get("/roles/delete/{id}", roleId))
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(view().name("error"))
-				.andExpect(model().attribute("exceptionMessage", exceptionMessage));
+		mockMvc.perform(MockMvcRequestBuilders.get("/roles/delete/{id}", roleId)).andExpect(status().is2xxSuccessful())
+				.andExpect(view().name("error")).andExpect(model().attribute("exceptionMessage", exceptionMessage));
 
 		verify(roleService, times(1)).deleteById(roleId);
 	}
@@ -140,11 +128,9 @@ public class RoleRecordsControllerTest {
 		when(roleService.findByIdAsDTO(roleId)).thenReturn(roleDTO);
 
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.get("/roles/update/{id}", roleId))
-				.andExpect(status().isOk())
+		mockMvc.perform(MockMvcRequestBuilders.get("/roles/update/{id}", roleId)).andExpect(status().isOk())
 				.andExpect(model().attributeExists("entity", "authorityDTOList"))
-				.andExpect(model().attribute("entity", roleDTO))
-				.andExpect(view().name("rolesUpdateForm"));
+				.andExpect(model().attribute("entity", roleDTO)).andExpect(view().name("rolesUpdateForm"));
 
 		verify(roleService, times(1)).findByIdAsDTO(roleId);
 	}
@@ -160,11 +146,9 @@ public class RoleRecordsControllerTest {
 		when(roleService.findByIdAsDTO(roleId)).thenThrow(new ServiceException(exceptionMessage));
 
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.get("/roles/update/{id}", roleId))
-				.andExpect(status().is2xxSuccessful())
+		mockMvc.perform(MockMvcRequestBuilders.get("/roles/update/{id}", roleId)).andExpect(status().is2xxSuccessful())
 				.andExpect(model().attributeExists("exceptionMessage"))
-				.andExpect(model().attribute("exceptionMessage", exceptionMessage))
-				.andExpect(view().name("error"));
+				.andExpect(model().attribute("exceptionMessage", exceptionMessage)).andExpect(view().name("error"));
 
 		verify(roleService, times(1)).findByIdAsDTO(roleId);
 	}
@@ -177,10 +161,8 @@ public class RoleRecordsControllerTest {
 		RoleDTO validRoleDTO = RoleDTO.builder().id(roleId).name("Valid Role").build();
 
 		// Act and Assert
-		mockMvc.perform(post("/roles/update/{id}", roleId).with(csrf())
-						.flashAttr("roleDTO", validRoleDTO))
-				.andExpect(status().is3xxRedirection())
-				.andExpect(view().name("redirect:/roles/update/" + roleId));
+		mockMvc.perform(post("/roles/update/{id}", roleId).with(csrf()).flashAttr("roleDTO", validRoleDTO))
+				.andExpect(status().is3xxRedirection()).andExpect(view().name("redirect:/roles/update/" + roleId));
 
 		verify(roleService, times(1)).save(validRoleDTO);
 		verify(roleService, times(0)).findByIdAsDTO(any());
@@ -196,12 +178,9 @@ public class RoleRecordsControllerTest {
 		when(roleService.findByIdAsDTO(roleId)).thenReturn(invalidRoleDTO);
 
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.post("/roles/update/{id}", roleId)
-						.with(csrf())
-						.flashAttr("roleDTO", invalidRoleDTO))
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(model().attributeExists("entity"))
-				.andExpect(model().attribute("entity", invalidRoleDTO))
+		mockMvc.perform(MockMvcRequestBuilders.post("/roles/update/{id}", roleId).with(csrf())
+						.flashAttr("roleDTO", invalidRoleDTO)).andExpect(status().is2xxSuccessful())
+				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", invalidRoleDTO))
 				.andExpect(view().name("rolesUpdateForm"));
 
 		// Verify that roleService.save(roleDTO) was not called
@@ -213,19 +192,16 @@ public class RoleRecordsControllerTest {
 	public void update_whenRoleServiceThrowValidationException_thenProcessForm() throws Exception {
 		// Arrange
 		Long roleId = 1L;
-		RoleDTO roleDTO = RoleDTO.builder()
-				.id(roleId)
-				.name("Valid Name")
-				.authorityDTOS(Collections.emptyList())
-				.build();
+		RoleDTO roleDTO =
+				RoleDTO.builder().id(roleId).name("Valid Name").authorityDTOS(Collections.emptyList()).build();
 
 		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
 		when(roleService.save(roleDTO)).thenThrow(validationException);
 
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.post("/roles/update/{id}", roleId).with(csrf())
-						.flashAttr("roleDTO", roleDTO))
+		mockMvc.perform(
+						MockMvcRequestBuilders.post("/roles/update/{id}", roleId).with(csrf()).flashAttr("roleDTO", roleDTO))
 				.andExpect(status().is3xxRedirection());
 
 		verify(roleService, times(1)).save(roleDTO);
@@ -236,19 +212,15 @@ public class RoleRecordsControllerTest {
 	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
 	public void update_whenRoleServiceThrowServiceException_processError() throws Exception {
 		Long roleId = 1L;
-		RoleDTO roleDTO = RoleDTO.builder()
-				.id(roleId)
-				.name("Valid Name")
-				.authorityDTOS(Collections.emptyList())
-				.build();
+		RoleDTO roleDTO =
+				RoleDTO.builder().id(roleId).name("Valid Name").authorityDTOS(Collections.emptyList()).build();
 		String exceptionMessage = "Service Exception";
 
 		when(roleService.save(any(RoleDTO.class))).thenThrow(new ServiceException(exceptionMessage));
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/roles/update/{id}", roleId).with(csrf())
-						.flashAttr("roleDTO", roleDTO))
-				.andExpect(status().isOk())
-				.andExpect(model().attribute("exceptionMessage", exceptionMessage))
+		mockMvc.perform(
+						MockMvcRequestBuilders.post("/roles/update/{id}", roleId).with(csrf()).flashAttr("roleDTO", roleDTO))
+				.andExpect(status().isOk()).andExpect(model().attribute("exceptionMessage", exceptionMessage))
 				.andExpect(view().name("error"));
 
 		verify(roleService, times(1)).save(any(RoleDTO.class));
@@ -259,10 +231,8 @@ public class RoleRecordsControllerTest {
 	@WithMockUser(username = USERNAME, authorities = INSERT_AUTHORITY)
 	public void getInsertForm_happyPath() throws Exception {
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.get("/roles/insert"))
-				.andExpect(status().isOk())
-				.andExpect(view().name("rolesInsertForm"))
-				.andExpect(model().attributeExists("authorityDTOList"));
+		mockMvc.perform(MockMvcRequestBuilders.get("/roles/insert")).andExpect(status().isOk())
+				.andExpect(view().name("rolesInsertForm")).andExpect(model().attributeExists("authorityDTOList"));
 
 	}
 
@@ -286,10 +256,8 @@ public class RoleRecordsControllerTest {
 		when(roleService.save(roleDTO)).thenReturn(roleId);
 
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.post("/roles/insert").with(csrf())
-						.flashAttr("roleDTO", roleDTO))
-				.andExpect(status().is3xxRedirection())
-				.andExpect(view().name("redirect:/authorities"))
+		mockMvc.perform(MockMvcRequestBuilders.post("/roles/insert").with(csrf()).flashAttr("roleDTO", roleDTO))
+				.andExpect(status().is3xxRedirection()).andExpect(view().name("redirect:/authorities"))
 				.andExpect(flash().attribute("insertedSuccessId", roleId));
 
 		// Verify interactions and ensure no more interactions
@@ -305,10 +273,8 @@ public class RoleRecordsControllerTest {
 		RoleDTO roleDTO = RoleDTO.builder().name("").build();
 
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.post("/roles/insert").with(csrf())
-						.flashAttr("roleDTO", roleDTO))
-				.andExpect(status().is2xxSuccessful())
-				.andExpect(view().name("rolesInsertForm"));
+		mockMvc.perform(MockMvcRequestBuilders.post("/roles/insert").with(csrf()).flashAttr("roleDTO", roleDTO))
+				.andExpect(status().is2xxSuccessful()).andExpect(view().name("rolesInsertForm"));
 
 		// Verify that roleService was not interacted with
 		verifyNoInteractions(roleService);
@@ -325,8 +291,7 @@ public class RoleRecordsControllerTest {
 		when(roleService.save(roleDTO)).thenThrow(validationException);
 
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.post("/roles/insert").with(csrf())
-						.flashAttr("roleDTO", roleDTO))
+		mockMvc.perform(MockMvcRequestBuilders.post("/roles/insert").with(csrf()).flashAttr("roleDTO", roleDTO))
 				.andExpect(status().is3xxRedirection());
 
 		// Verify that roleService.save(roleDTO) was called once
@@ -344,8 +309,7 @@ public class RoleRecordsControllerTest {
 		when(roleService.save(roleDTO)).thenThrow(new ServiceException(exceptionMessage));
 
 		// Act and Assert
-		mockMvc.perform(MockMvcRequestBuilders.post("/roles/insert").with(csrf())
-						.flashAttr("roleDTO", roleDTO))
+		mockMvc.perform(MockMvcRequestBuilders.post("/roles/insert").with(csrf()).flashAttr("roleDTO", roleDTO))
 				.andExpect(status().is2xxSuccessful())
 				.andExpect(model().attribute("exceptionMessage", exceptionMessage));
 

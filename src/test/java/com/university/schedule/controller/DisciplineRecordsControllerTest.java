@@ -90,7 +90,13 @@ public class DisciplineRecordsControllerTest {
 	@Test
 	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
 	public void delete_happyPath() throws Exception {
-		// Test code for delete method
+		Long buildingId = 1L;
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/disciplines/delete/{id}", buildingId))
+				.andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("/disciplines"));
+
+		verify(disciplineService, times(1)).deleteById(buildingId);
 	}
 
 	@Test

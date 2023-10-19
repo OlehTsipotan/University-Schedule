@@ -2,6 +2,7 @@ package com.university.schedule.controller;
 
 import com.university.schedule.dto.RoleDTO;
 import com.university.schedule.dto.UserDTO;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.service.RoleService;
@@ -10,9 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -20,13 +20,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(UserRecordsController.class)
-@ComponentScan("com.university.schedule.formatter")
+@ActiveProfiles("test")
 public class UserRecordsControllerTest {
+
+	public static final String USERNAME = "testUsername";
+	public static final String VIEW_AUTHORITY = "VIEW_USERS";
+	public static final String EDIT_AUTHORITY = "EDIT_USERS";
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -38,24 +43,42 @@ public class UserRecordsControllerTest {
 	private RoleService roleService;
 
 	@Test
-	@WithMockUser(username = "username", authorities = {"VIEW_USERS"})
-	public void getAll_processPage() throws Exception {
-		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName", null);
-		List<UserDTO> userDTOS = new ArrayList<>();
-		userDTOS.add(new UserDTO(1L, "email 1", "firstName 1", "lastName 1", roleDTO, true));
+	@WithMockUser(username = USERNAME, authorities = VIEW_AUTHORITY)
+	public void getAll_whenNoArgs_happyPath() throws Exception {
+		List<UserDTO> userDTOList = new ArrayList<>();
+		userDTOList.add(new UserDTO(1L, "user1@example.com", "John", "Doe", new RoleDTO(), true));
+		userDTOList.add(new UserDTO(2L, "user2@example.com", "Jane", "Doe", new RoleDTO(), true));
 
-		// Mock the behavior of userService
-		when(userService.findAllAsDTO(any(Pageable.class))).thenReturn(userDTOS);
+		when(userService.findAllAsDTO(any())).thenReturn(userDTOList);
 
-		// Perform a GET request to /users and verify the result
-		mockMvc.perform(MockMvcRequestBuilders.get("/users")).andExpect(status().isOk()).andExpect(view().name("users"))
-				.andExpect(model().attributeExists("entities", "currentLimit", "currentOffset", "sortField",
-						"sortDirection", "reverseSortDirection")).andExpect(model().attribute("entities", userDTOS));
+		mockMvc.perform(MockMvcRequestBuilders.get("/users?offset=5")).andExpect(status().is2xxSuccessful())
+				.andExpect(view().name("users")).andExpect(
+						model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
+								"reverseSortDirection")).andExpect(model().attribute("entities", userDTOList));
+
+		verify(userService, times(1)).findAllAsDTO(any());
 	}
 
 	@Test
-	@WithMockUser(username = "username", authorities = {"EDIT_USERS"})
-	public void delete() throws Exception {
+	@WithMockUser(username = USERNAME, authorities = VIEW_AUTHORITY)
+	public void getAll_whenLimitAndOffsetArgs_happyPath() throws Exception {
+		List<UserDTO> userDTOList = new ArrayList<>();
+		userDTOList.add(new UserDTO(1L, "user1@example.com", "John", "Doe", new RoleDTO(), true));
+		userDTOList.add(new UserDTO(2L, "user2@example.com", "Jane", "Doe", new RoleDTO(), true));
+
+		when(userService.findAllAsDTO(any())).thenReturn(userDTOList);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/users?offset=10&limit=5")).andExpect(status().is2xxSuccessful())
+				.andExpect(view().name("users")).andExpect(
+						model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
+								"reverseSortDirection")).andExpect(model().attribute("entities", userDTOList));
+
+		verify(userService, times(1)).findAllAsDTO(any());
+	}
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+	public void delete_happyPath() throws Exception {
 		Long userId = 1L;
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/users/delete/{id}", userId)).andExpect(status().is3xxRedirection())
@@ -65,82 +88,116 @@ public class UserRecordsControllerTest {
 	}
 
 	@Test
-	@WithMockUser(username = "username", authorities = {"EDIT_USERS"})
-	public void getUpdateForm() throws Exception {
+	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+	public void delete_whenUserServiceThrowsDeletionFailedException_thenProcessError() throws Exception {
 		Long userId = 1L;
+		String exceptionMessage = "Delete Error";
 
-		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
-		List<RoleDTO> roleDTOS = List.of(roleDTO);
-		UserDTO userDTO = new UserDTO(userId, "email 1", "firstName 1", "lastName 1", roleDTO, true);
+		doThrow(new DeletionFailedException(exceptionMessage)).when(userService).deleteById(userId);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/users/delete/{id}", userId)).andExpect(status().is2xxSuccessful())
+				.andExpect(view().name("error")).andExpect(model().attribute("exceptionMessage", exceptionMessage));
+
+		verify(userService, times(1)).deleteById(userId);
+	}
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+	public void getUpdateForm_happyPath() throws Exception {
+		Long userId = 1L;
+		UserDTO userDTO = new UserDTO(userId, "user1@example.com", "John", "Doe", new RoleDTO(), true);
 
 		when(userService.findByIdAsDTO(userId)).thenReturn(userDTO);
-		when(roleService.findAllAsDTO()).thenReturn(roleDTOS);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/users/update/{id}", userId)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("entity", "roleDTOList")).andExpect(view().name("usersUpdateForm"))
-				.andExpect(model().attribute("entity", userDTO)).andExpect(model().attribute("roleDTOList", roleDTOS));
+				.andExpect(model().attributeExists("entity")).andExpect(view().name("usersUpdateForm"))
+				.andExpect(model().attribute("entity", userDTO));
 
 		verify(userService, times(1)).findByIdAsDTO(userId);
-		verify(roleService, times(1)).findAllAsDTO();
 	}
 
 	@Test
-	@WithMockUser(username = "username", authorities = {"EDIT_USERS"})
-	public void update_whenNotValidUserUpdateDTO_emptyField_thenProcessForm() throws Exception {
+	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+	public void getUpdateForm_whenUserNotFoundUserServiceThrowsServiceException_thenProcessError() throws Exception {
 		Long userId = 1L;
+		String exceptionMessage = "Not found";
 
-		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
-		List<RoleDTO> roleDTOS = List.of(roleDTO);
-		UserDTO userDTO = new UserDTO(userId, "email 1", "firstName 1", "", roleDTO, true);
+		when(userService.findByIdAsDTO(userId)).thenThrow(new ServiceException(exceptionMessage));
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/users/update/{id}", userId)).andExpect(status().is2xxSuccessful())
+				.andExpect(view().name("error")).andExpect(model().attribute("exceptionMessage", exceptionMessage));
+
+		verify(userService, times(1)).findByIdAsDTO(userId);
+	}
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+	public void update_whenValidUser_thenRedirectSuccess() throws Exception {
+		Long userId = 1L;
+		UserDTO userDTO = new UserDTO(userId, "user1@example.com", "John", "Doe", new RoleDTO(), true);
+
+		mockMvc.perform(
+						MockMvcRequestBuilders.post("/users/update/{id}", userId).with(csrf()).flashAttr("userDTO", userDTO))
+				.andExpect(status().is3xxRedirection()).andExpect(view().name("redirect:/users/update/" + userId));
+
+		verify(userService, times(1)).update(userDTO);
+		verify(userService, times(0)).findByIdAsDTO(anyLong());
+	}
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+	public void update_whenNotValidUserByEmptyField_thenProcessForm() throws Exception {
+		Long userId = 1L;
+		UserDTO userDTO = new UserDTO(userId, "user1@example.com", "", "Doe", new RoleDTO(), true);
 
 		when(userService.findByIdAsDTO(userId)).thenReturn(userDTO);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/users/update/{id}", userId)
-						.param("isEnable", "false") // Add any other request parameters as needed
-						.with(csrf()).flashAttr("userDTO", userDTO)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", userDTO))
-				.andExpect(view().name("usersUpdateForm"));
+		mockMvc.perform(
+						MockMvcRequestBuilders.post("/users/update/{id}", userId).with(csrf()).flashAttr("userDTO", userDTO))
+				.andExpect(status().is2xxSuccessful()).andExpect(model().attributeExists("entity"))
+				.andExpect(model().attribute("entity", userDTO)).andExpect(view().name("usersUpdateForm"));
 
-		verify(userService, times(0)).update(userDTO);
+		verify(userService, times(0)).update(any());
+		verify(userService, times(1)).findByIdAsDTO(userId);
 	}
 
 	@Test
-	@WithMockUser(username = "username", authorities = {"EDIT_USERS"})
-	public void update_whenUserUpdateDTOServiceThrowValidationException_thenProcessForm() throws Exception {
+	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+	public void update_whenUserServiceThrowValidationException_thenProcessForm() throws Exception {
 		Long userId = 1L;
-
-		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
-		List<RoleDTO> roleDTOS = List.of(roleDTO);
-		UserDTO userDTO = new UserDTO(userId, "email 1", "firstName 1", "lastName 1", roleDTO, true);
+		UserDTO userDTO = new UserDTO(userId, "user1@example.com", "John", "Doe", new RoleDTO(), true);
 
 		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
+		when(userService.update(userDTO)).thenThrow(validationException);
 		when(userService.findByIdAsDTO(userId)).thenReturn(userDTO);
-		when(userService.update((UserDTO) any())).thenThrow(validationException);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/users/update/{id}", userId)
-				.param("isEnable", "false") // Add any other request parameters as needed
-				.with(csrf()).flashAttr("userDTO", userDTO)).andExpect(status().is3xxRedirection());
+		mockMvc.perform(
+						MockMvcRequestBuilders.post("/users/update/{id}", userId).with(csrf()).flashAttr("userDTO", userDTO))
+				.andExpect(status().is3xxRedirection());
 
 		verify(userService, times(1)).update(userDTO);
+		verifyNoMoreInteractions(userService);
 	}
 
 	@Test
-	@WithMockUser(username = "username", authorities = {"EDIT_USERS"})
-	public void update_whenUserUpdateDTOServiceThrowServiceException_thenProcessForm() throws Exception {
+	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+	public void update_whenUserServiceThrowServiceException_thenProcessError() throws Exception {
 		Long userId = 1L;
+		UserDTO userDTO = new UserDTO(userId, "user1@example.com", "John", "Doe", new RoleDTO(), true);
 
-		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
-		List<RoleDTO> roleDTOS = List.of(roleDTO);
-		UserDTO userDTO = new UserDTO(userId, "email 1", "firstName 1", "lastName 1", roleDTO, true);
+		String exceptionMessage = "Service Exception";
+		ServiceException serviceException = new ServiceException(exceptionMessage);
 
-		ServiceException serviceException = new ServiceException("testException");
-
-		when(userService.update((UserDTO) any())).thenThrow(serviceException);
+		when(userService.update(userDTO)).thenThrow(serviceException);
 		when(userService.findByIdAsDTO(userId)).thenReturn(userDTO);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/users/update/{id}", userId)
-				.param("isEnable", "false") // Add any other request parameters as needed
-				.with(csrf()).flashAttr("userDTO", userDTO)).andExpect(status().is3xxRedirection());
+		mockMvc.perform(
+						MockMvcRequestBuilders.post("/users/update/{id}", userId).with(csrf()).flashAttr("userDTO", userDTO))
+				.andExpect(status().is2xxSuccessful())
+				.andExpect(model().attribute("exceptionMessage", exceptionMessage));
+
+		verify(userService, times(1)).update(userDTO);
+		verifyNoMoreInteractions(userService);
 	}
 }

@@ -29,7 +29,7 @@ public class UserController {
 	private final RoleService roleService;
 
 	@GetMapping("/user/login")
-	public String getLogin() {
+	public String getLoginForm() {
 		return LOGIN_FORM_TEMPLATE;
 	}
 
@@ -43,9 +43,8 @@ public class UserController {
 	}
 
 	@PostMapping("/user/register")
-	public String update(@Valid @ModelAttribute UserRegisterDTO userRegisterDTO, BindingResult result, Model model,
-	                     RedirectAttributes redirectAttributes) {
-		userRegisterDTO.setRoleDTO(roleService.findByIdAsDTO(userRegisterDTO.getRoleDTO().getId()));
+	public String register(@Valid @ModelAttribute UserRegisterDTO userRegisterDTO, BindingResult result, Model model,
+	                       RedirectAttributes redirectAttributes) {
 		if (!result.hasErrors()) {
 			userRegistrationService.register(userRegisterDTO);
 			redirectAttributes.addFlashAttribute("registerSuccess", true);

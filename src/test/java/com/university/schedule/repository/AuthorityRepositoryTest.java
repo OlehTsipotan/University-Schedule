@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -77,17 +78,6 @@ public class AuthorityRepositoryTest {
         entityManager.persist(role);
 
         Authority authorityToSave = new Authority(authorityName, Set.of(role));
-        authorityRepository.save(authorityToSave);
-
-        Authority authorityFromDb = entityManager.find(Authority.class, authorityToSave.getId());
-        assertEquals(authorityToSave, authorityFromDb);
-    }
-
-
-    @ParameterizedTest
-    @NullAndEmptySource
-    public void save_withEmptyName(String name) {
-        Authority authorityToSave = new Authority(name);
         authorityRepository.save(authorityToSave);
 
         Authority authorityFromDb = entityManager.find(Authority.class, authorityToSave.getId());

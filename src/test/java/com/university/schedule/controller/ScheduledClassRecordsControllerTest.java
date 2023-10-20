@@ -1,5 +1,6 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.config.WebTestConfig;
 import com.university.schedule.dto.*;
 import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
@@ -15,6 +16,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
@@ -33,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 
 @WebMvcTest(ScheduledClassRecordsController.class)
+@Import(WebTestConfig.class)
 @ActiveProfiles("test")
 public class ScheduledClassRecordsControllerTest {
 

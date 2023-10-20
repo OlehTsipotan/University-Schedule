@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -36,51 +37,34 @@ public class BuildingEntityValidatorTest {
     }
 
 
-
     @Test
-    public void validate_whenBuildingIsValid(){
-        Building building = Building.builder()
-                .id(1L)
-                .name("name")
-                .address("address")
-                .build();
+    public void validate_whenBuildingIsValid() {
+        Building building = Building.builder().id(1L).name("name").address("address").build();
         assertDoesNotThrow(() -> validator.validate(building));
     }
 
     @ParameterizedTest
     @NullSource
-    public void validate_whenBuildingIsNull_throwIllegalArgumentException(Building nullBuilding){
+    public void validate_whenBuildingIsNull_throwIllegalArgumentException(Building nullBuilding) {
         assertThrows(IllegalArgumentException.class, () -> validator.validate(nullBuilding));
     }
 
     // It is no matter what field is empty
     @ParameterizedTest
-    @EmptySource
-    public void validate_whenBuildingNameFieldIsEmpty_throwValidationException(String name){
-        Building building = Building.builder()
-                .id(1L)
-                .name(name)
-                .address("address")
-                .build();
+    @NullAndEmptySource
+    public void validate_whenBuildingNameFieldIsEmpty_throwValidationException(String name) {
+        Building building = Building.builder().id(1L).name(name).address("address").build();
         assertThrows(ValidationException.class, () -> validator.validate(building));
     }
 
     @Test
-    public void validate_whenBuildingNameIsNotUnique_throwValidationException(){
+    public void validate_whenBuildingNameIsNotUnique_throwValidationException() {
 
         String shareName = "name";
 
-        Building buildingToCheck = Building.builder()
-                .id(1L)
-                .name(shareName)
-                .address("addressToCheck")
-                .build();
+        Building buildingToCheck = Building.builder().id(1L).name(shareName).address("addressToCheck").build();
 
-        Building buildingToFind = Building.builder()
-                .id(2L)
-                .name(shareName)
-                .address("addressToFind")
-                .build();
+        Building buildingToFind = Building.builder().id(2L).name(shareName).address("addressToFind").build();
 
         when(buildingRepository.findByName(shareName)).thenReturn(Optional.ofNullable(buildingToFind));
 
@@ -88,21 +72,13 @@ public class BuildingEntityValidatorTest {
     }
 
     @Test
-    public void validate_whenBuildingAddressIsNotUnique_throwValidationException(){
+    public void validate_whenBuildingAddressIsNotUnique_throwValidationException() {
 
         String shareAddress = "address";
 
-        Building buildingToCheck = Building.builder()
-                .id(1L)
-                .name("nameToCheck")
-                .address(shareAddress)
-                .build();
+        Building buildingToCheck = Building.builder().id(1L).name("nameToCheck").address(shareAddress).build();
 
-        Building buildingToFind = Building.builder()
-                .id(2L)
-                .name("nameToFind")
-                .address(shareAddress)
-                .build();
+        Building buildingToFind = Building.builder().id(2L).name("nameToFind").address(shareAddress).build();
 
         when(buildingRepository.findByAddress(shareAddress)).thenReturn(Optional.ofNullable(buildingToFind));
 

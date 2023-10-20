@@ -50,7 +50,7 @@ public class BuildingRepositoryTest {
 
 	@ParameterizedTest
 	@CsvSource(value = {"BuildingName:BuildingAddress"}, delimiter = ':')
-	public void save_byBuildingObject(String name, String address) {
+	public void save_success(String name, String address) {
 
 		// Creating Building instance to save
 		Building buildingToSave = new Building(name, address);
@@ -69,7 +69,7 @@ public class BuildingRepositoryTest {
 
 	@ParameterizedTest
 	@CsvSource(value = {"BuildingName:BuildingAddress"}, delimiter = ':')
-	public void findById(String name, String address) {
+	public void findById_success(String name, String address) {
 
 		// Creating Building instance to save
 		Building buildingToSave = new Building(name, address);
@@ -88,7 +88,7 @@ public class BuildingRepositoryTest {
 
 	@ParameterizedTest
 	@CsvSource(value = {"BuildingName:BuildingAddress"}, delimiter = ':')
-	public void findByName(String name, String address) {
+	public void findByName_success(String name, String address) {
 		// Creating Building instance to save
 		Building buildingToSave = new Building(name, address);
 
@@ -107,7 +107,7 @@ public class BuildingRepositoryTest {
 
 	@ParameterizedTest
 	@CsvSource(value = {"BuildingName:BuildingAddress"}, delimiter = ':')
-	public void findByAddress(String name, String address) {
+	public void findByAddress_success(String name, String address) {
 		// Creating Building instance to save
 		Building buildingToSave = new Building(name, address);
 
@@ -126,7 +126,7 @@ public class BuildingRepositoryTest {
 
 	@ParameterizedTest
 	@ValueSource(ints = {10})
-	public void findAll(int amount) {
+	public void findAll_success(int amount) {
 		Building building;
 		List<Building> ownBuildingList = new ArrayList<>();
 		for (int i = 0; i < amount; i++) {
@@ -145,7 +145,7 @@ public class BuildingRepositoryTest {
 
 	@ParameterizedTest
 	@CsvSource(value = {"BuildingName:BuildingAddress"}, delimiter = ':')
-	public void deleteById(String name, String address) {
+	public void deleteById_success(String name, String address) {
 		// Creating Building instance to save
 		Building buildingToSave = new Building(name, address);
 

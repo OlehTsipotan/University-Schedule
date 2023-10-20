@@ -3,12 +3,10 @@ package com.university.schedule.validation;
 import com.university.schedule.exception.ScheduleGenerationDateException;
 import com.university.schedule.exception.ScheduleGenerationException;
 import com.university.schedule.model.*;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.DayOfWeek;
@@ -23,10 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
-public class ScheduleEntityValidatorTest {
+public class ScheduleValidatorTest {
 
-    @Autowired
     public ScheduleValidator scheduleValidator;
+
+    @BeforeEach
+    public void setUp() {
+        scheduleValidator = new ScheduleValidator();
+    }
 
     @ParameterizedTest
     @CsvSource(value = {
@@ -209,16 +211,6 @@ public class ScheduleEntityValidatorTest {
 
         assertThrows(ScheduleGenerationException.class,
             () -> scheduleValidator.validate(LocalDate.of(2000, 5, 1), LocalDate.of(2000, 5, 10), dayScheduleItemList));
-
-    }
-
-    @TestConfiguration
-    static class MenuPropertiesImplTestContextConfiguration {
-
-        @Bean
-        public ScheduleValidator scheduleGeneratorValidator() {
-            return new ScheduleValidator();
-        }
 
     }
 }

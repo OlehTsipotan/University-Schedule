@@ -66,8 +66,8 @@ public class DisciplineRepositoryTest {
         Discipline disciplineToSave = new Discipline(name);
         disciplineRepository.save(disciplineToSave);
 
-        Authority authorityFromDb = entityManager.find(Authority.class, disciplineToSave.getId());
-        assertEquals(disciplineToSave, authorityFromDb);
+        Discipline disciplineFromDb = entityManager.find(Discipline.class, disciplineToSave.getId());
+        assertEquals(disciplineToSave, disciplineFromDb);
     }
 
     @ParameterizedTest

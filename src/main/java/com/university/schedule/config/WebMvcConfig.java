@@ -1,6 +1,8 @@
 package com.university.schedule.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.format.Formatter;
@@ -14,6 +16,7 @@ import java.util.Set;
 
 @Configuration
 @EnableWebMvc
+@EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
 @Profile("dev")
 public class WebMvcConfig implements WebMvcConfigurer {
 

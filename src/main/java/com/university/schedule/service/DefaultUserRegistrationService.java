@@ -4,6 +4,7 @@ import com.university.schedule.converter.ConverterService;
 import com.university.schedule.dto.UserRegisterDTO;
 import com.university.schedule.exception.RegistrationFailedException;
 import com.university.schedule.exception.ServiceException;
+import com.university.schedule.model.Role;
 import com.university.schedule.model.Student;
 import com.university.schedule.model.Teacher;
 import com.university.schedule.model.User;
@@ -28,6 +29,8 @@ public class DefaultUserRegistrationService implements UserRegistrationService {
 
 	private final ConverterService converterService;
 
+	private final RoleService roleService;
+
 	private final UserRegisterDTOValidator userRegisterDTOValidator;
 
 
@@ -38,9 +41,11 @@ public class DefaultUserRegistrationService implements UserRegistrationService {
 		User user = convertToEntity(userRegisterDTO);
 		user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-		if ("Teacher".equals(user.getRole().getName())) {
+		Role userRole = roleService.findById(user.getRole().getId());
+
+		if ("Teacher".equals(userRole.getName())) {
 			return execute(() -> teacherService.save(new Teacher(user)));
-		} else if ("Student".equals(user.getRole().getName())) {
+		} else if ("Student".equals(userRole.getName())) {
 			return execute(() -> studentService.save(new Student(user)));
 		}
 		throw new RegistrationFailedException("Can`t register user with role = " + user.getRole().getName());

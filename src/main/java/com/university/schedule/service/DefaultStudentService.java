@@ -5,8 +5,10 @@ import com.university.schedule.dto.StudentDTO;
 import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Student;
+import com.university.schedule.model.User;
 import com.university.schedule.repository.StudentRepository;
 import com.university.schedule.validation.StudentEntityValidator;
+import com.university.schedule.visitor.UserPageableStudentVisitor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -25,13 +27,13 @@ public class DefaultStudentService implements StudentService {
 
 	private final StudentRepository studentRepository;
 
-	private final RoleService roleService;
-
-	private final GroupService groupService;
+	private final UserService userService;
 
 	private final ConverterService converterService;
 
 	private final StudentEntityValidator studentEntityValidator;
+
+	private final UserPageableStudentVisitor userPageableStudentVisitor;
 
 	@Override
 	public List<Student> findAll() {
@@ -52,6 +54,15 @@ public class DefaultStudentService implements StudentService {
 	public List<StudentDTO> findAllAsDTO(Pageable pageable) {
 		List<StudentDTO> studentDTOList =
 				execute(() -> studentRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} Students", studentDTOList.size());
+		return studentDTOList;
+	}
+
+	@Override
+	public List<StudentDTO> findAllAsDTO(String email, Pageable pageable) {
+		User user = userService.findByEmail(email);
+		List<Student> studentPage = execute(() -> user.accept(userPageableStudentVisitor, pageable));
+		List<StudentDTO> studentDTOList = studentPage.stream().map(this::convertToDTO).toList();
 		log.debug("Retrieved All {} Students", studentDTOList.size());
 		return studentDTOList;
 	}

@@ -1,8 +1,10 @@
 package com.university.schedule.controller;
 
+import com.university.schedule.model.User;
 import com.university.schedule.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,11 +18,12 @@ public class WelcomeController {
 
 	private final UserService userService;
 
-
-	@GetMapping({"/", "/welcome"})
-	private String welcome(Model model, Principal principal) {
-		String userFullName = userService.findByEmail(principal.getName()).getFullName();
-		model.addAttribute("userFullName", userFullName);
-		return "index";
+	@Secured("VIEW_WELCOME")
+	@GetMapping("/welcome")
+	public String welcome(Model model, Principal principal) {
+		User user = userService.findByEmail(principal.getName());
+		model.addAttribute("userFullName", user.getFullName());
+		model.addAttribute("role", user.getRole().getName());
+		return "index/userIndex";
 	}
 }

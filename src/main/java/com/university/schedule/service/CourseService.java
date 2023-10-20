@@ -31,6 +31,8 @@ public interface CourseService {
 
 	List<CourseDTO> findAllAsDTO(Pageable pageable);
 
+	List<CourseDTO> findAllAsDTO(String email, Pageable pageable);
+
 	void deleteById(Long id);
 
 

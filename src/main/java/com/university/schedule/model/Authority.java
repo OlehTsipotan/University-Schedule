@@ -35,6 +35,9 @@ public class Authority {
 	@ToString.Exclude
 	private Set<Role> roles;
 
+	public Authority(String name){
+		this.name = name;
+	}
 
 	@Override
 	public boolean equals(Object o) {

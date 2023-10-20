@@ -1,16 +1,23 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.dto.*;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.service.*;
+import com.university.schedule.utility.DateUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -19,258 +26,328 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+
 @WebMvcTest(ScheduledClassRecordsController.class)
-@ComponentScan("com.university.schedule.formatter")
+@ActiveProfiles("test")
 public class ScheduledClassRecordsControllerTest {
 
+	private static final String USERNAME = "testUsername";
+	private static final String VIEW_CLASSES = "VIEW_CLASSES";
+	private static final String VIEW_SCHEDULE = "VIEW_SCHEDULE";
+	private static final String EDIT_CLASSES = "EDIT_CLASSES";
+	private static final String INSERT_CLASSES = "INSERT_CLASSES";
 	@Autowired
 	private MockMvc mockMvc;
-
 	@MockBean
 	private ClassroomService classroomService;
-
-	@MockBean
-	private ScheduledClassService scheduledClassService;
-
-	@MockBean
-	private CourseService courseService;
-
-	@MockBean
-	private TeacherService teacherService;
-
 	@MockBean
 	private ClassTimeService classTimeService;
-
+	@MockBean
+	private ScheduledClassService scheduledClassService;
+	@MockBean
+	private CourseService courseService;
+	@MockBean
+	private TeacherService teacherService;
 	@MockBean
 	private ClassTypeService classTypeService;
-
 	@MockBean
 	private GroupService groupService;
 
-	@Test
-	@WithMockUser(username = "username", authorities = {"VIEW_CLASSES"})
-	public void getAll_processPage() throws Exception {
-		CourseDTO courseDTO = new CourseDTO(1L, "CourseDTOName");
-		List<CourseDTO> courseDTOS = List.of(courseDTO);
+	@Mock
+	private DateUtils dateUtils;
 
-		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
-		TeacherDTO teacherDTO =
-				new TeacherDTO(1L, "teacher@email.com", "teacherFirstName", "teacherLastName", roleDTO, true,
-						courseDTOS);
+	public ScheduledClassDTO getValidScheduledClassDTO() {
+		return new ScheduledClassDTO(1L, new CourseDTO(1L, "Course A"),
+				new TeacherDTO(1L, "teacher@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>()),
+				new ClassroomDTO(1L, "Classroom A", new BuildingDTO(1L, "Building A", "Address A")),
+				new ClassTimeDTO(1L, 1, LocalTime.of(9, 0), 90), LocalDate.of(2023, 10, 17),
+				new ClassTypeDTO(1L, "Lecture"), new ArrayList<>());
+	}
 
-		DisciplineDTO disciplineDTO = new DisciplineDTO(1L, "disciplineDTOName");
-		GroupDTO groupDTO = new GroupDTO(1L, "groupDTOName", disciplineDTO, courseDTOS);
-		List<GroupDTO> groupDTOS = List.of(groupDTO);
-		LocalDate localDate = LocalDate.of(2000, 1, 1);
-		ClassTimeDTO classTimeDTO = new ClassTimeDTO(1L, 1, LocalTime.of(8, 30), 95);
-		ClassTypeDTO classTypeDTO = new ClassTypeDTO(1L, "classTypeDTO");
-		BuildingDTO buildingDTO = new BuildingDTO(1L, "buildingDTOName", "buildingDTOAddress");
-		ClassroomDTO classroomDTO = new ClassroomDTO(1L, "classroomDTOName", buildingDTO);
-
-		// Create a list of ScheduledClassDTOs for testing
-		List<ScheduledClassDTO> scheduledClassDTOs = new ArrayList<>();
-		scheduledClassDTOs.add(
-				ScheduledClassDTO.builder().id(1L).courseDTO(courseDTO).teacherDTO(teacherDTO).groupDTOS(groupDTOS)
-						.date(localDate).classTimeDTO(classTimeDTO).classTypeDTO(classTypeDTO)
-						.classroomDTO(classroomDTO).build());
-
-		// Mock the behavior of scheduledClassDTOService
-		when(scheduledClassService.findAllAsDTO(any(Pageable.class))).thenReturn(scheduledClassDTOs);
-
-		// Perform a GET request to /classes and verify the result
-		mockMvc.perform(MockMvcRequestBuilders.get("/classes")).andExpect(status().isOk())
-				.andExpect(view().name("classes")).andExpect(
-						model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
-								"reverseSortDirection")).andExpect(model().attribute("entities", scheduledClassDTOs));
+	public List<ScheduledClassDTO> getValidScheduledClassDTOList() {
+		return List.of(new ScheduledClassDTO(1L, new CourseDTO(1L, "Course A"),
+						new TeacherDTO(1L, "teacher@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>()),
+						new ClassroomDTO(1L, "Classroom A", new BuildingDTO(1L, "Building A", "Address A")),
+						new ClassTimeDTO(1L, 1, LocalTime.of(9, 0), 90), LocalDate.of(2023, 10, 17),
+						new ClassTypeDTO(1L, "Lecture"), new ArrayList<>()),
+				new ScheduledClassDTO(2L, new CourseDTO(2L, "Course B"),
+						new TeacherDTO(2L, "teacher2@example.com", "Jane", "Doe", new RoleDTO(), true,
+								new ArrayList<>()),
+						new ClassroomDTO(2L, "Classroom B", new BuildingDTO(2L, "Building B", "Address B")),
+						new ClassTimeDTO(2L, 2, LocalTime.of(10, 0), 60), LocalDate.of(2023, 10, 18),
+						new ClassTypeDTO(2L, "Lab"), new ArrayList<>()));
 	}
 
 	@Test
-	@WithMockUser(username = "username", authorities = {"EDIT_CLASSES"})
-	public void delete() throws Exception {
+	@WithMockUser(username = USERNAME, authorities = VIEW_CLASSES)
+	public void getAll_whenNoArgs_happyPath() throws Exception {
+		List<ScheduledClassDTO> scheduledClassDTOS = getValidScheduledClassDTOList();
+
+		when(scheduledClassService.findAllAsDTO(any())).thenReturn(scheduledClassDTOS);
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/classes")).andExpect(status().is2xxSuccessful())
+				.andExpect(view().name("classes")).andExpect(
+						model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
+								"reverseSortDirection")).andExpect(model().attribute("entities", scheduledClassDTOS));
+
+		verify(scheduledClassService, times(1)).findAllAsDTO(any());
+	}
+
+
+	@ParameterizedTest
+	@CsvSource({"5, 10"})
+	@WithMockUser(username = USERNAME, authorities = VIEW_CLASSES)
+	public void getAll_whenLimitAndOffsetArgs_happyPath(int limit, int offset) throws Exception {
+		List<ScheduledClassDTO> scheduledClassDTOS = getValidScheduledClassDTOList();
+
+		when(scheduledClassService.findAllAsDTO(any(Pageable.class))).thenReturn(scheduledClassDTOS);
+
+		mockMvc.perform(MockMvcRequestBuilders.get(String.format("/classes?offset=%d&limit=%d", offset, limit)))
+				.andExpect(status().is2xxSuccessful()).andExpect(view().name("classes")).andExpect(
+						model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
+								"reverseSortDirection"));
+
+		verify(scheduledClassService, times(1)).findAllAsDTO(
+				argThat(pageable -> pageable.getOffset() == offset && pageable.getPageSize() == limit));
+	}
+
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = EDIT_CLASSES)
+	public void delete_happyPath() throws Exception {
+		Long classId = 1L;
+
+		mockMvc.perform(MockMvcRequestBuilders.get("/classes/delete/{id}", classId))
+				.andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("/classes")); // Check if redirected back to /classes
+
+		verify(scheduledClassService, times(1)).deleteById(classId);
+	}
+
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = EDIT_CLASSES)
+	public void delete_whenScheduledClassServiceThrowsDeletionFailedException_thenProcessError() throws Exception {
 		Long scheduledClassId = 1L;
+		String exceptionMessage = "Delete Error";
+
+		doThrow(new DeletionFailedException(exceptionMessage)).when(scheduledClassService).deleteById(scheduledClassId);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/classes/delete/{id}", scheduledClassId))
-				.andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/classes"));
+				.andExpect(status().is2xxSuccessful()).andExpect(view().name("error"))
+				.andExpect(model().attribute("exceptionMessage", exceptionMessage));
 
 		verify(scheduledClassService, times(1)).deleteById(scheduledClassId);
 	}
 
+
 	@Test
-	@WithMockUser(username = "username", authorities = {"EDIT_CLASSES"})
-	public void getUpdateForm() throws Exception {
+	@WithMockUser(username = USERNAME, authorities = EDIT_CLASSES)
+	public void getUpdateForm_happyPath() throws Exception {
 		Long scheduledClassId = 1L;
-
-		CourseDTO courseDTO = new CourseDTO(1L, "CourseDTOName");
-		List<CourseDTO> courseDTOS = List.of(courseDTO);
-
-		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
-		TeacherDTO teacherDTO =
-				new TeacherDTO(1L, "teacher@email.com", "teacherFirstName", "teacherLastName", roleDTO, true,
-						courseDTOS);
-		List<TeacherDTO> teacherDTOS = List.of(teacherDTO);
-
-		DisciplineDTO disciplineDTO = new DisciplineDTO(1L, "disciplineDTOName");
-		GroupDTO groupDTO = new GroupDTO(1L, "groupDTOName", disciplineDTO, courseDTOS);
-		List<GroupDTO> groupDTOS = List.of(groupDTO);
-
-		LocalDate localDate = LocalDate.of(2000, 1, 1);
-
-		ClassTimeDTO classTimeDTO = new ClassTimeDTO(1L, 1, LocalTime.of(8, 30), 95);
-		List<ClassTimeDTO> classTimeDTOs = List.of(classTimeDTO);
-
-		ClassTypeDTO classTypeDTO = new ClassTypeDTO(1L, "classTypeDTO");
-		List<ClassTypeDTO> classTypeDTOs = List.of(classTypeDTO);
-
-		BuildingDTO buildingDTO = new BuildingDTO(1L, "buildingDTOName", "buildingDTOAddress");
-		ClassroomDTO classroomDTO = new ClassroomDTO(1L, "classroomDTOName", buildingDTO);
-		List<ClassroomDTO> classroomDTOs = List.of(classroomDTO);
-
-		// Create a list of ScheduledClassDTOs for testing
-		ScheduledClassDTO scheduledClassDTO =
-				ScheduledClassDTO.builder().id(scheduledClassId).courseDTO(courseDTO).teacherDTO(teacherDTO)
-						.groupDTOS(groupDTOS).date(localDate).classTimeDTO(classTimeDTO).classTypeDTO(classTypeDTO)
-						.classroomDTO(classroomDTO).build();
+		ScheduledClassDTO scheduledClassDTO = getValidScheduledClassDTO();
 
 		when(scheduledClassService.findByIdAsDTO(scheduledClassId)).thenReturn(scheduledClassDTO);
-		when(courseService.findAllAsDTO()).thenReturn(courseDTOS);
-		when(teacherService.findAllAsDTO()).thenReturn(teacherDTOS);
-		when(classroomService.findAllAsDTO()).thenReturn(classroomDTOs);
-		when(classTimeService.findAllAsDTO()).thenReturn(classTimeDTOs);
-		when(classTypeService.findAllAsDTO()).thenReturn(classTypeDTOs);
-		when(groupService.findAllAsDTO()).thenReturn(groupDTOS);
 
 		mockMvc.perform(MockMvcRequestBuilders.get("/classes/update/{id}", scheduledClassId)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("entity", "courseDTOList", "teacherDTOList", "classroomDTOList",
-						"classTimeDTOList", "classTypeDTOList", "groupDTOList"))
-				.andExpect(view().name("classesUpdateForm")).andExpect(model().attribute("entity", scheduledClassDTO))
-				.andExpect(model().attribute("courseDTOList", courseDTOS))
-				.andExpect(model().attribute("teacherDTOList", teacherDTOS))
-				.andExpect(model().attribute("classroomDTOList", classroomDTOs))
-				.andExpect(model().attribute("classTimeDTOList", classTimeDTOs))
-				.andExpect(model().attribute("classTypeDTOList", classTypeDTOs))
-				.andExpect(model().attribute("groupDTOList", groupDTOS));
+				.andExpect(model().attributeExists("entity")).andExpect(view().name("classesUpdateForm"))
+				.andExpect(model().attribute("entity", scheduledClassDTO));
 
 		verify(scheduledClassService, times(1)).findByIdAsDTO(scheduledClassId);
-		verify(courseService, times(1)).findAllAsDTO();
-		verify(teacherService, times(1)).findAllAsDTO();
-		verify(classroomService, times(1)).findAllAsDTO();
-		verify(classTimeService, times(1)).findAllAsDTO();
-		verify(classTypeService, times(1)).findAllAsDTO();
-		verify(groupService, times(1)).findAllAsDTO();
+	}
+
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = EDIT_CLASSES)
+	public void update_whenValidScheduledClass_thenRedirectSuccess() throws Exception {
+		ScheduledClassDTO scheduledClassDTO = getValidScheduledClassDTO();
+		Long scheduledClassId = scheduledClassDTO.getId();
+
+		when(scheduledClassService.save(any(ScheduledClassDTO.class))).thenReturn(scheduledClassId);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/classes/update/{id}", scheduledClassId)
+						.flashAttr("scheduledClassDTO", scheduledClassDTO)).andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("/classes/update/" + scheduledClassId));
+
+		verify(scheduledClassService, times(1)).save(any(ScheduledClassDTO.class));
 	}
 
 	@Test
-	@WithMockUser(username = "username", authorities = {"EDIT_CLASSES"})
-	public void update_whenScheduledClassServiceThrowValidationException_thenProcessForm() throws Exception {
-		Long scheduledClassId = 1L;
+	@WithMockUser(username = USERNAME, authorities = EDIT_CLASSES)
+	public void update_whenNotValidScheduledClassDTOByNullField_thenProcessForm() throws Exception {
+		Long classId = 1L;
+		ScheduledClassDTO scheduledClassDTO = getValidScheduledClassDTO();
+		scheduledClassDTO.setClassroomDTO(null);
 
-		CourseDTO courseDTO = new CourseDTO(1L, "CourseDTOName");
-		List<CourseDTO> courseDTOS = List.of(courseDTO);
+		when(scheduledClassService.findByIdAsDTO(classId)).thenReturn(scheduledClassDTO);
 
-		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
-		TeacherDTO teacherDTO =
-				new TeacherDTO(1L, "teacher@email.com", "teacherFirstName", "teacherLastName", roleDTO, true,
-						courseDTOS);
-		List<TeacherDTO> teacherDTOS = List.of(teacherDTO);
+		mockMvc.perform(MockMvcRequestBuilders.post("/classes/update/{id}", classId).with(csrf())
+						.flashAttr("scheduledClassDTO", scheduledClassDTO)).andExpect(status().is2xxSuccessful())
+				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", scheduledClassDTO))
+				.andExpect(view().name("classesUpdateForm"));
 
-		DisciplineDTO disciplineDTO = new DisciplineDTO(1L, "disciplineDTOName");
-		GroupDTO groupDTO = new GroupDTO(1L, "groupDTOName", disciplineDTO, courseDTOS);
-		List<GroupDTO> groupDTOS = List.of(groupDTO);
+		verify(scheduledClassService, times(0)).save((ScheduledClassDTO) any());
+		verify(scheduledClassService, times(1)).findByIdAsDTO(classId);
+	}
 
-		LocalDate localDate = LocalDate.of(2000, 1, 1);
 
-		ClassTimeDTO classTimeDTO = new ClassTimeDTO(1L, 1, LocalTime.of(8, 30), 95);
-		List<ClassTimeDTO> classTimeDTOs = List.of(classTimeDTO);
+	@Test
+	@WithMockUser(username = USERNAME, authorities = EDIT_CLASSES)
+	public void update_whenScheduledClassServiceThrowsValidationException_thenProcessForm() throws Exception {
+		ScheduledClassDTO scheduledClassDTO = getValidScheduledClassDTO();
+		Long scheduledClassId = scheduledClassDTO.getId();
 
-		ClassTypeDTO classTypeDTO = new ClassTypeDTO(1L, "classTypeDTO");
-		List<ClassTypeDTO> classTypeDTOs = List.of(classTypeDTO);
+		ValidationException validationException = new ValidationException("testException", List.of("myError"));
+		doThrow(validationException).when(scheduledClassService).save(any(ScheduledClassDTO.class));
 
-		BuildingDTO buildingDTO = new BuildingDTO(1L, "buildingDTOName", "buildingDTOAddress");
-		ClassroomDTO classroomDTO = new ClassroomDTO(1L, "classroomDTOName", buildingDTO);
-		List<ClassroomDTO> classroomDTOs = List.of(classroomDTO);
+		mockMvc.perform(MockMvcRequestBuilders.post("/classes/update/{id}", scheduledClassId).with(csrf())
+				.flashAttr("scheduledClassDTO", scheduledClassDTO)).andExpect(status().is3xxRedirection());
 
-		when(courseService.findByIdAsDTO(courseDTO.getId())).thenReturn(courseDTO);
-		when(teacherService.findByIdAsDTO(teacherDTO.getId())).thenReturn(teacherDTO);
-		when(groupService.findByIdAsDTO(groupDTO.getId())).thenReturn(groupDTO);
-		when(classTimeService.findByIdAsDTO(classTimeDTO.getId())).thenReturn(classTimeDTO);
-		when(classTypeService.findByIdAsDTO(classTypeDTO.getId())).thenReturn(classTypeDTO);
-		when(classroomService.findByIdAsDTO(classroomDTO.getId())).thenReturn(classroomDTO);
+		verify(scheduledClassService, times(1)).save(any(ScheduledClassDTO.class));
+		verifyNoMoreInteractions(scheduledClassService);
+	}
 
-		// Create a list of ScheduledClassDTOs for testing
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = EDIT_CLASSES)
+	public void update_whenScheduledClassServiceThrowsServiceException_thenProcessError() throws Exception {
 		ScheduledClassDTO scheduledClassDTO =
-				ScheduledClassDTO.builder().id(scheduledClassId).courseDTO(courseDTO).teacherDTO(teacherDTO)
-						.groupDTOS(groupDTOS).date(localDate).classTimeDTO(classTimeDTO).classTypeDTO(classTypeDTO)
-						.classroomDTO(classroomDTO).build();
+				getValidScheduledClassDTO(); // Assuming you have a method to generate a valid ScheduledClassDTO
+		Long scheduledClassId = scheduledClassDTO.getId();
+		String exceptionMessage = "Service Exception";
+
+		when(scheduledClassService.save(any(ScheduledClassDTO.class))).thenThrow(
+				new ServiceException(exceptionMessage));
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/classes/update/{id}", scheduledClassId).with(csrf())
+						.flashAttr("scheduledClassDTO", scheduledClassDTO)).andExpect(status().isOk())
+				.andExpect(view().name("error")).andExpect(model().attribute("exceptionMessage", exceptionMessage));
+
+		verify(scheduledClassService, times(1)).save(any(ScheduledClassDTO.class));
+		verify(scheduledClassService, times(0)).findByIdAsDTO(any());
+	}
+
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = INSERT_CLASSES)
+	public void getInsertForm_happyPath() throws Exception {
+		mockMvc.perform(MockMvcRequestBuilders.get("/classes/insert")).andExpect(status().is2xxSuccessful())
+				.andExpect(view().name("classesInsertForm")).andExpect(
+						model().attributeExists("courseDTOList", "teacherDTOList", "classroomDTOList", "classTimeDTOList",
+								"classTypeDTOList", "groupDTOList"));
+	}
+
+	@Test
+	@WithMockUser(username = USERNAME)
+	public void getInsertFrom_whenAccessDenied_processError() throws Exception {
+		mockMvc.perform(get("/classes/insert")).andExpect(status().is2xxSuccessful())
+				.andExpect(model().attributeExists("exceptionMessage")).andExpect(view().name("error"));
+	}
+
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = INSERT_CLASSES)
+	public void insert_whenValidScheduledClass_thenRedirectSuccess() throws Exception {
+		ScheduledClassDTO scheduledClassDTO = getValidScheduledClassDTO();
+
+		when(scheduledClassService.save(scheduledClassDTO)).thenReturn(1L);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/classes/insert").with(csrf())
+						.flashAttr("scheduledClassDTO", scheduledClassDTO)).andExpect(status().is3xxRedirection())
+				.andExpect(redirectedUrl("/classes"));
+
+		verify(scheduledClassService, times(1)).save(scheduledClassDTO);
+		verifyNoMoreInteractions(scheduledClassService);
+	}
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = INSERT_CLASSES)
+	public void insert_whenNotValidScheduledClassDTOByNullField_thenProcessForm() throws Exception {
+		Long classId = 1L;
+		ScheduledClassDTO scheduledClassDTO = getValidScheduledClassDTO();
+		scheduledClassDTO.setClassroomDTO(null);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/classes/insert", classId).with(csrf())
+						.flashAttr("scheduledClassDTO", scheduledClassDTO)).andExpect(status().is2xxSuccessful())
+				.andExpect(view().name("classesInsertForm"));
+
+		verify(scheduledClassService, times(0)).save((ScheduledClassDTO) any());
+	}
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = VIEW_SCHEDULE)
+	public void getSchedule_happyPath() throws Exception {
+		Long scheduledClassId = 1L;
+		List<ScheduledClassDTO> scheduledClassDTOS = getValidScheduledClassDTOList();
+
+		ScheduleFilterItem scheduleFilterItem = ScheduleFilterItem.builder().email(USERNAME).build();
+
+		when(scheduledClassService.findAllAsDTOByScheduleFilterItem(scheduleFilterItem)).thenReturn(scheduledClassDTOS);
+
+		try (MockedStatic<DateUtils> utilities = Mockito.mockStatic(DateUtils.class)) {
+			utilities.when(() -> DateUtils.getDatesBetween(any(), any()))
+					.thenReturn(List.of(LocalDate.of(2023, 5, 1), LocalDate.of(2023, 5, 2)));
+
+			mockMvc.perform(MockMvcRequestBuilders.get("/schedule", scheduledClassId))
+					.andExpect(model().attribute("scheduledClassDTOS", scheduledClassDTOS))
+					.andExpect(status().is2xxSuccessful()).andExpect(view().name("schedule"));
+
+		}
+
+		verify(scheduledClassService, times(1)).findAllAsDTOByScheduleFilterItem(scheduleFilterItem);
+	}
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = VIEW_SCHEDULE)
+	public void getScheduleFiltered_happyPath() throws Exception {
+		Long scheduledClassId = 1L;
+		List<ScheduledClassDTO> scheduledClassDTOS = getValidScheduledClassDTOList();
+
+		ScheduleFilterItem scheduleFilterItem =
+				ScheduleFilterItem.builder().email(USERNAME).startDate(LocalDate.of(2023, 5, 5))
+						.endDate(LocalDate.of(2023, 5, 10)).build();
+
+		when(scheduledClassService.findAllAsDTOByScheduleFilterItem(scheduleFilterItem)).thenReturn(scheduledClassDTOS);
+
+		mockMvc.perform(MockMvcRequestBuilders.post("/schedule", scheduledClassId)
+						.flashAttr("scheduleFilterItem", scheduleFilterItem)).andExpect(status().is2xxSuccessful())
+				.andExpect(view().name("schedule"))
+				.andExpect(model().attribute("scheduledClassDTOS", scheduledClassDTOS))
+				.andExpect(model().attribute("filtered", true));
+
+		verify(scheduledClassService, times(1)).findAllAsDTOByScheduleFilterItem(scheduleFilterItem);
+	}
+
+	@Test
+	@WithMockUser(username = USERNAME, authorities = INSERT_CLASSES)
+	public void insert_whenScheduledClassServiceThrowsValidationException_thenProcessForm() throws Exception {
+		ScheduledClassDTO scheduledClassDTO = getValidScheduledClassDTO();
 
 		ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
-		when(scheduledClassService.save((ScheduledClassDTO) any())).thenThrow(validationException);
-		when(scheduledClassService.findByIdAsDTO(scheduledClassId)).thenReturn(scheduledClassDTO);
+		when(scheduledClassService.save(scheduledClassDTO)).thenThrow(validationException);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/classes/update/{id}", scheduledClassId).with(csrf())
+		mockMvc.perform(MockMvcRequestBuilders.post("/classes/insert").with(csrf())
 				.flashAttr("scheduledClassDTO", scheduledClassDTO)).andExpect(status().is3xxRedirection());
-
-		verify(scheduledClassService, times(1)).save(scheduledClassDTO);
 	}
 
 	@Test
-	@WithMockUser(username = "username", authorities = {"EDIT_CLASSES"})
-	public void update_whenScheduledClassServiceThrowServiceException_thenProcessForm() throws Exception {
-		Long scheduledClassId = 1L;
+	@WithMockUser(username = USERNAME, authorities = INSERT_CLASSES)
+	public void insert_whenScheduledClassServiceThrowsServiceException_thenProcessError() throws Exception {
+		ScheduledClassDTO scheduledClassDTO = getValidScheduledClassDTO();
 
-		CourseDTO courseDTO = new CourseDTO(1L, "CourseDTOName");
-		List<CourseDTO> courseDTOS = List.of(courseDTO);
+		String exceptionMessage = "Service Exception";
 
-		RoleDTO roleDTO = new RoleDTO(1L, "roleDTOName");
-		TeacherDTO teacherDTO =
-				new TeacherDTO(1L, "teacher@email.com", "teacherFirstName", "teacherLastName", roleDTO, true,
-						courseDTOS);
-		List<TeacherDTO> teacherDTOS = List.of(teacherDTO);
+		when(scheduledClassService.save(scheduledClassDTO)).thenThrow(new ServiceException(exceptionMessage));
 
-		DisciplineDTO disciplineDTO = new DisciplineDTO(1L, "disciplineDTOName");
-		GroupDTO groupDTO = new GroupDTO(1L, "groupDTOName", disciplineDTO, courseDTOS);
-		List<GroupDTO> groupDTOS = List.of(groupDTO);
-
-		LocalDate localDate = LocalDate.of(2000, 1, 1);
-
-		ClassTimeDTO classTimeDTO = new ClassTimeDTO(1L, 1, LocalTime.of(8, 30), 95);
-		List<ClassTimeDTO> classTimeDTOs = List.of(classTimeDTO);
-
-		ClassTypeDTO classTypeDTO = new ClassTypeDTO(1L, "classTypeDTO");
-		List<ClassTypeDTO> classTypeDTOs = List.of(classTypeDTO);
-
-		BuildingDTO buildingDTO = new BuildingDTO(1L, "buildingDTOName", "buildingDTOAddress");
-		ClassroomDTO classroomDTO = new ClassroomDTO(1L, "classroomDTOName", buildingDTO);
-		List<ClassroomDTO> classroomDTOs = List.of(classroomDTO);
-
-		when(courseService.findByIdAsDTO(courseDTO.getId())).thenReturn(courseDTO);
-		when(teacherService.findByIdAsDTO(teacherDTO.getId())).thenReturn(teacherDTO);
-		when(groupService.findByIdAsDTO(groupDTO.getId())).thenReturn(groupDTO);
-		when(classTimeService.findByIdAsDTO(classTimeDTO.getId())).thenReturn(classTimeDTO);
-		when(classTypeService.findByIdAsDTO(classTypeDTO.getId())).thenReturn(classTypeDTO);
-		when(classroomService.findByIdAsDTO(classroomDTO.getId())).thenReturn(classroomDTO);
-
-		// Create a list of ScheduledClassDTOs for testing
-		ScheduledClassDTO scheduledClassDTO =
-				ScheduledClassDTO.builder().id(scheduledClassId).courseDTO(courseDTO).teacherDTO(teacherDTO)
-						.groupDTOS(groupDTOS).date(localDate).classTimeDTO(classTimeDTO).classTypeDTO(classTypeDTO)
-						.classroomDTO(classroomDTO).build();
-
-		ServiceException serviceException = new ServiceException("testException");
-
-		when(scheduledClassService.save((ScheduledClassDTO) any())).thenThrow(serviceException);
-		when(scheduledClassService.findByIdAsDTO(scheduledClassId)).thenReturn(scheduledClassDTO);
-
-		mockMvc.perform(MockMvcRequestBuilders.post("/classes/update/{id}", scheduledClassId).with(csrf())
-				.flashAttr("scheduledClassDTO", scheduledClassDTO)).andExpect(status().is3xxRedirection());
-
-		verify(scheduledClassService, times(1)).save(scheduledClassDTO);
-
+		mockMvc.perform(MockMvcRequestBuilders.post("/classes/insert").with(csrf())
+						.flashAttr("scheduledClassDTO", scheduledClassDTO)).andExpect(status().isOk())
+				.andExpect(model().attribute("exceptionMessage", exceptionMessage));
 	}
-}
 
+}

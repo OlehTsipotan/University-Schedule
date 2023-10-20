@@ -74,7 +74,8 @@ public class ScheduleEntityValidatorTest {
         dayScheduleItemList.add(dayScheduleItem1);
         dayScheduleItemList.add(dayScheduleItem2);
 
-        assertThrows(ScheduleGenerationException.class, () -> scheduleValidator.validate(LocalDate.of(2000, 5, 1), LocalDate.of(2000, 5, 10), dayScheduleItemList));
+        assertThrows(ScheduleGenerationException.class, () -> scheduleValidator.validate(LocalDate.of(2000, 5, 1), LocalDate.of(2000, 5, 10),
+		        dayScheduleItemList));
     }
 
     @ParameterizedTest
@@ -126,8 +127,7 @@ public class ScheduleEntityValidatorTest {
 
         assertDoesNotThrow(() -> scheduleValidator.validate(
                 LocalDate.of(2000, 5, 1),
-                LocalDate.of(2000, 5, 10),
-                dayScheduleItemList));
+                LocalDate.of(2000, 5, 10), dayScheduleItemList));
     }
 
     @ParameterizedTest
@@ -177,7 +177,8 @@ public class ScheduleEntityValidatorTest {
         dayScheduleItemList.add(dayScheduleItem1);
         dayScheduleItemList.add(dayScheduleItem2);
 
-        assertThrows(ScheduleGenerationDateException.class, () -> scheduleValidator.validate(LocalDate.of(2000, 6, 1), LocalDate.of(2000, 5, 1), dayScheduleItemList));
+        assertThrows(ScheduleGenerationDateException.class, () -> scheduleValidator.validate(LocalDate.of(2000, 6, 1), LocalDate.of(2000, 5, 1),
+		        dayScheduleItemList));
     }
 
     @ParameterizedTest
@@ -231,8 +232,7 @@ public class ScheduleEntityValidatorTest {
         assertThrows(ScheduleGenerationException.class,
                 () -> scheduleValidator.validate(
                         LocalDate.of(2000, 5, 1),
-                        LocalDate.of(2000, 5, 10),
-                        dayScheduleItemList));
+                        LocalDate.of(2000, 5, 10), dayScheduleItemList));
 
     }
 

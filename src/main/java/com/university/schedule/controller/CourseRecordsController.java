@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -31,9 +33,9 @@ public class CourseRecordsController {
 	@GetMapping("/courses")
 	public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
 	                     @RequestParam(defaultValue = "0") int offset,
-	                     @RequestParam(defaultValue = "id,asc") String[] sort) {
+	                     @RequestParam(defaultValue = "id,asc") String[] sort, Principal principal) {
 		Pageable pageable = PaginationSortingUtility.getPageable(limit, offset, sort);
-		List<CourseDTO> courseDTOList = courseService.findAllAsDTO(pageable);
+		List<CourseDTO> courseDTOList = courseService.findAllAsDTO(principal.getName(), pageable);
 
 		model.addAttribute("entities", courseDTOList);
 		model.addAttribute("currentLimit", limit);
@@ -44,6 +46,7 @@ public class CourseRecordsController {
 
 		return "courses";
 	}
+
 
 	@Secured("EDIT_COURSES")
 	@GetMapping("/courses/delete/{id}")

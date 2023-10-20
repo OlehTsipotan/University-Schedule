@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.security.Principal;
 import java.util.List;
 
 @Controller
@@ -37,9 +38,9 @@ public class StudentRecordsController {
 	@GetMapping("/students")
 	public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
 	                     @RequestParam(defaultValue = "0") int offset,
-	                     @RequestParam(defaultValue = "id,asc") String[] sort) {
+	                     @RequestParam(defaultValue = "id,asc") String[] sort, Principal principal) {
 		Pageable pageable = PaginationSortingUtility.getPageable(limit, offset, sort);
-		List<StudentDTO> studentDTOList = studentService.findAllAsDTO(pageable);
+		List<StudentDTO> studentDTOList = studentService.findAllAsDTO(principal.getName(), pageable);
 
 		model.addAttribute("entities", studentDTOList);
 		model.addAttribute("currentLimit", limit);

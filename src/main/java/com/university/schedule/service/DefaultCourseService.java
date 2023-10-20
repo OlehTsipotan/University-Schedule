@@ -7,8 +7,10 @@ import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Course;
 import com.university.schedule.model.Group;
 import com.university.schedule.model.Teacher;
+import com.university.schedule.model.User;
 import com.university.schedule.repository.CourseRepository;
 import com.university.schedule.validation.CourseEntityValidator;
+import com.university.schedule.visitor.UserPageableCourseVisitor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -29,6 +31,10 @@ public class DefaultCourseService implements CourseService {
 	private final ConverterService converterService;
 
 	private final CourseEntityValidator courseEntityValidator;
+
+	private final UserPageableCourseVisitor userPageableCourseVisitor;
+
+	private final UserService userService;
 
 	@Override
 	@Transactional
@@ -99,6 +105,16 @@ public class DefaultCourseService implements CourseService {
 		log.debug("Retrieved All {} Courses", courseDTOList.size());
 		return courseDTOList;
 	}
+
+	@Override
+	public List<CourseDTO> findAllAsDTO(String email, Pageable pageable) {
+		User user = userService.findByEmail(email);
+		List<Course> coursePage = execute(() -> user.accept(userPageableCourseVisitor, pageable));
+		List<CourseDTO> courseDTOS = coursePage.stream().map(this::convertToDTO).toList();
+		log.debug("Retrieved All {} Courses", courseDTOS.size());
+		return courseDTOS;
+	}
+
 
 	@Override
 	public List<Course> findByTeacher(Teacher teacher) {

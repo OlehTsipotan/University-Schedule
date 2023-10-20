@@ -1,6 +1,7 @@
 package com.university.schedule.service;
 
 import com.university.schedule.converter.ConverterService;
+import com.university.schedule.dto.ScheduleFilterItem;
 import com.university.schedule.dto.ScheduledClassDTO;
 import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
@@ -25,17 +26,7 @@ public class DefaultScheduledClassService implements ScheduledClassService {
 
 	private final ScheduledClassRepository scheduledClassRepository;
 
-	private final CourseService courseService;
-
-	private final ClassTimeService classTimeService;
-
-	private final ClassTypeService classTypeService;
-
-	private final TeacherService teacherService;
-
-	private final GroupService groupService;
-
-	private final ClassroomService classroomService;
+	private final ScheduleFilterItemService scheduleFilterItemService;
 
 	private final ConverterService converterService;
 
@@ -93,6 +84,27 @@ public class DefaultScheduledClassService implements ScheduledClassService {
 		log.debug("Retrieved All {} ScheduledClasses", scheduledClassDTOList.size());
 		return scheduledClassDTOList;
 	}
+
+	@Override
+	public List<ScheduledClassDTO> findAllAsDTOByScheduleFilterItem(ScheduleFilterItem scheduleFilterItem) {
+		scheduleFilterItemService.processRawItem(scheduleFilterItem);
+		List<ScheduledClassDTO> scheduledClassDTOList;
+		if (scheduleFilterItem.getGroupIdList() == null) {
+			scheduledClassDTOList =
+					execute(() -> scheduledClassRepository.findAllFiltered(scheduleFilterItem.getStartDate(),
+							scheduleFilterItem.getEndDate(), scheduleFilterItem.getClassTypeId(),
+							scheduleFilterItem.getTeacherId())).stream().map(this::convertToDTO).toList();
+		} else {
+			scheduledClassDTOList =
+					execute(() -> scheduledClassRepository.findAllFiltered(scheduleFilterItem.getStartDate(),
+							scheduleFilterItem.getEndDate(), scheduleFilterItem.getClassTypeId(),
+							scheduleFilterItem.getTeacherId(), scheduleFilterItem.getGroupIdList())).stream()
+							.map(this::convertToDTO).toList();
+		}
+		log.debug("Retrieved All {} ScheduledClasses", scheduledClassDTOList.size());
+		return scheduledClassDTOList;
+	}
+
 
 	@Override
 	public List<ScheduledClassDTO> findAllAsDTO(Pageable pageable) {

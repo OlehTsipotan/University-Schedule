@@ -88,7 +88,7 @@ public class AuthorityRepositoryTest {
     @CsvSource(value = {"AuthorityName"}, delimiter = ':')
     public void findById_success(String name) {
         Authority authorityToSave = new Authority(name);
-        authorityRepository.save(authorityToSave);
+        entityManager.persist(authorityToSave);
 
         Authority authorityFromDb = authorityRepository.findById(authorityToSave.getId()).get();
         assertEquals(authorityToSave, authorityFromDb);
@@ -98,7 +98,7 @@ public class AuthorityRepositoryTest {
     @CsvSource(value = {"AuthorityName"}, delimiter = ':')
     public void findByName_success(String authorityName) {
         Authority authorityToSave = new Authority(authorityName);
-        authorityRepository.save(authorityToSave);
+        entityManager.persist(authorityToSave);
 
         Authority authorityFromDb = authorityRepository.findByName(authorityName).get();
         assertEquals(authorityToSave, authorityFromDb);

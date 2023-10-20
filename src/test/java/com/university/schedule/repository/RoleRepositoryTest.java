@@ -5,7 +5,6 @@ import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Role;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +17,13 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 @Testcontainers
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class DisciplineRepositoryTest {
+public class RoleRepositoryTest {
 
     private static String DATABASE_NAME = "databaseName";
     private static String DATABASE_USERNAME = "databaseName";
@@ -39,7 +35,7 @@ public class DisciplineRepositoryTest {
             .withPassword(DATABASE_USER_PASSWORD);
 
     @Autowired
-    DisciplineRepository disciplineRepository;
+    RoleRepository roleRepository;
     @Autowired
     TestEntityManager entityManager;
 
@@ -60,46 +56,44 @@ public class DisciplineRepositoryTest {
         flyway.migrate();
     }
 
+
     @ParameterizedTest
-    @CsvSource(value = {"DisciplineName"}, delimiter = ':')
+    @CsvSource(value = {"ROLE_ADMIN"})
     public void save_success(String name) {
-        Discipline disciplineToSave = new Discipline(name);
-        disciplineRepository.save(disciplineToSave);
-
-        Authority authorityFromDb = entityManager.find(Authority.class, disciplineToSave.getId());
-        assertEquals(disciplineToSave, authorityFromDb);
+        Role role = new Role();
+        role.setName(name);
+        roleRepository.save(role);
+        assertEquals(role, roleRepository.findByName(name).get());
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"DisciplineName"}, delimiter = ':')
+    @CsvSource(value = {"ROLE_ADMIN"})
     public void findById_success(String name) {
-        Discipline disciplineToSave = new Discipline(name);
-        entityManager.persist(disciplineToSave);
+        Role roleToSave = new Role(name);
+        entityManager.persist(roleToSave);
 
-        Discipline disciplineFromDb = disciplineRepository.findById(disciplineToSave.getId()).get();
-        assertEquals(disciplineToSave, disciplineFromDb);
+        Role roleFromDb = roleRepository.findById(roleToSave.getId()).get();
+        assertEquals(roleToSave, roleFromDb);
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"DisciplineName"}, delimiter = ':')
+    @CsvSource(value = {"ROLE_ADMIN"})
     public void findByName_success(String name) {
-        Discipline disciplineToSave = new Discipline(name);
-        entityManager.persist(disciplineToSave);
+        Role roleToSave = new Role(name);
+        entityManager.persist(roleToSave);
 
-        Discipline disciplineFromDb = disciplineRepository.findByName(name).get();
-        assertEquals(disciplineToSave, disciplineFromDb);
+        Role roleFromDb = roleRepository.findByName(name).get();
+        assertEquals(roleToSave, roleFromDb);
     }
-
 
     @ParameterizedTest
-    @CsvSource(value = {"DisciplineName"}, delimiter = ':')
+    @CsvSource(value = {"ROLE_ADMIN"})
     public void delete_success(String name) {
-        Discipline disciplineToSave = new Discipline(name);
-        entityManager.persist(disciplineToSave);
+        Role roleToSave = new Role(name);
+        entityManager.persist(roleToSave);
 
-        disciplineRepository.delete(disciplineToSave);
+        roleRepository.delete(roleToSave);
 
-        assertNull(entityManager.find(Discipline.class, disciplineToSave.getId()));
+        assertNull(entityManager.find(Discipline.class, roleToSave.getId()));
     }
-
 }

@@ -39,6 +39,11 @@ public class Authority {
 		this.name = name;
 	}
 
+    public Authority(String name, Set<Role> roles){
+        this.name = name;
+        this.roles = roles;
+    }
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

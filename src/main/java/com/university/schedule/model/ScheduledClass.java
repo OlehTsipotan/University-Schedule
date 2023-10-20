@@ -72,7 +72,8 @@ public class ScheduledClass {
 		this.groups = groups;
 	}
 
-	public ScheduledClass(Course course, Teacher teacher, ClassTime classTime, LocalDate date, ClassType classType,
+	public ScheduledClass(Course course, Teacher teacher, Classroom classroom, ClassTime classTime, LocalDate date,
+                          ClassType classType,
 	                      Set<Group> groups) {
 		this.course = course;
 		this.teacher = teacher;
@@ -80,6 +81,7 @@ public class ScheduledClass {
 		this.date = date;
 		this.classType = classType;
 		this.groups = groups;
+        this.classroom = classroom;
 	}
 
 	@Override

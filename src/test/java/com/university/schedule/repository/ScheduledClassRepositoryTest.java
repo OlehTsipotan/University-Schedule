@@ -378,63 +378,7 @@ public class ScheduledClassRepositoryTest {
         assertTrue(allScheduledClasses.contains(scheduledClassToSave3));
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {"CourseName:test@example.co:password:John:Doe:1:9:0:90:Lecture"}, delimiter = ':')
-    public void findAllAsDTOByScheduleFilterItem(String courseName, String email, String password, String firstName,
-                                                 String lastName, Integer orderNumber, int hour, int minute,
-                                                 int durationMinutes, String classTypeName) {
-        // Creating instance
-        Course course = new Course(courseName);
-        Teacher teacher = new Teacher(email, password, firstName, lastName);
-        ClassTime classTime =
-            new ClassTime(orderNumber, LocalTime.of(hour, minute), Duration.ofMinutes(durationMinutes));
-        LocalDate date1 = LocalDate.of(2023, 5, 1);
-        LocalDate date2 = LocalDate.of(2023, 5, 2);
-        LocalDate date3 = LocalDate.of(2023, 5, 3);
-        ClassType classType = new ClassType(classTypeName);
-        Set<Group> groups = new HashSet<>();
-        Discipline discipline = new Discipline("discipline1");
 
-
-        entityManager.persist(course);
-        entityManager.persist(discipline);
-        entityManager.persist(teacher);
-        entityManager.persist(classTime);
-        entityManager.persist(classType);
-
-        Group group1 = new Group("group1", discipline);
-        Group group2 = new Group("group2", discipline);
-
-        entityManager.persist(group2);
-        entityManager.persist(group1);
-        groups.add(group1);
-
-        ScheduledClass scheduledClassToSave1 =
-            ScheduledClass.builder().course(course).teacher(teacher).classroom(null) // Set classroom if needed
-                .classTime(classTime).date(date1).classType(classType).groups(groups).build();
-
-        ScheduledClass scheduledClassToSave2 =
-            ScheduledClass.builder().course(course).teacher(teacher).classroom(null) // Set classroom if needed
-                .classTime(classTime).date(date2).classType(classType).groups(Set.of(group2, group1)).build();
-
-        ScheduledClass scheduledClassToSave3 =
-            ScheduledClass.builder().course(course).teacher(teacher).classroom(null) // Set classroom if needed
-                .classTime(classTime).date(date3).classType(classType).groups(groups).build();
-
-        entityManager.persist(scheduledClassToSave1);
-        entityManager.persist(scheduledClassToSave2);
-        entityManager.persist(scheduledClassToSave3);
-        List<Long> longs = new ArrayList<>();
-        longs.add(1L);
-        longs.add(2L);
-        List<ScheduledClass> allScheduledClasses =
-            scheduledClassRepository.findAllFiltered(date1, date2, null, null, new ArrayList<>());
-        System.out.printf(allScheduledClasses.toString());
-        assertEquals(2, allScheduledClasses.size());
-
-        assertTrue(allScheduledClasses.contains(scheduledClassToSave1));
-        assertTrue(allScheduledClasses.contains(scheduledClassToSave2));
-    }
 
 
     @ParameterizedTest

@@ -1,4 +1,4 @@
-package com.university.schedule.validation;
+package com.university.schedule.service;
 
 import lombok.RequiredArgsConstructor;
 import org.flywaydb.core.Flyway;

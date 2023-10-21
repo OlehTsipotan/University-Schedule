@@ -17,7 +17,7 @@ public class DataSchemaService {
 	}
 
 	@Autowired
-	private void setFlyway(Flyway flyway){
+	public void setFlyway(Flyway flyway){
 		this.flyway = flyway;
 	}
 

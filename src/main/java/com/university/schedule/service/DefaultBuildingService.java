@@ -51,16 +51,12 @@ public class DefaultBuildingService implements BuildingService {
 		return building.getId();
 	}
 
-	private Building findById(Long id) {
-		Building building = execute(() -> buildingRepository.findById(id)).orElseThrow(
-				() -> new ServiceException("Building not found"));
-		log.debug("Retrieved {}", building);
-		return building;
-	}
-
 	@Override
 	public BuildingDTO findByIdAsDTO(Long id) {
-		return convertToDTO(this.findById(id));
+        Building building = execute(() -> buildingRepository.findById(id)).orElseThrow(
+            () -> new ServiceException("Building not found"));
+        log.debug("Retrieved {}", building);
+        return convertToDTO(building);
 	}
 
 	@Override
@@ -73,7 +69,7 @@ public class DefaultBuildingService implements BuildingService {
 
 	@Override
 	public BuildingDTO findByAddressAsDTO(String address) {
-		Building building = execute(() -> buildingRepository.findByName(address)).orElseThrow(
+		Building building = execute(() -> buildingRepository.findByAddress(address)).orElseThrow(
 				() -> new ServiceException("Building not found"));
 		log.debug("Retrieved {}", building);
 		return convertToDTO(building);
@@ -96,6 +92,9 @@ public class DefaultBuildingService implements BuildingService {
 
 	@Override
 	public List<BuildingDTO> findAllAsDTO(Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable is null");
+        }
 		List<BuildingDTO> buildingDTOList =
 				execute(() -> buildingRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
 		log.debug("Retrieved All {} Buildings", buildingDTOList.size());
@@ -105,11 +104,9 @@ public class DefaultBuildingService implements BuildingService {
 	@Override
 	@Transactional
 	public void deleteById(Long id) {
-		try {
-			findById(id);
-		} catch (ServiceException e) {
-			throw new DeletionFailedException("There is no Building to delete with id = " + id);
-		}
+        if (!buildingRepository.existsById(id)) {
+            throw new DeletionFailedException("There is no Building to delete with id = " + id);
+        }
 		execute(() -> buildingRepository.deleteById(id));
 		log.info("Deleted id = {}", id);
 	}

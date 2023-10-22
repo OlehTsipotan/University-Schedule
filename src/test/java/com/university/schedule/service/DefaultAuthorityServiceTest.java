@@ -69,7 +69,7 @@ public class DefaultAuthorityServiceTest {
     }
 
     @Test
-    public void save_whenAuthorityIsNotValid_throwIllegalArgumentException() {
+    public void save_whenAuthorityIsNotValid_throwValidationException() {
         Authority authority = Authority.builder().id(1L).name("name").build();
         doThrow(ValidationException.class).when(authorityEntityValidator).validate(authority);
         assertThrows(ValidationException.class, () -> defaultAuthorityService.save(authority));

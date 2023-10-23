@@ -9,19 +9,17 @@ import java.util.List;
 
 public interface ClassroomService {
 
-	Long save(Classroom classroom);
+    Long save(Classroom classroom);
 
-	Long save(ClassroomDTO classroomDTO);
+    Long save(ClassroomDTO classroomDTO);
 
-	ClassroomDTO findByIdAsDTO(Long id);
+    ClassroomDTO findByIdAsDTO(Long id);
 
-	Classroom findByNameAndBuilding(String name, Building building);
+    List<Classroom> findByBuilding(Building building);
 
-	List<Classroom> findByBuilding(Building building);
+    List<ClassroomDTO> findAllAsDTO();
 
-	List<ClassroomDTO> findAllAsDTO();
+    List<ClassroomDTO> findAllAsDTO(Pageable pageable);
 
-	List<ClassroomDTO> findAllAsDTO(Pageable pageable);
-
-	void deleteById(Long id);
+    void deleteById(Long id);
 }

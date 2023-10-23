@@ -101,9 +101,12 @@ public class DefaultAuthorityService implements AuthorityService {
     @Override
     @Transactional
     public void deleteById(Long id) {
-        if (!authorityRepository.existsById(id)) {
-            throw new DeletionFailedException("There is no Authority to delete with id = " + id);
-        }
+        execute(() -> {
+            if (!authorityRepository.existsById(id)) {
+                throw new DeletionFailedException("There is no Authority to delete with id = " + id);
+            }
+            authorityRepository.deleteById(id);
+        });
         execute(() -> authorityRepository.deleteById(id));
         log.info("Deleted id = {}", id);
 

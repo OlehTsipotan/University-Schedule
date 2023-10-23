@@ -104,9 +104,12 @@ public class DefaultBuildingService implements BuildingService {
 	@Override
 	@Transactional
 	public void deleteById(Long id) {
-        if (!buildingRepository.existsById(id)) {
-            throw new DeletionFailedException("There is no Building to delete with id = " + id);
-        }
+        execute(() -> {
+            if (!buildingRepository.existsById(id)) {
+                throw new DeletionFailedException("There is no Building to delete with id = " + id);
+            }
+            buildingRepository.deleteById(id);
+        });
 		execute(() -> buildingRepository.deleteById(id));
 		log.info("Deleted id = {}", id);
 	}

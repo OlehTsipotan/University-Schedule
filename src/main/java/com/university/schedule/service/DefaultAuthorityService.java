@@ -107,7 +107,6 @@ public class DefaultAuthorityService implements AuthorityService {
             }
             authorityRepository.deleteById(id);
         });
-        execute(() -> authorityRepository.deleteById(id));
         log.info("Deleted id = {}", id);
 
     }

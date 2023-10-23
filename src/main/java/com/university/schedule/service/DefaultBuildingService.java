@@ -110,7 +110,6 @@ public class DefaultBuildingService implements BuildingService {
             }
             buildingRepository.deleteById(id);
         });
-		execute(() -> buildingRepository.deleteById(id));
 		log.info("Deleted id = {}", id);
 	}
 

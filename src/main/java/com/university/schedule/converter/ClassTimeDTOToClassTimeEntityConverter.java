@@ -19,7 +19,9 @@ public class ClassTimeDTOToClassTimeEntityConverter implements Converter<ClassTi
 		org.modelmapper.Converter<Integer, Duration> converter =
 				durationMinutes -> Duration.ofMinutes(durationMinutes.getSource());
 
-		modelMapper.typeMap(ClassTimeDTO.class, ClassTime.class).addMappings(modelMapper -> modelMapper.using(converter)
+        org.modelmapper.Condition<Integer, Duration> nonNull = ctx -> ctx.getSource() != null;
+
+		modelMapper.typeMap(ClassTimeDTO.class, ClassTime.class).addMappings(modelMapper -> modelMapper.when(nonNull).using(converter)
 				.map(ClassTimeDTO::getDurationMinutes, ClassTime::setDuration));
 	}
 

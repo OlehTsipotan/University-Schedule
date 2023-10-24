@@ -51,13 +51,6 @@ public class DefaultClassTimeService implements ClassTimeService {
 		return classTime.getId();
 	}
 
-	private ClassTime findById(Long id) {
-		ClassTime classTime = execute(() -> classTimeRepository.findById(id)).orElseThrow(
-				() -> new ServiceException("ClassTime not found"));
-		log.debug("Retrieved {}", classTime);
-		return classTime;
-	}
-
 	@Override
 	public ClassTimeDTO findByIdAsDTO(Long id) {
 		ClassTime classTime = execute(() -> classTimeRepository.findById(id)).orElseThrow(
@@ -74,14 +67,10 @@ public class DefaultClassTimeService implements ClassTimeService {
 		return classTime;
 	}
 
-	private List<ClassTime> findAll() {
-		List<ClassTime> classTimes = execute(() -> classTimeRepository.findAll());
-		log.debug("Retrieved All {} ClassTimes", classTimes.size());
-		return classTimes;
-	}
-
-
 	public List<ClassTimeDTO> findAllAsDTO(Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable is null");
+        }
 		List<ClassTimeDTO> classTimeDTOList =
 				execute(() -> classTimeRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
 		log.debug("Retrieved All {} ClassTimes", classTimeDTOList.size());
@@ -98,12 +87,12 @@ public class DefaultClassTimeService implements ClassTimeService {
 	@Override
 	@Transactional
 	public void deleteById(Long id) {
-		try {
-			this.findById(id);
-		} catch (ServiceException e) {
-			throw new DeletionFailedException("There is no ClassTime to delete with id = " + id);
-		}
-		execute(() -> classTimeRepository.deleteById(id));
+        execute(() -> {
+            if (!classTimeRepository.existsById(id)) {
+                throw new DeletionFailedException("There is no ClassTime to delete with id = " + id);
+            }
+            classTimeRepository.deleteById(id);
+        });
 		log.info("Deleted id = {}", id);
 	}
 

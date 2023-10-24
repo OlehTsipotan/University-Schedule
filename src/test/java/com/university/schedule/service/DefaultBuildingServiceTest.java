@@ -279,8 +279,6 @@ public class DefaultBuildingServiceTest {
 
     @Test
     public void deleteById_whenBuildingIsFound_success() {
-        Building building = Building.builder().id(1L).name("name").address("address").build();
-
         when(buildingRepository.existsById(1L)).thenReturn(true);
 
         assertDoesNotThrow(() -> defaultBuildingService.deleteById(1L));

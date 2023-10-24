@@ -22,120 +22,116 @@ import java.util.List;
 @Service
 public class DefaultClassTypeService implements ClassTypeService {
 
-	private final ClassTypeRepository classTypeRepository;
+    private final ClassTypeRepository classTypeRepository;
 
-	private final ConverterService converterService;
+    private final ConverterService converterService;
 
-	private final ClassTypeEntityValidator classTypeEntityValidator;
-
-
-	@Override
-	@Transactional
-	public Long save(ClassTypeDTO classTypeDTO) {
-		ClassType classType = convertToEntity(classTypeDTO);
-		execute(() -> {
-			classTypeEntityValidator.validate(classType);
-			classTypeRepository.save(classType);
-		});
-		log.info("saved {}", classType);
-		return classType.getId();
-	}
-
-	@Override
-	@Transactional
-	public Long save(ClassType classType) {
-		execute(() -> {
-			classTypeEntityValidator.validate(classType);
-			classTypeRepository.save(classType);
-		});
-		log.info("saved {}", classType);
-		return classType.getId();
-	}
-
-	@Override
-	public ClassTypeDTO findByIdAsDTO(Long id) {
-		ClassType classType = execute(() -> classTypeRepository.findById(id)).orElseThrow(
-				() -> new ServiceException("ClassType not found"));
-		log.debug("Retrieved {}", classType);
-		return convertToDTO(classType);
-	}
-
-	private ClassType findById(Long id) {
-		ClassType classType = execute(() -> classTypeRepository.findById(id)).orElseThrow(
-				() -> new ServiceException("ClassType not found"));
-		log.debug("Retrieved {}", classType);
-		return classType;
-	}
-
-	@Override
-	public ClassType findByName(String name) {
-		ClassType classType = execute(() -> classTypeRepository.findByName(name)).orElseThrow(
-				() -> new ServiceException("ClassType not found"));
-		log.debug("Retrieved {}", classType);
-		return classType;
-	}
-
-	@Override
-	public List<ClassTypeDTO> findAllAsDTO() {
-		List<ClassTypeDTO> classTypeDTOList =
-				execute(() -> classTypeRepository.findAll()).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} ClassTypes", classTypeDTOList.size());
-		return classTypeDTOList;
-	}
+    private final ClassTypeEntityValidator classTypeEntityValidator;
 
 
-	@Override
-	public List<ClassTypeDTO> findAllAsDTO(Pageable pageable) {
-		List<ClassTypeDTO> classTypeDTOList =
-				execute(() -> classTypeRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} ClassTypes", classTypeDTOList.size());
-		return classTypeDTOList;
-	}
+    @Override
+    @Transactional
+    public Long save(ClassTypeDTO classTypeDTO) {
+        ClassType classType = convertToEntity(classTypeDTO);
+        execute(() -> {
+            classTypeEntityValidator.validate(classType);
+            classTypeRepository.save(classType);
+        });
+        log.info("saved {}", classType);
+        return classType.getId();
+    }
 
-	@Override
-	@Transactional
-	public void deleteById(Long id) {
-		try {
-			findById(id);
-		} catch (ServiceException e) {
-			throw new DeletionFailedException("There is no ClassType to delete with id = " + id);
-		}
-		execute(() -> classTypeRepository.deleteById(id));
-		log.info("Deleted id = {}", id);
-	}
+    @Override
+    @Transactional
+    public Long save(ClassType classType) {
+        execute(() -> {
+            classTypeEntityValidator.validate(classType);
+            classTypeRepository.save(classType);
+        });
+        log.info("saved {}", classType);
+        return classType.getId();
+    }
+
+    @Override
+    public ClassTypeDTO findByIdAsDTO(Long id) {
+        ClassType classType = execute(() -> classTypeRepository.findById(id)).orElseThrow(
+            () -> new ServiceException("ClassType not found"));
+        log.debug("Retrieved {}", classType);
+        return convertToDTO(classType);
+    }
+
+    @Override
+    public ClassType findByName(String name) {
+        ClassType classType = execute(() -> classTypeRepository.findByName(name)).orElseThrow(
+            () -> new ServiceException("ClassType not found"));
+        log.debug("Retrieved {}", classType);
+        return classType;
+    }
+
+    @Override
+    public List<ClassTypeDTO> findAllAsDTO() {
+        List<ClassTypeDTO> classTypeDTOList =
+            execute(() -> classTypeRepository.findAll()).stream().map(this::convertToDTO).toList();
+        log.debug("Retrieved All {} ClassTypes", classTypeDTOList.size());
+        return classTypeDTOList;
+    }
 
 
-	private ClassTypeDTO convertToDTO(ClassType classType) {
-		return converterService.convert(classType, ClassTypeDTO.class);
-	}
+    @Override
+    public List<ClassTypeDTO> findAllAsDTO(Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable is null");
+        }
+        List<ClassTypeDTO> classTypeDTOList =
+            execute(() -> classTypeRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+        log.debug("Retrieved All {} ClassTypes", classTypeDTOList.size());
+        return classTypeDTOList;
+    }
 
-	private ClassType convertToEntity(ClassTypeDTO classTypeDTO) {
-		return converterService.convert(classTypeDTO, ClassType.class);
-	}
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        execute(() -> {
+            if (!classTypeRepository.existsById(id)) {
+                throw new DeletionFailedException("There is no ClassTime to delete with id = " + id);
+            }
+            classTypeRepository.deleteById(id);
+        });
+        log.info("Deleted id = {}", id);
+    }
 
-	private <T> T execute(DaoSupplier<T> supplier) {
-		try {
-			return supplier.get();
-		} catch (DataAccessException e) {
-			throw new ServiceException("DAO operation failed", e);
-		}
-	}
 
-	private void execute(DaoProcessor processor) {
-		try {
-			processor.process();
-		} catch (DataAccessException e) {
-			throw new ServiceException("DAO operation failed", e);
-		}
-	}
+    private ClassTypeDTO convertToDTO(ClassType classType) {
+        return converterService.convert(classType, ClassTypeDTO.class);
+    }
 
-	@FunctionalInterface
-	public interface DaoSupplier<T> {
-		T get();
-	}
+    private ClassType convertToEntity(ClassTypeDTO classTypeDTO) {
+        return converterService.convert(classTypeDTO, ClassType.class);
+    }
 
-	@FunctionalInterface
-	public interface DaoProcessor {
-		void process();
-	}
+    private <T> T execute(DaoSupplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (DataAccessException e) {
+            throw new ServiceException("DAO operation failed", e);
+        }
+    }
+
+    private void execute(DaoProcessor processor) {
+        try {
+            processor.process();
+        } catch (DataAccessException e) {
+            throw new ServiceException("DAO operation failed", e);
+        }
+    }
+
+    @FunctionalInterface
+    public interface DaoSupplier<T> {
+        T get();
+    }
+
+    @FunctionalInterface
+    public interface DaoProcessor {
+        void process();
+    }
 }

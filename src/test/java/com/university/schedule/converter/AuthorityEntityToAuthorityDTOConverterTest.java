@@ -20,7 +20,7 @@ public class AuthorityEntityToAuthorityDTOConverterTest {
     }
 
     @Test
-    public void convert_whenAuthorityDTOIsValid_success() {
+    public void convert_whenAuthorityIsValid_success() {
         AuthorityDTO authorityDTO = AuthorityDTO.builder().id(1L).name("name").build();
         Authority authority = Authority.builder().id(1L).name("name").build();
         assertEquals(authorityDTO, authorityEntityToAuthorityDTOConverter.convert(authority));

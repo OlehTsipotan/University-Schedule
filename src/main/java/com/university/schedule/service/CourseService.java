@@ -13,23 +13,17 @@ public interface CourseService {
 
 	Long save(CourseDTO courseDTO);
 
-	Course findById(Long id);
-
 	CourseDTO findByIdAsDTO(Long id);
 
 	List<Course> findByGroupsName(String groupName);
 
 	List<Course> findByGroup(Group group);
 
-	Course findByName(String name);
-
 	List<Course> findAll();
 
 	List<CourseDTO> findAllAsDTO();
 
 	List<Course> findByTeacher(Teacher teacher);
-
-	List<CourseDTO> findAllAsDTO(Pageable pageable);
 
 	List<CourseDTO> findAllAsDTO(String email, Pageable pageable);
 

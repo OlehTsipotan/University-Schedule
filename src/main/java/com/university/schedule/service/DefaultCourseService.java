@@ -60,27 +60,11 @@ public class DefaultCourseService implements CourseService {
 	}
 
 	@Override
-	public Course findById(Long id) {
-		Course course = execute(() -> courseRepository.findById(id)).orElseThrow(
-				() -> new ServiceException("Course not found"));
-		log.debug("Retrieved {}", course);
-		return course;
-	}
-
-	@Override
 	public CourseDTO findByIdAsDTO(Long id) {
 		Course course = execute(() -> courseRepository.findById(id)).orElseThrow(
 				() -> new ServiceException("Course not found"));
 		log.debug("Retrieved {}", course);
 		return convertToDTO(course);
-	}
-
-	@Override
-	public Course findByName(String name) {
-		Course course = execute(() -> courseRepository.findByName(name)).orElseThrow(
-				() -> new ServiceException("Course not found"));
-		log.debug("Retrieved {}", course);
-		return course;
 	}
 
 	@Override
@@ -99,15 +83,10 @@ public class DefaultCourseService implements CourseService {
 	}
 
 	@Override
-	public List<CourseDTO> findAllAsDTO(Pageable pageable) {
-		List<CourseDTO> courseDTOList =
-				execute(() -> courseRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Courses", courseDTOList.size());
-		return courseDTOList;
-	}
-
-	@Override
 	public List<CourseDTO> findAllAsDTO(String email, Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable is null");
+        }
 		User user = userService.findByEmail(email);
 		List<Course> coursePage = execute(() -> user.accept(userPageableCourseVisitor, pageable));
 		List<CourseDTO> courseDTOS = coursePage.stream().map(this::convertToDTO).toList();
@@ -134,12 +113,12 @@ public class DefaultCourseService implements CourseService {
 	@Override
 	@Transactional
 	public void deleteById(Long id) {
-		try {
-			findById(id);
-		} catch (ServiceException e) {
-			throw new DeletionFailedException("There is no Course to delete with id = " + id);
-		}
-		execute(() -> courseRepository.deleteById(id));
+        execute(() -> {
+            if (!courseRepository.existsById(id)) {
+                throw new DeletionFailedException("There is no ClassTime to delete with id = " + id);
+            }
+            courseRepository.deleteById(id);
+        });
 		log.info("Deleted id = {}", id);
 	}
 

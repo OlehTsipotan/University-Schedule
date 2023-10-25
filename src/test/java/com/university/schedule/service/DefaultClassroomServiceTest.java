@@ -3,6 +3,7 @@ package com.university.schedule.service;
 import com.university.schedule.converter.ConverterService;
 import com.university.schedule.dto.BuildingDTO;
 import com.university.schedule.dto.ClassroomDTO;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.model.Building;
@@ -222,9 +223,9 @@ public class DefaultClassroomServiceTest {
     }
 
     @Test
-    public void deleteById_whenClassroomIsNotFound_throwServiceException() {
+    public void deleteById_whenClassroomIsNotFound_throwDeletionFailedException() {
         when(classroomRepository.existsById(1L)).thenReturn(false);
-        assertThrows(ServiceException.class, () -> defaultClassroomService.deleteById(1L));
+        assertThrows(DeletionFailedException.class, () -> defaultClassroomService.deleteById(1L));
         verify(classroomRepository).existsById(1L);
     }
 

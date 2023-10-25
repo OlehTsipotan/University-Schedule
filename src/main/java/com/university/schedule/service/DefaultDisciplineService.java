@@ -90,7 +90,7 @@ public class DefaultDisciplineService implements DisciplineService {
     public void deleteById(Long id) {
         execute(() -> {
             if (!disciplineRepository.existsById(id)) {
-                throw new DeletionFailedException("There is no ClassTime to delete with id = " + id);
+                throw new DeletionFailedException("There is no Discipline to delete with id = " + id);
             }
             disciplineRepository.deleteById(id);
         });

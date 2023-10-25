@@ -270,7 +270,7 @@ public class DefaultClassTimeServiceTest {
     }
 
     @Test
-    public void deleteById_whenBuildingIsNotFound_throwServiceException() {
+    public void deleteById_whenBuildingIsNotFound_throwDeletionFailedException() {
         when(classTimeRepository.existsById(1L)).thenReturn(false);
 
         assertThrows(DeletionFailedException.class, () -> defaultClassTimeService.deleteById(1L));

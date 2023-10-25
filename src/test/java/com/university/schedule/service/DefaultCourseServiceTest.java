@@ -2,6 +2,7 @@ package com.university.schedule.service;
 
 import com.university.schedule.converter.ConverterService;
 import com.university.schedule.dto.CourseDTO;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.model.Course;
 import com.university.schedule.model.Group;
@@ -253,10 +254,10 @@ public class DefaultCourseServiceTest {
     }
 
     @Test
-    public void deleteById_whenCourseIsNotFound_throwServiceException() {
+    public void deleteById_whenCourseIsNotFound_throwDeletionFailedException() {
         Long id = 1L;
         when(courseRepository.existsById(id)).thenReturn(false);
-        assertThrows(ServiceException.class, () -> defaultCourseService.deleteById(id));
+        assertThrows(DeletionFailedException.class, () -> defaultCourseService.deleteById(id));
 
         verify(courseRepository).existsById(id);
         verifyNoMoreInteractions(courseRepository);

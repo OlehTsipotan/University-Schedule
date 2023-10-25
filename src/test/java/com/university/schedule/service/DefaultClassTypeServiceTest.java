@@ -259,7 +259,7 @@ public class DefaultClassTypeServiceTest {
     }
 
     @Test
-    public void deleteById_whenClassTypeIsNotFound_throwServiceException() {
+    public void deleteById_whenClassTypeIsNotFound_throwDeletionFailedException() {
         when(classTypeRepository.existsById(1L)).thenReturn(false);
 
         assertThrows(DeletionFailedException.class, () -> defaultClassTypeService.deleteById(1L));

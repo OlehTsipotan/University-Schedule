@@ -288,7 +288,7 @@ public class DefaultBuildingServiceTest {
     }
 
     @Test
-    public void deleteById_whenBuildingIsNotFound_throwServiceException() {
+    public void deleteById_whenBuildingIsNotFound_throwDeletionFailedException() {
         when(buildingRepository.existsById(1L)).thenReturn(false);
 
         assertThrows(DeletionFailedException.class, () -> defaultBuildingService.deleteById(1L));

@@ -2,6 +2,7 @@ package com.university.schedule.service;
 
 import com.university.schedule.converter.ConverterService;
 import com.university.schedule.dto.DisciplineDTO;
+import com.university.schedule.exception.DeletionFailedException;
 import com.university.schedule.exception.ServiceException;
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.model.Discipline;
@@ -223,7 +224,7 @@ public class DefaultDisciplineServiceTest {
     }
 
     @Test
-    public void delete_whenDisciplineRepositoryThrowsExceptionExtendsDataAccessException_throwServiceException() {
+    public void deleteById_whenDisciplineRepositoryThrowsExceptionExtendsDataAccessException_throwServiceException() {
         doThrow(BadJpqlGrammarException.class).when(disciplineRepository).existsById(anyLong());
 
         assertThrows(ServiceException.class, () -> defaultDisciplineService.deleteById(anyLong()));
@@ -232,17 +233,17 @@ public class DefaultDisciplineServiceTest {
     }
 
     @Test
-    public void delete_whenNoDisciplineFound_throwServiceException(){
+    public void deleteById_whenNoDisciplineFound_throwDeletionFailedException(){
         when(disciplineRepository.existsById(anyLong())).thenReturn(false);
 
-        assertThrows(ServiceException.class, () -> defaultDisciplineService.deleteById(anyLong()));
+        assertThrows(DeletionFailedException.class, () -> defaultDisciplineService.deleteById(anyLong()));
 
         verify(disciplineRepository).existsById(anyLong());
         verifyNoMoreInteractions(disciplineRepository);
     }
 
     @Test
-    public void delete_success(){
+    public void deleteById_success(){
         when(disciplineRepository.existsById(anyLong())).thenReturn(true);
         assertDoesNotThrow(() -> defaultDisciplineService.deleteById(1L));
 

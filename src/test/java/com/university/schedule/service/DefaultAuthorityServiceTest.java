@@ -289,7 +289,7 @@ public class DefaultAuthorityServiceTest {
     }
 
     @Test
-    public void deleteById_whenAuthorityDoNotExistByPassedId_throwDeletionFailedException() {
+    public void deleteById_whenAuthorityDoNotExist_throwDeletionFailedException() {
         Long id = 1L;
         when(authorityRepository.existsById(id)).thenReturn(false);
         assertThrows(DeletionFailedException.class, () -> defaultAuthorityService.deleteById(id));

@@ -6,6 +6,7 @@ import com.university.schedule.dto.GroupDTO;
 import com.university.schedule.model.Course;
 import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Group;
+import org.modelmapper.Condition;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -26,6 +27,9 @@ public class GroupEntityToGroupDTOConverter implements Converter<Group, GroupDTO
 		this.modelMapper = new ModelMapper();
 		this.disciplineEntityToDisciplineDTOConverter = new DisciplineEntityToDisciplineDTOConverter();
 		this.courseEntityToCourseDTOConverter = new CourseEntityToCourseDTOConverter();
+
+        Condition notNull = ctx -> ctx.getSource() != null;
+
 		org.modelmapper.Converter<Discipline, DisciplineDTO> disciplineConverter =
 				building -> disciplineEntityToDisciplineDTOConverter.convert(building.getSource());
 
@@ -33,8 +37,8 @@ public class GroupEntityToGroupDTOConverter implements Converter<Group, GroupDTO
 				courseList -> courseList.getSource().stream().map(courseEntityToCourseDTOConverter::convert).toList();
 
 		modelMapper.typeMap(Group.class, GroupDTO.class).addMappings(modelMapper -> {
-			modelMapper.using(disciplineConverter).map(Group::getDiscipline, GroupDTO::setDisciplineDTO);
-			modelMapper.using(coursesListConverter).map(Group::getCourses, GroupDTO::setCourseDTOS);
+			modelMapper.when(notNull).using(disciplineConverter).map(Group::getDiscipline, GroupDTO::setDisciplineDTO);
+			modelMapper.when(notNull).using(coursesListConverter).map(Group::getCourses, GroupDTO::setCourseDTOS);
 		});
 	}
 

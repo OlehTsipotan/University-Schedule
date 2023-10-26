@@ -55,13 +55,6 @@ public class DefaultScheduledClassService implements ScheduledClassService {
 		return scheduledClass.getId();
 	}
 
-	private ScheduledClass findById(Long id) {
-		ScheduledClass scheduledClass = execute(() -> scheduledClassRepository.findById(id)).orElseThrow(
-				() -> new ServiceException("ScheduledClass not found"));
-		log.debug("Retrieved {}", scheduledClass);
-		return scheduledClass;
-	}
-
 	@Override
 	public ScheduledClassDTO findByIdAsDTO(Long id) {
 		ScheduledClass scheduledClass = execute(() -> scheduledClassRepository.findById(id)).orElseThrow(
@@ -108,12 +101,26 @@ public class DefaultScheduledClassService implements ScheduledClassService {
 
 	@Override
 	public List<ScheduledClassDTO> findAllAsDTO(Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable is null");
+        }
 		List<ScheduledClassDTO> scheduledClassDTOList =
 				execute(() -> scheduledClassRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
 		log.debug("Retrieved All {} ScheduledClasses", scheduledClassDTOList.size());
 		return scheduledClassDTOList;
 	}
 
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        execute(() -> {
+            if (!scheduledClassRepository.existsById(id)) {
+                throw new DeletionFailedException("There is no ScheduledClass to delete with id = " + id);
+            }
+            scheduledClassRepository.deleteById(id);
+        });
+        log.info("Deleted id = {}", id);
+    }
 
 	private ScheduledClassDTO convertToDTO(ScheduledClass source) {
 		return converterService.convert(source, ScheduledClassDTO.class);
@@ -121,18 +128,6 @@ public class DefaultScheduledClassService implements ScheduledClassService {
 
 	private ScheduledClass convertToEntity(ScheduledClassDTO source) {
 		return converterService.convert(source, ScheduledClass.class);
-	}
-
-	@Override
-	@Transactional
-	public void deleteById(Long id) {
-		try {
-			findById(id);
-		} catch (ServiceException e) {
-			throw new DeletionFailedException("There is no ScheduledClass to delete with id = " + id);
-		}
-		execute(() -> scheduledClassRepository.deleteById(id));
-		log.info("Deleted id = {}", id);
 	}
 
 	private <T> T execute(DaoSupplier<T> supplier) {

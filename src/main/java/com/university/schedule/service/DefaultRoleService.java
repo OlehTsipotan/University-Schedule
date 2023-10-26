@@ -23,132 +23,128 @@ import java.util.List;
 public class DefaultRoleService implements RoleService {
 
 
-	private final RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-	private final ConverterService converterService;
+    private final ConverterService converterService;
 
-	private final RoleEntityValidator roleEntityValidator;
+    private final RoleEntityValidator roleEntityValidator;
 
-	@Override
-	public List<Role> findAll() {
-		List<Role> roles = execute(() -> roleRepository.findAll());
-		log.debug("Retrieved All {} Role", roles.size());
-		return roles;
-	}
+    @Override
+    public List<RoleDTO> findAllAsDTO() {
+        List<RoleDTO> roleDTOList = execute(() -> roleRepository.findAll()).stream().map(this::convertToDTO).toList();
+        log.debug("Retrieved All {} Role", roleDTOList.size());
+        return roleDTOList;
+    }
 
-	@Override
-	public List<RoleDTO> findAllAsDTO() {
-		List<RoleDTO> roleDTOList = execute(() -> roleRepository.findAll()).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Role", roleDTOList.size());
-		return roleDTOList;
-	}
+    @Override
+    public List<RoleDTO> findAllForRegistrationAsDTO() {
+        List<RoleDTO> roleDTOList = execute(() -> roleRepository.findAll()).stream().map(this::convertToDTO)
+            .filter(roleDTO -> !"Admin".equals(roleDTO.getName())).toList();
+        log.debug("Retrieved All {} Role", roleDTOList.size());
+        return roleDTOList;
+    }
 
-	@Override
-	public List<RoleDTO> findAllForRegistrationAsDTO() {
-		List<RoleDTO> roleDTOList = execute(() -> roleRepository.findAll()).stream().map(this::convertToDTO)
-				.filter(roleDTO -> !"Admin".equals(roleDTO.getName())).toList();
-		log.debug("Retrieved All {} Role", roleDTOList.size());
-		return roleDTOList;
-	}
+    @Override
+    public List<RoleDTO> findAllAsDTO(Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable is null");
+        }
+        List<RoleDTO> roleDTOS =
+            execute(() -> roleRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+        log.debug("Retrieved All {} Role", roleDTOS.size());
+        return roleDTOS;
+    }
 
-	@Override
-	public List<RoleDTO> findAllAsDTO(Pageable pageable) {
-		List<RoleDTO> roleDTOS =
-				execute(() -> roleRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Role", roleDTOS.size());
-		return roleDTOS;
-	}
+    @Override
+    @Transactional
+    public Long save(Role role) {
+        execute(() -> {
+            roleEntityValidator.validate(role);
+            roleRepository.save(role);
+        });
+        log.info("saved {}", role);
+        return role.getId();
+    }
 
-	@Override
-	@Transactional
-	public Long save(Role role) {
-		execute(() -> {
-			roleEntityValidator.validate(role);
-			roleRepository.save(role);
-		});
-		log.info("saved {}", role);
-		return role.getId();
-	}
+    @Override
+    @Transactional
+    public Long save(RoleDTO roleDTO) {
+        Role role = convertToEntity(roleDTO);
+        execute(() -> {
+            roleEntityValidator.validate(role);
+            roleRepository.save(role);
+        });
+        log.info("saved {}", role);
+        return role.getId();
+    }
 
-	@Override
-	@Transactional
-	public Long save(RoleDTO roleDTO) {
-		Role role = convertToEntity(roleDTO);
-		execute(() -> {
-			roleEntityValidator.validate(role);
-			roleRepository.save(role);
-		});
-		log.info("saved {}", role);
-		return role.getId();
-	}
+    @Override
+    public Role findById(Long id) {
+        Role role =
+            execute(() -> roleRepository.findById(id)).orElseThrow(() -> new ServiceException("Role not found"));
+        log.debug("Retrieved {}", role);
+        return role;
+    }
 
-	@Override
-	public Role findById(Long id) {
-		Role role =
-				execute(() -> roleRepository.findById(id)).orElseThrow(() -> new ServiceException("Role not found"));
-		log.debug("Retrieved {}", role);
-		return role;
-	}
+    @Override
+    public RoleDTO findByIdAsDTO(Long id) {
+        Role role =
+            execute(() -> roleRepository.findById(id)).orElseThrow(() -> new ServiceException("Role not found"));
+        log.debug("Retrieved {}", role);
+        return convertToDTO(role);
+    }
 
-	@Override
-	public RoleDTO findByIdAsDTO(Long id) {
-		Role role =
-				execute(() -> roleRepository.findById(id)).orElseThrow(() -> new ServiceException("Role not found"));
-		log.debug("Retrieved {}", role);
-		return convertToDTO(role);
-	}
+    @Override
+    public Role findByName(String name) {
+        Role role =
+            execute(() -> roleRepository.findByName(name)).orElseThrow(() -> new ServiceException("Role not found"));
+        log.debug("Retrieved {}", role);
+        return role;
+    }
 
-	@Override
-	public Role findByName(String name) {
-		Role role = execute(() -> roleRepository.findByName(name)).orElseThrow(
-				() -> new ServiceException("Role not found"));
-		log.debug("Retrieved {}", role);
-		return role;
-	}
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        execute(() -> {
+            if (!roleRepository.existsById(id)) {
+                throw new DeletionFailedException("There is no Role to delete with id = " + id);
+            }
+            roleRepository.deleteById(id);
+        });
+        log.info("Deleted id = {}", id);
+    }
 
-	@Override
-	@Transactional
-	public void deleteById(Long id) {
-		try {
-			findById(id);
-		} catch (ServiceException e) {
-			throw new DeletionFailedException("There is no Role to delete with id = " + id);
-		}
-		execute(() -> roleRepository.deleteById(id));
-		log.info("Deleted id = {}", id);
-	}
+    private RoleDTO convertToDTO(Role source) {
+        return converterService.convert(source, RoleDTO.class);
+    }
 
-	private RoleDTO convertToDTO(Role source) {
-		return converterService.convert(source, RoleDTO.class);
-	}
+    private Role convertToEntity(RoleDTO source) {
+        return converterService.convert(source, Role.class);
+    }
 
-	private Role convertToEntity(RoleDTO source) {
-		return converterService.convert(source, Role.class);
-	}
+    private <T> T execute(DaoSupplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (DataAccessException e) {
+            throw new ServiceException("DAO operation failed", e);
+        }
+    }
 
-	private <T> T execute(DaoSupplier<T> supplier) {
-		try {
-			return supplier.get();
-		} catch (DataAccessException e) {
-			throw new ServiceException("DAO operation failed", e);
-		}
-	}
+    private void execute(DaoProcessor processor) {
+        try {
+            processor.process();
+        } catch (DataAccessException e) {
+            throw new ServiceException("DAO operation failed", e);
+        }
+    }
 
-	private void execute(DaoProcessor processor) {
-		try {
-			processor.process();
-		} catch (DataAccessException e) {
-			throw new ServiceException("DAO operation failed", e);
-		}
-	}
+    @FunctionalInterface
+    public interface DaoSupplier<T> {
+        T get();
+    }
 
-	@FunctionalInterface
-	public interface DaoSupplier<T> {
-		T get();
-	}
-
-	@FunctionalInterface
-	public interface DaoProcessor {
-		void process();
-	}
+    @FunctionalInterface
+    public interface DaoProcessor {
+        void process();
+    }
 }

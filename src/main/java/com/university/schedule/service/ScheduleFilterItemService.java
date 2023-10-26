@@ -23,6 +23,9 @@ public class ScheduleFilterItemService {
 	private final UserService userService;
 
 	public void processRawItem(ScheduleFilterItem scheduleFilterItem) {
+        if (scheduleFilterItem == null) {
+            throw new IllegalArgumentException("ScheduleFilterItem is null");
+        }
 		replaceForUserByEmail(scheduleFilterItem);
 		replaceNullValues(scheduleFilterItem);
 	}

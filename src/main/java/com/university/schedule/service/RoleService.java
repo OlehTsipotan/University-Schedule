@@ -8,23 +8,21 @@ import java.util.List;
 
 public interface RoleService {
 
-	List<Role> findAll();
+    List<RoleDTO> findAllAsDTO();
 
-	List<RoleDTO> findAllAsDTO();
+    List<RoleDTO> findAllForRegistrationAsDTO();
 
-	List<RoleDTO> findAllForRegistrationAsDTO();
+    List<RoleDTO> findAllAsDTO(Pageable pageable);
 
-	List<RoleDTO> findAllAsDTO(Pageable pageable);
+    Role findByName(String name);
 
-	Role findByName(String name);
+    Long save(Role role);
 
-	Long save(Role role);
+    Long save(RoleDTO roleDTO);
 
-	Long save(RoleDTO roleDTO);
+    Role findById(Long id);
 
-	Role findById(Long id);
+    RoleDTO findByIdAsDTO(Long id);
 
-	RoleDTO findByIdAsDTO(Long id);
-
-	void deleteById(Long id);
+    void deleteById(Long id);
 }

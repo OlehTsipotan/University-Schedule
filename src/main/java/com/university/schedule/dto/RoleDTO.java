@@ -14,7 +14,6 @@ public class RoleDTO {
 
 	private Long id;
 
-	@NonNull
 	@NotBlank(message = "RoleDTO name must not be blank")
 	@Size(max = 255)
 	private String name;

@@ -4,6 +4,7 @@ import com.university.schedule.dto.AuthorityDTO;
 import com.university.schedule.dto.RoleDTO;
 import com.university.schedule.model.Authority;
 import com.university.schedule.model.Role;
+import org.modelmapper.Condition;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -28,8 +29,11 @@ public class RoleDTOToRoleEntityConverter implements Converter<RoleDTO, Role> {
 				courseList -> courseList.getSource().stream().map(authorityDTOToAuthorityEntityConverter::convert)
 						.collect(Collectors.toSet());
 
+        Condition notNull = ctx -> ctx.getSource() != null;
+
 		modelMapper.typeMap(RoleDTO.class, Role.class).addMappings(modelMapper -> {
-			modelMapper.using(authoritiesListConverter).map(RoleDTO::getAuthorityDTOS, Role::setAuthorities);
+			modelMapper.when(notNull).using(authoritiesListConverter).map(RoleDTO::getAuthorityDTOS,
+                Role::setAuthorities);
 		});
 	}
 

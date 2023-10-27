@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +53,9 @@ public class DefaultStudentService implements StudentService {
 
 	@Override
 	public List<StudentDTO> findAllAsDTO(Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable is null");
+        }
 		List<StudentDTO> studentDTOList =
 				execute(() -> studentRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
 		log.debug("Retrieved All {} Students", studentDTOList.size());
@@ -60,6 +64,9 @@ public class DefaultStudentService implements StudentService {
 
 	@Override
 	public List<StudentDTO> findAllAsDTO(String email, Pageable pageable) {
+        if (pageable == null || email == null) {
+            throw new IllegalArgumentException("Pageable or email is null");
+        }
 		User user = userService.findByEmail(email);
 		List<Student> studentPage = execute(() -> user.accept(userPageableStudentVisitor, pageable));
 		List<StudentDTO> studentDTOList = studentPage.stream().map(this::convertToDTO).toList();
@@ -81,6 +88,9 @@ public class DefaultStudentService implements StudentService {
 	@Override
 	@Transactional
 	public Long update(StudentDTO studentDTO) {
+        if (studentDTO == null) {
+            throw new IllegalArgumentException("StudentDTO is null");
+        }
 		Student studentToSave = convertToExistingEntity(studentDTO);
 		execute(() -> {
 			studentEntityValidator.validate(studentToSave);
@@ -110,12 +120,12 @@ public class DefaultStudentService implements StudentService {
 	@Override
 	@Transactional
 	public void deleteById(Long id) {
-		try {
-			findById(id);
-		} catch (ServiceException e) {
-			throw new DeletionFailedException("There is no Student to delete with id = " + id);
-		}
-		execute(() -> studentRepository.deleteById(id));
+        execute(() -> {
+            if (!studentRepository.existsById(id)) {
+                throw new DeletionFailedException("There is no Student to delete with id = " + id);
+            }
+            studentRepository.deleteById(id);
+        });
 		log.info("Deleted id = {}", id);
 	}
 

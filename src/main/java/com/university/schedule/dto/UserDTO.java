@@ -12,17 +12,14 @@ public class UserDTO {
 
 	private Long id;
 
-	@NonNull
 	@NotBlank(message = "User email must not be blank")
 	@Size(max = 255)
 	private String email;
 
-	@NonNull
 	@NotBlank(message = "User firstName must not be blank")
 	@Size(max = 255)
 	private String firstName;
 
-	@NonNull
 	@NotBlank(message = "User lastName must not be blank")
 	@Size(max = 255)
 	private String lastName;

@@ -17,34 +17,35 @@ import java.util.Set;
 @Component
 public class TeacherEntityToTeacherDTOConverter implements Converter<Teacher, TeacherDTO> {
 
-	private final ModelMapper modelMapper;
-	private final CourseEntityToCourseDTOConverter courseEntityToCourseDTOConverter;
-	private final RoleEntityToRoleDTOConverter roleEntityToRoleDTOConverter;
+    private final ModelMapper modelMapper;
+    private final CourseEntityToCourseDTOConverter courseEntityToCourseDTOConverter;
+    private final RoleEntityToRoleDTOConverter roleEntityToRoleDTOConverter;
 
 
-	public TeacherEntityToTeacherDTOConverter() {
-		this.modelMapper = new ModelMapper();
-		this.courseEntityToCourseDTOConverter = new CourseEntityToCourseDTOConverter();
-		this.roleEntityToRoleDTOConverter = new RoleEntityToRoleDTOConverter();
+    public TeacherEntityToTeacherDTOConverter() {
+        this.modelMapper = new ModelMapper();
+        this.courseEntityToCourseDTOConverter = new CourseEntityToCourseDTOConverter();
+        this.roleEntityToRoleDTOConverter = new RoleEntityToRoleDTOConverter();
 
 
-		org.modelmapper.Converter<Role, RoleDTO> roleDTOConverter =
-				role -> roleEntityToRoleDTOConverter.convert(role.getSource());
+        org.modelmapper.Converter<Role, RoleDTO> roleDTOConverter =
+            role -> roleEntityToRoleDTOConverter.convert(role.getSource());
 
-		org.modelmapper.Converter<Set<Course>, List<CourseDTO>> courseDTOSConverter =
-				courseList -> courseList.getSource().stream().map(courseEntityToCourseDTOConverter::convert).toList();
-		Condition notNull = ctx -> ctx.getSource() != null;
+        org.modelmapper.Converter<Set<Course>, List<CourseDTO>> courseDTOSConverter =
+            courseList -> courseList.getSource().stream().map(courseEntityToCourseDTOConverter::convert).toList();
 
-		modelMapper.typeMap(Teacher.class, TeacherDTO.class).addMappings(modelMapper -> {
-			modelMapper.map(Teacher::isEnable, TeacherDTO::setIsEnable);
-			modelMapper.when(notNull).using(roleDTOConverter).map(Teacher::getRole, TeacherDTO::setRoleDTO);
-			modelMapper.when(notNull).using(courseDTOSConverter).map(Teacher::getCourses, TeacherDTO::setCourseDTOS);
-		});
+        Condition notNull = ctx -> ctx.getSource() != null;
 
-	}
+        modelMapper.typeMap(Teacher.class, TeacherDTO.class).addMappings(modelMapper -> {
+            modelMapper.map(Teacher::isEnable, TeacherDTO::setIsEnable);
+            modelMapper.when(notNull).using(roleDTOConverter).map(Teacher::getRole, TeacherDTO::setRoleDTO);
+            modelMapper.when(notNull).using(courseDTOSConverter).map(Teacher::getCourses, TeacherDTO::setCourseDTOS);
+        });
 
-	@Override
-	public TeacherDTO convert(Teacher source) {
-		return modelMapper.map(source, TeacherDTO.class);
-	}
+    }
+
+    @Override
+    public TeacherDTO convert(Teacher source) {
+        return modelMapper.map(source, TeacherDTO.class);
+    }
 }

@@ -25,10 +25,6 @@ public class DefaultTeacherService implements TeacherService {
 
 	private final TeacherRepository teacherRepository;
 
-	private final RoleService roleService;
-
-	private final CourseService courseService;
-
 	private final ConverterService converterService;
 
 	private final TeacherEntityValidator teacherEntityValidator;
@@ -50,6 +46,9 @@ public class DefaultTeacherService implements TeacherService {
 
 	@Override
 	public List<TeacherDTO> findAllAsDTO(Pageable pageable) {
+        if (pageable == null) {
+            throw new IllegalArgumentException("Pageable is null");
+        }
 		List<TeacherDTO> teacherDTOList =
 				execute(() -> teacherRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
 		log.debug("Retrieved All {} Teachers", teacherDTOList.size());
@@ -70,6 +69,9 @@ public class DefaultTeacherService implements TeacherService {
 	@Override
 	@Transactional
 	public Long update(TeacherDTO teacherDTO) {
+        if (teacherDTO == null) {
+            throw new IllegalArgumentException("TeacherDTO is null");
+        }
 		Teacher teacherToSave = convertToExistingEntity(teacherDTO);
 		execute(() -> {
 			teacherEntityValidator.validate(teacherToSave);
@@ -79,7 +81,7 @@ public class DefaultTeacherService implements TeacherService {
 		return teacherToSave.getId();
 	}
 
-	private Teacher findById(Long id) {
+	public Teacher findById(Long id) {
 		Teacher teacher = execute(() -> teacherRepository.findById(id)).orElseThrow(
 				() -> new ServiceException("Teacher not found"));
 		log.debug("Retrieved {}", teacher);
@@ -97,12 +99,12 @@ public class DefaultTeacherService implements TeacherService {
 	@Override
 	@Transactional
 	public void deleteById(Long id) {
-		try {
-			findById(id);
-		} catch (ServiceException e) {
-			throw new DeletionFailedException("There is no Teacher to delete with id = " + id);
-		}
-		execute(() -> teacherRepository.deleteById(id));
+        execute(() -> {
+            if (!teacherRepository.existsById(id)) {
+                throw new DeletionFailedException("There is no Teacher to delete with id = " + id);
+            }
+            teacherRepository.deleteById(id);
+        });
 		log.info("Deleted id = {}", id);
 	}
 

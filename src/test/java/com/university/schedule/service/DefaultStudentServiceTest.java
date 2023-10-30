@@ -176,8 +176,8 @@ public class DefaultStudentServiceTest {
 
     @ParameterizedTest
     @NullSource
-    public void save_whenStudentIsNull_throwServiceException(Student nullStudent) {
-        when(studentRepository.save(null)).thenThrow(InvalidDataAccessApiUsageException.class);
+    public void save_whenStudentIsNull_throwIllegalArgument(Student nullStudent) {
+        doThrow(IllegalArgumentException.class).when(studentEntityValidator).validate(nullStudent);
         assertThrows(ServiceException.class, () -> defaultStudentService.save(nullStudent));
     }
 

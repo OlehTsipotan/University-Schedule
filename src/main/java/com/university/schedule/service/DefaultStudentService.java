@@ -100,7 +100,6 @@ public class DefaultStudentService implements StudentService {
 		return studentToSave.getId();
 	}
 
-	@Override
 	public Student findById(Long id) {
 		Student student = execute(() -> studentRepository.findById(id)).orElseThrow(
 				() -> new ServiceException("Student not found"));

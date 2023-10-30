@@ -20,8 +20,6 @@ public interface StudentService {
 
 	Long update(StudentDTO studentDTO);
 
-	Student findById(Long id);
-
 	StudentDTO findByIdAsDTO(Long id);
 
 	void deleteById(Long id);

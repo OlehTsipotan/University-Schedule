@@ -5,6 +5,7 @@ import com.university.schedule.model.Authority;
 import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Role;
 import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,8 +17,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,7 +24,6 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-@Testcontainers
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class AuthorityRepositoryTest {
@@ -34,15 +32,18 @@ public class AuthorityRepositoryTest {
     private static final String DATABASE_USERNAME = "databaseName";
     private static final String DATABASE_USER_PASSWORD = "databaseName";
 
-    @Container
     public static PostgreSQLContainer<?> postgres =
         new PostgreSQLContainer<>("postgres:latest").withDatabaseName(DATABASE_NAME).withUsername(DATABASE_USERNAME)
-            .withPassword(DATABASE_USER_PASSWORD);
-
+            .withPassword(DATABASE_USER_PASSWORD).withReuse(true);
     @Autowired
     AuthorityRepository authorityRepository;
     @Autowired
     TestEntityManager entityManager;
+
+    @BeforeAll
+    static void beforeAll() {
+        postgres.start();
+    }
 
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {

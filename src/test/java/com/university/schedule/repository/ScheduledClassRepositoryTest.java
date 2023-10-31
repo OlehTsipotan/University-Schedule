@@ -2,6 +2,7 @@ package com.university.schedule.repository;
 
 import com.university.schedule.model.*;
 import org.flywaydb.core.Flyway;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -13,8 +14,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.Duration;
 import java.time.LocalDate;
@@ -26,21 +25,22 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class ScheduledClassRepositoryTest {
 
-    @Container
     public static PostgreSQLContainer<?> postgres =
         new PostgreSQLContainer<>("postgres:latest").withDatabaseName("databaseName").withUsername("username")
-            .withPassword("password");
-
+            .withPassword("password").withReuse(true);
     @Autowired
     ScheduledClassRepository scheduledClassRepository;
-
     @Autowired
     TestEntityManager entityManager;
+
+    @BeforeAll
+    static void beforeAll() {
+        postgres.start();
+    }
 
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {

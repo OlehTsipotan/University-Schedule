@@ -3,6 +3,7 @@ package com.university.schedule.repository;
 import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Group;
 import com.university.schedule.model.Student;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -13,8 +14,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,21 +23,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Testcontainers
+
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class StudentRepositoryTest {
 
-    @Container
     public static PostgreSQLContainer<?> postgres =
         new PostgreSQLContainer<>("postgres:latest").withDatabaseName("databaseName").withUsername("username")
-            .withPassword("password");
-
+            .withPassword("password").withReuse(true);
     @Autowired
     StudentRepository studentRepository;
-
     @Autowired
     TestEntityManager entityManager;
+
+    @BeforeAll
+    static void beforeAll() {
+        postgres.start();
+    }
 
     @DynamicPropertySource
     static void registerProperties(DynamicPropertyRegistry registry) {

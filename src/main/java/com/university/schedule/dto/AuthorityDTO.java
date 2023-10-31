@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 @Data
 public class AuthorityDTO {
 
-	private Long id;
+    private Long id;
 
-	@NotBlank(message = "Authority name must not be blank")
-	@Size(max = 255)
-	private String name;
+    @NotBlank(message = "Authority name must not be blank")
+    @Size(max = 255)
+    private String name;
 
 
 }

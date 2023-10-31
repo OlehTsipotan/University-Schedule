@@ -31,15 +31,12 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 public class ScheduledClassEntityValidatorTest {
 
+    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
     private ScheduledClassEntityValidator validator;
-
     @Mock
     private ScheduledClassRepository scheduledClassRepository;
-
     @Mock
     private CourseService courseService;
-
-    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @BeforeEach
     public void setUp() {
@@ -103,7 +100,8 @@ public class ScheduledClassEntityValidatorTest {
         when(scheduledClassRepository.findByDateAndClassTimeAndTeacher(scheduledClassToCheck.getDate(),
             scheduledClassToCheck.getClassTime(), scheduledClassToCheck.getTeacher())).thenReturn(
             Optional.of(scheduledClassToBeFounded));
-        when(courseService.findByTeacher(scheduledClassToCheck.getTeacher())).thenReturn(List.of(scheduledClassToCheck.getCourse()));
+        when(courseService.findByTeacher(scheduledClassToCheck.getTeacher())).thenReturn(
+            List.of(scheduledClassToCheck.getCourse()));
         when(courseService.findByGroup(any())).thenReturn(List.of(scheduledClassToCheck.getCourse()));
         assertThrows(ValidationException.class, () -> validator.validate(scheduledClassToCheck));
     }
@@ -125,7 +123,7 @@ public class ScheduledClassEntityValidatorTest {
     }
 
     @Test
-    public void validate_whenScheduledClassFieldsAreNull_throwValidationException(){
+    public void validate_whenScheduledClassFieldsAreNull_throwValidationException() {
         ScheduledClass scheduledClass = new ScheduledClass();
         assertThrows(ValidationException.class, () -> validator.validate(scheduledClass));
     }

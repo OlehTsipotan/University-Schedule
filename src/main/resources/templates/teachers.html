@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <meta name="description" content="University schedule web-application "/>
-    <meta name="author" content="Oleh Tsipotan"/>
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+    <meta content="University schedule web-application " name="description"/>
+    <meta content="Oleh Tsipotan" name="author"/>
     <title>Teachers Records</title>
 
-    <link th:href="@{styles/main.css}" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{styles/main.css}"/>
 
-    <link th:href="@{assets/calendar-days-solid.svg}" rel="icon" type="image/x-icon"/>
-    <link th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}" rel="stylesheet"/>
-    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}" rel="stylesheet"/>
-    <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
+    <link rel="icon" th:href="@{assets/calendar-days-solid.svg}" type="image/x-icon"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}"/>
+    <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}"/>
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbar('Teachers')}"></div>
@@ -29,7 +29,7 @@
             <th th:replace="~{fragments/sorting :: sorting('teachers', 'lastName','LastName')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('teachers', 'courses','Courses')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('teachers', 'isEnable','isEnable')}"></th>
-            <th sec:authorize="hasAuthority('EDIT_TEACHERS')" class="static-col">Actions</th>
+            <th class="static-col" sec:authorize="hasAuthority('EDIT_TEACHERS')">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -40,14 +40,14 @@
             <td th:text="${entity.getLastName()}"></td>
             <td>
                 <span th:each="courseDTO, iterStat : ${entity.getCourseDTOS()}"><span
-                        th:text="${courseDTO.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
+                    th:text="${courseDTO.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
             </td>
             <td th:text="${entity.isEnable()}"></td>
-            <td sec:authorize="hasAuthority('EDIT_TEACHERS')" class="static-col">
-                <a th:href="@{'/teachers/update/' + ${entity.getId()}}" id="btnUpdate"
-                   title="Update this Teacher" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
-                <a th:href="@{'/teachers/delete/' + ${entity.getId()}}" id="btnDelete"
-                   title="Delete this Teacher" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
+            <td class="static-col" sec:authorize="hasAuthority('EDIT_TEACHERS')">
+                <a class="fa-solid fa-pen-to-square icon-dark btn-delete" id="btnUpdate"
+                   th:href="@{'/teachers/update/' + ${entity.getId()}}" title="Update this Teacher"></a>
+                <a class="fa-regular fa-trash-can icon-dark btn-delete" id="btnDelete"
+                   th:href="@{'/teachers/delete/' + ${entity.getId()}}" title="Delete this Teacher"></a>
             </td>
         </tr>
         </tbody>

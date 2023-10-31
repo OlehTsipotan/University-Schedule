@@ -20,43 +20,43 @@ import java.util.List;
 @Service
 public class ScheduleFilterItemService {
 
-	private final UserService userService;
+    private final UserService userService;
 
-	public void processRawItem(ScheduleFilterItem scheduleFilterItem) {
+    public void processRawItem(ScheduleFilterItem scheduleFilterItem) {
         if (scheduleFilterItem == null) {
             throw new IllegalArgumentException("ScheduleFilterItem is null");
         }
-		replaceForUserByEmail(scheduleFilterItem);
-		replaceNullValues(scheduleFilterItem);
-	}
+        replaceForUserByEmail(scheduleFilterItem);
+        replaceNullValues(scheduleFilterItem);
+    }
 
-	private void replaceForUserByEmail(ScheduleFilterItem scheduleFilterItem) {
-		User user = userService.findByEmail(scheduleFilterItem.getEmail());
-		if (user instanceof Teacher) {
-			scheduleFilterItem.setTeacherId(user.getId());
-		} else if (user instanceof Student student) {
-			List<Long> groupDTOS = new ArrayList<>();
-			if (student.getGroup() != null) {
-				groupDTOS.add(student.getGroup().getId());
-			}
-			scheduleFilterItem.setGroupIdList(groupDTOS);
-		} else {
-			throw new ServiceException("Admin should not have access to this method.");
-		}
-	}
+    private void replaceForUserByEmail(ScheduleFilterItem scheduleFilterItem) {
+        User user = userService.findByEmail(scheduleFilterItem.getEmail());
+        if (user instanceof Teacher) {
+            scheduleFilterItem.setTeacherId(user.getId());
+        } else if (user instanceof Student student) {
+            List<Long> groupDTOS = new ArrayList<>();
+            if (student.getGroup() != null) {
+                groupDTOS.add(student.getGroup().getId());
+            }
+            scheduleFilterItem.setGroupIdList(groupDTOS);
+        } else {
+            throw new ServiceException("Admin should not have access to this method.");
+        }
+    }
 
-	private void replaceNullValues(ScheduleFilterItem scheduleFilterItem) {
-		if (scheduleFilterItem.getStartDate() == null) {
-			LocalDate countFrom = scheduleFilterItem.getEndDate() == null? LocalDate.now() :
-					scheduleFilterItem.getEndDate();
-			LocalDate previousOrSameMonday = countFrom.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-			scheduleFilterItem.setStartDate(previousOrSameMonday);
-		}
-		if (scheduleFilterItem.getEndDate() == null) {
-			LocalDate countFrom = scheduleFilterItem.getStartDate() == null? LocalDate.now() :
-					scheduleFilterItem.getStartDate();
-			LocalDate nextOrSameSunday = countFrom.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
-			scheduleFilterItem.setEndDate(nextOrSameSunday);
-		}
-	}
+    private void replaceNullValues(ScheduleFilterItem scheduleFilterItem) {
+        if (scheduleFilterItem.getStartDate() == null) {
+            LocalDate countFrom =
+                scheduleFilterItem.getEndDate() == null ? LocalDate.now() : scheduleFilterItem.getEndDate();
+            LocalDate previousOrSameMonday = countFrom.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            scheduleFilterItem.setStartDate(previousOrSameMonday);
+        }
+        if (scheduleFilterItem.getEndDate() == null) {
+            LocalDate countFrom =
+                scheduleFilterItem.getStartDate() == null ? LocalDate.now() : scheduleFilterItem.getStartDate();
+            LocalDate nextOrSameSunday = countFrom.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
+            scheduleFilterItem.setEndDate(nextOrSameSunday);
+        }
+    }
 }

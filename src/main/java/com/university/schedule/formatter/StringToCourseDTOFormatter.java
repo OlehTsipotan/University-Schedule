@@ -12,13 +12,13 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class StringToCourseDTOFormatter implements Formatter<CourseDTO> {
 
-	@Override
-	public CourseDTO parse(String text, Locale locale) throws ParseException {
-		return CourseDTO.builder().id(Long.parseLong(text)).build();
-	}
+    @Override
+    public CourseDTO parse(String text, Locale locale) throws ParseException {
+        return CourseDTO.builder().id(Long.parseLong(text)).build();
+    }
 
-	@Override
-	public String print(CourseDTO object, Locale locale) {
-		return null;
-	}
+    @Override
+    public String print(CourseDTO object, Locale locale) {
+        return null;
+    }
 }

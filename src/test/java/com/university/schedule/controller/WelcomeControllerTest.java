@@ -22,44 +22,44 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles(value = "test")
 public class WelcomeControllerTest {
 
-	public static final String USERNAME = "testUsername";
-	public static final String ROLE_ADMIN = "ROLE_ADMIN";
+    public static final String USERNAME = "testUsername";
+    public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
-	public static final String VIEW_AUTHORITY = "VIEW_WELCOME";
+    public static final String VIEW_AUTHORITY = "VIEW_WELCOME";
 
-	@Autowired
-	MockMvc mockMvc;
+    @Autowired
+    MockMvc mockMvc;
 
-	@MockBean
-	UserService userService;
+    @MockBean
+    UserService userService;
 
-	@MockBean
-	User user;
+    @MockBean
+    User user;
 
-	@Test
-	@WithMockUser(username = USERNAME, authorities = VIEW_AUTHORITY)
-	public void welcome_happyPath() throws Exception {
+    @Test
+    @WithMockUser(username = USERNAME, authorities = VIEW_AUTHORITY)
+    public void welcome_happyPath() throws Exception {
 
-		String userFullName = "userFullName";
-		String roleName = "roleName";
+        String userFullName = "userFullName";
+        String roleName = "roleName";
 
-		when(userService.findByEmail(USERNAME)).thenReturn(user);
-		when(user.getFullName()).thenReturn(userFullName);
-		when(user.getRole()).thenReturn(new Role(roleName));
+        when(userService.findByEmail(USERNAME)).thenReturn(user);
+        when(user.getFullName()).thenReturn(userFullName);
+        when(user.getRole()).thenReturn(new Role(roleName));
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/welcome")).andExpect(status().is2xxSuccessful())
-				.andExpect(view().name("index/userIndex")).andExpect(model().attribute("userFullName", userFullName))
-				.andExpect(model().attribute("role", roleName));
+        mockMvc.perform(MockMvcRequestBuilders.get("/welcome")).andExpect(status().is2xxSuccessful())
+            .andExpect(view().name("index/userIndex")).andExpect(model().attribute("userFullName", userFullName))
+            .andExpect(model().attribute("role", roleName));
 
-		verify(userService, times(1)).findByEmail(USERNAME);
-	}
+        verify(userService, times(1)).findByEmail(USERNAME);
+    }
 
 
-	@Test
-	@WithMockUser(username = USERNAME, authorities = ROLE_ADMIN)
-	public void welcome_withNoViewAuthority_thenAccessDenied() throws Exception{
-		mockMvc.perform(MockMvcRequestBuilders.get("/welcome")).andExpect(status().is2xxSuccessful())
-				.andExpect(model().attributeExists("exceptionMessage"));
+    @Test
+    @WithMockUser(username = USERNAME, authorities = ROLE_ADMIN)
+    public void welcome_withNoViewAuthority_thenAccessDenied() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/welcome")).andExpect(status().is2xxSuccessful())
+            .andExpect(model().attributeExists("exceptionMessage"));
 
-	}
+    }
 }

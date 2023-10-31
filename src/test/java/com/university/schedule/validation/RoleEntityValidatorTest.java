@@ -22,12 +22,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 public class RoleEntityValidatorTest {
+    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
     private RoleEntityValidator validator;
-
     @Mock
     private RoleRepository roleRepository;
-
-    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @BeforeEach
     public void setUp() {

@@ -23,12 +23,11 @@ public class GroupEntityToGroupDTOConverterTest {
     @ParameterizedTest
     @NullSource
     public void convert_whenGroupIsNull_throwIllegalArgumentException(Group nullGroup) {
-        assertThrows(IllegalArgumentException.class,
-            () -> groupEntityToGroupDTOConverter.convert(nullGroup));
+        assertThrows(IllegalArgumentException.class, () -> groupEntityToGroupDTOConverter.convert(nullGroup));
     }
 
     @Test
-    public void convert_success(){
+    public void convert_success() {
         Discipline discipline = new Discipline(1L, "discipline");
         Group group = new Group(1L, "group", discipline);
 

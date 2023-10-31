@@ -9,16 +9,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DataSchemaService {
 
-	private Flyway flyway;
+    private Flyway flyway;
 
-	public void clean() {
-		flyway.clean();
-		flyway.migrate();
-	}
+    public void clean() {
+        flyway.clean();
+        flyway.migrate();
+    }
 
-	@Autowired
-	public void setFlyway(Flyway flyway){
-		this.flyway = flyway;
-	}
+    @Autowired
+    public void setFlyway(Flyway flyway) {
+        this.flyway = flyway;
+    }
 
 }

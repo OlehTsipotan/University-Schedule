@@ -15,27 +15,27 @@ import java.util.stream.Collectors;
 
 @Component
 public class GroupDTOToGroupEntityConverter implements Converter<GroupDTO, Group> {
-	private final ModelMapper modelMapper;
-	private final CourseDTOToCourseEntityConverter courseDTOToCourseEntityConverter;
+    private final ModelMapper modelMapper;
+    private final CourseDTOToCourseEntityConverter courseDTOToCourseEntityConverter;
 
 
-	public GroupDTOToGroupEntityConverter() {
-		this.modelMapper = new ModelMapper();
-		this.courseDTOToCourseEntityConverter = new CourseDTOToCourseEntityConverter();
+    public GroupDTOToGroupEntityConverter() {
+        this.modelMapper = new ModelMapper();
+        this.courseDTOToCourseEntityConverter = new CourseDTOToCourseEntityConverter();
 
-		org.modelmapper.Converter<List<CourseDTO>, Set<Course>> coursesListConverter =
-				courseDTOSet -> courseDTOSet.getSource().stream().map(courseDTOToCourseEntityConverter::convert)
-						.collect(Collectors.toSet());
+        org.modelmapper.Converter<List<CourseDTO>, Set<Course>> coursesListConverter =
+            courseDTOSet -> courseDTOSet.getSource().stream().map(courseDTOToCourseEntityConverter::convert)
+                .collect(Collectors.toSet());
 
-		Condition notNull = ctx -> ctx.getSource() != null;
+        Condition notNull = ctx -> ctx.getSource() != null;
 
-		modelMapper.typeMap(GroupDTO.class, Group.class).addMappings(modelMapper -> {
-			modelMapper.when(notNull).using(coursesListConverter).map(GroupDTO::getCourseDTOS, Group::setCourses);
-		});
-	}
+        modelMapper.typeMap(GroupDTO.class, Group.class).addMappings(modelMapper -> {
+            modelMapper.when(notNull).using(coursesListConverter).map(GroupDTO::getCourseDTOS, Group::setCourses);
+        });
+    }
 
-	@Override
-	public Group convert(GroupDTO source) {
-		return modelMapper.map(source, Group.class);
-	}
+    @Override
+    public Group convert(GroupDTO source) {
+        return modelMapper.map(source, Group.class);
+    }
 }

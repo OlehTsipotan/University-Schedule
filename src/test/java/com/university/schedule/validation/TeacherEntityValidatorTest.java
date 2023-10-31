@@ -20,12 +20,10 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(SpringExtension.class)
 public class TeacherEntityValidatorTest {
 
+    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
     private TeacherEntityValidator validator;
-
     @Mock
     private UserEntityValidator userEntityValidator;
-
-    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @BeforeEach
     public void setUp() {

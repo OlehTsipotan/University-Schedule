@@ -17,7 +17,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -25,86 +24,86 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CourseRecordsController {
 
-	private static final String UPDATE_FORM_TEMPLATE = "coursesUpdateForm";
-	private static final String INSERT_FORM_TEMPLATE = "coursesInsertForm";
-	private final CourseService courseService;
+    private static final String UPDATE_FORM_TEMPLATE = "coursesUpdateForm";
+    private static final String INSERT_FORM_TEMPLATE = "coursesInsertForm";
+    private final CourseService courseService;
 
-	@Secured("VIEW_COURSES")
-	@GetMapping("/courses")
-	public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
-	                     @RequestParam(defaultValue = "0") int offset,
-	                     @RequestParam(defaultValue = "id,asc") String[] sort, Principal principal) {
-		Pageable pageable = PaginationSortingUtility.getPageable(limit, offset, sort);
-		List<CourseDTO> courseDTOList = courseService.findAllAsDTO(principal.getName(), pageable);
+    @Secured("VIEW_COURSES")
+    @GetMapping("/courses")
+    public String getAll(Model model, @RequestParam(defaultValue = "100") int limit,
+                         @RequestParam(defaultValue = "0") int offset,
+                         @RequestParam(defaultValue = "id,asc") String[] sort, Principal principal) {
+        Pageable pageable = PaginationSortingUtility.getPageable(limit, offset, sort);
+        List<CourseDTO> courseDTOList = courseService.findAllAsDTO(principal.getName(), pageable);
 
-		model.addAttribute("entities", courseDTOList);
-		model.addAttribute("currentLimit", limit);
-		model.addAttribute("currentOffset", offset);
-		model.addAttribute("sortField", sort[0]);
-		model.addAttribute("sortDirection", sort[1]);
-		model.addAttribute("reverseSortDirection", sort[1].equals("asc") ? "desc" : "asc");
+        model.addAttribute("entities", courseDTOList);
+        model.addAttribute("currentLimit", limit);
+        model.addAttribute("currentOffset", offset);
+        model.addAttribute("sortField", sort[0]);
+        model.addAttribute("sortDirection", sort[1]);
+        model.addAttribute("reverseSortDirection", sort[1].equals("asc") ? "desc" : "asc");
 
-		return "courses";
-	}
+        return "courses";
+    }
 
 
-	@Secured("EDIT_COURSES")
-	@GetMapping("/courses/delete/{id}")
-	public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request,
-	                           RedirectAttributes redirectAttributes) {
-		courseService.deleteById(id);
-		redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
+    @Secured("EDIT_COURSES")
+    @GetMapping("/courses/delete/{id}")
+    public RedirectView delete(@PathVariable(name = "id") Long id, HttpServletRequest request,
+                               RedirectAttributes redirectAttributes) {
+        courseService.deleteById(id);
+        redirectAttributes.addFlashAttribute("success", "Record with ID = " + id + ", successfully deleted.");
 
-		String referer = request.getHeader("Referer");
-		String redirectTo = (referer != null) ? referer : "/courses";
+        String referer = request.getHeader("Referer");
+        String redirectTo = (referer != null) ? referer : "/courses";
 
-		return new RedirectView(redirectTo);
-	}
+        return new RedirectView(redirectTo);
+    }
 
-	@Secured("EDIT_COURSES")
-	@GetMapping("/courses/update/{id}")
-	public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, CourseDTO courseDTO) {
-		CourseDTO courseDTOToDisplay = courseService.findByIdAsDTO(id);
-		model.addAttribute("entity", courseDTOToDisplay);
+    @Secured("EDIT_COURSES")
+    @GetMapping("/courses/update/{id}")
+    public String getUpdateForm(@PathVariable(name = "id") Long id, Model model, CourseDTO courseDTO) {
+        CourseDTO courseDTOToDisplay = courseService.findByIdAsDTO(id);
+        model.addAttribute("entity", courseDTOToDisplay);
 
-		return UPDATE_FORM_TEMPLATE;
-	}
+        return UPDATE_FORM_TEMPLATE;
+    }
 
-	@Secured("EDIT_COURSES")
-	@PostMapping("/courses/update/{id}")
-	public String update(@PathVariable Long id, @Valid @ModelAttribute CourseDTO courseDTO, BindingResult result,
-	                     Model model, RedirectAttributes redirectAttributes) {
+    @Secured("EDIT_COURSES")
+    @PostMapping("/courses/update/{id}")
+    public String update(@PathVariable Long id, @Valid @ModelAttribute CourseDTO courseDTO, BindingResult result,
+                         Model model, RedirectAttributes redirectAttributes) {
 
-		if (!result.hasErrors()) {
-			courseService.save(courseDTO);
-			redirectAttributes.addFlashAttribute("success", true);
-			return "redirect:/courses/update/" + id;
-		}
+        if (!result.hasErrors()) {
+            courseService.save(courseDTO);
+            redirectAttributes.addFlashAttribute("success", true);
+            return "redirect:/courses/update/" + id;
+        }
 
-		CourseDTO courseDTOToDisplay = courseService.findByIdAsDTO(id);
-		model.addAttribute("entity", courseDTOToDisplay);
+        CourseDTO courseDTOToDisplay = courseService.findByIdAsDTO(id);
+        model.addAttribute("entity", courseDTOToDisplay);
 
-		return UPDATE_FORM_TEMPLATE;
-	}
+        return UPDATE_FORM_TEMPLATE;
+    }
 
-	@Secured("INSERT_COURSES")
-	@GetMapping("/courses/insert")
-	public String getInsertForm(Model model, CourseDTO courseDTO) {
-		return INSERT_FORM_TEMPLATE;
-	}
+    @Secured("INSERT_COURSES")
+    @GetMapping("/courses/insert")
+    public String getInsertForm(Model model, CourseDTO courseDTO) {
+        return INSERT_FORM_TEMPLATE;
+    }
 
-	@Secured("INSERT_COURSES")
-	@PostMapping("/courses/insert")
-	public String insert(@Valid @ModelAttribute CourseDTO courseDTO, BindingResult result, Model model,
-	                     RedirectAttributes redirectAttributes) {
+    @Secured("INSERT_COURSES")
+    @PostMapping("/courses/insert")
+    public String insert(@Valid @ModelAttribute CourseDTO courseDTO, BindingResult result, Model model,
+                         RedirectAttributes redirectAttributes) {
 
-		if (!result.hasErrors()) {
-			Long id = courseService.save(courseDTO);
-			redirectAttributes.addFlashAttribute("insertedSuccessId", id);
-			return "redirect:/courses";
-		}
+        if (!result.hasErrors()) {
+            Long id = courseService.save(courseDTO);
+            redirectAttributes.addFlashAttribute("insertedSuccessId", id);
+            return "redirect:/courses";
+        }
 
-		return INSERT_FORM_TEMPLATE;
+        return INSERT_FORM_TEMPLATE;
 
-	}
+    }
 }

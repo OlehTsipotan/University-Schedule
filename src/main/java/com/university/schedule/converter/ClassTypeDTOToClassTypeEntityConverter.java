@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClassTypeDTOToClassTypeEntityConverter implements Converter<ClassTypeDTO, ClassType> {
 
-	private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
 
-	public ClassTypeDTOToClassTypeEntityConverter() {
-		this.modelMapper = new ModelMapper();
-	}
+    public ClassTypeDTOToClassTypeEntityConverter() {
+        this.modelMapper = new ModelMapper();
+    }
 
-	@Override
-	public ClassType convert(ClassTypeDTO source) {
-		return modelMapper.map(source, ClassType.class);
-	}
+    @Override
+    public ClassType convert(ClassTypeDTO source) {
+        return modelMapper.map(source, ClassType.class);
+    }
 }

@@ -9,25 +9,25 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CourseService {
-	Long save(Course course);
+    Long save(Course course);
 
-	Long save(CourseDTO courseDTO);
+    Long save(CourseDTO courseDTO);
 
-	CourseDTO findByIdAsDTO(Long id);
+    CourseDTO findByIdAsDTO(Long id);
 
-	List<Course> findByGroupsName(String groupName);
+    List<Course> findByGroupsName(String groupName);
 
-	List<Course> findByGroup(Group group);
+    List<Course> findByGroup(Group group);
 
-	List<Course> findAll();
+    List<Course> findAll();
 
-	List<CourseDTO> findAllAsDTO();
+    List<CourseDTO> findAllAsDTO();
 
-	List<Course> findByTeacher(Teacher teacher);
+    List<Course> findByTeacher(Teacher teacher);
 
-	List<CourseDTO> findAllAsDTO(String email, Pageable pageable);
+    List<CourseDTO> findAllAsDTO(String email, Pageable pageable);
 
-	void deleteById(Long id);
+    void deleteById(Long id);
 
 
 }

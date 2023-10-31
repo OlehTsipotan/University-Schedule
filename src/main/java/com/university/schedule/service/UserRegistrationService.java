@@ -4,6 +4,6 @@ import com.university.schedule.dto.UserRegisterDTO;
 
 public interface UserRegistrationService {
 
-	Long register(UserRegisterDTO userRegisterDTO);
+    Long register(UserRegisterDTO userRegisterDTO);
 
 }

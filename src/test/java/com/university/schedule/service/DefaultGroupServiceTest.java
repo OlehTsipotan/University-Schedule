@@ -177,7 +177,7 @@ public class DefaultGroupServiceTest {
     }
 
     @Test
-    public void save_whenGroupDTOIsValid_success(){
+    public void save_whenGroupDTOIsValid_success() {
         GroupDTO groupDTO = new GroupDTO();
         Group group = new Group();
         when(converterService.convert(groupDTO, Group.class)).thenReturn(group);

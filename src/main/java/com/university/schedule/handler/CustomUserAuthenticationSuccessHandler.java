@@ -18,14 +18,14 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomUserAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-	private final UserService userService;
+    private final UserService userService;
 
-	@Override
-	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-	                                    Authentication authentication) throws IOException, ServletException {
-		UserDTO userDTO = userService.findByEmailAsDTO(authentication.getName());
-		log.debug("Logged as user, {}: {}", userDTO.getRoleDTO().getName(), authentication.getName());
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+                                        Authentication authentication) throws IOException, ServletException {
+        UserDTO userDTO = userService.findByEmailAsDTO(authentication.getName());
+        log.debug("Logged as user, {}: {}", userDTO.getRoleDTO().getName(), authentication.getName());
 
-		response.sendRedirect("/welcome");
-	}
+        response.sendRedirect("/welcome");
+    }
 }

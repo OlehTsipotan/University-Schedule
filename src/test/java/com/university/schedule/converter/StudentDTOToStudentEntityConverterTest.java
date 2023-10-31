@@ -28,7 +28,8 @@ public class StudentDTOToStudentEntityConverterTest {
     @ParameterizedTest
     @NullSource
     public void convert_whenStudentIsNull_throwIllegalArgumentException(StudentDTO studentDTO) {
-        assertThrows(IllegalArgumentException.class, () -> studentDTOToStudentEntityConverterUnderTest.convert(studentDTO));
+        assertThrows(IllegalArgumentException.class,
+            () -> studentDTOToStudentEntityConverterUnderTest.convert(studentDTO));
     }
 
     @Test
@@ -58,7 +59,7 @@ public class StudentDTOToStudentEntityConverterTest {
     }
 
     @Test
-    public void convert_whenStudentNullFields_success(){
+    public void convert_whenStudentNullFields_success() {
         Student student = new Student();
 
         StudentDTO studentDTO = new StudentDTO();

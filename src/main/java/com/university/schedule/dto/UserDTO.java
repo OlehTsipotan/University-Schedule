@@ -10,29 +10,29 @@ import lombok.*;
 @Data
 public class UserDTO {
 
-	private Long id;
+    private Long id;
 
-	@NotBlank(message = "User email must not be blank")
-	@Size(max = 255)
-	private String email;
+    @NotBlank(message = "User email must not be blank")
+    @Size(max = 255)
+    private String email;
 
-	@NotBlank(message = "User firstName must not be blank")
-	@Size(max = 255)
-	private String firstName;
+    @NotBlank(message = "User firstName must not be blank")
+    @Size(max = 255)
+    private String firstName;
 
-	@NotBlank(message = "User lastName must not be blank")
-	@Size(max = 255)
-	private String lastName;
+    @NotBlank(message = "User lastName must not be blank")
+    @Size(max = 255)
+    private String lastName;
 
-	private RoleDTO roleDTO;
-	@Getter(AccessLevel.NONE)
-	private Boolean isEnable;
+    private RoleDTO roleDTO;
+    @Getter(AccessLevel.NONE)
+    private Boolean isEnable;
 
-	public Boolean isEnable() {
-		return this.isEnable;
-	}
+    public Boolean isEnable() {
+        return this.isEnable;
+    }
 
-	public String getFullName() {
-		return firstName + ' ' + lastName;
-	}
+    public String getFullName() {
+        return firstName + ' ' + lastName;
+    }
 }

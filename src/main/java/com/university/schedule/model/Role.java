@@ -20,50 +20,50 @@ import java.util.Set;
 @Table(name = "roles")
 public class Role {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_generator")
-	@SequenceGenerator(name = "role_generator", sequenceName = "roles_seq", allocationSize = 1)
-	@Column(name = "role_id")
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "role_generator")
+    @SequenceGenerator(name = "role_generator", sequenceName = "roles_seq", allocationSize = 1)
+    @Column(name = "role_id")
+    private Long id;
 
-	@NotBlank(message = "Role name must not be blank")
-	@Size(max = 255)
-	private String name;
+    @NotBlank(message = "Role name must not be blank")
+    @Size(max = 255)
+    private String name;
 
-	@OneToMany(mappedBy = "role")
-	@ToString.Exclude
-	private List<User> users;
+    @OneToMany(mappedBy = "role")
+    @ToString.Exclude
+    private List<User> users;
 
-	@ManyToMany
-	@JoinTable(name = "roles_authorities", joinColumns = @JoinColumn(name = "role_id"),
-	           inverseJoinColumns = @JoinColumn(name = "authority_id"))
-	@ToString.Exclude
-	private Set<Authority> authorities;
+    @ManyToMany
+    @JoinTable(name = "roles_authorities", joinColumns = @JoinColumn(name = "role_id"),
+               inverseJoinColumns = @JoinColumn(name = "authority_id"))
+    @ToString.Exclude
+    private Set<Authority> authorities;
 
-	public Role(Long id, String name) {
-		this.id = id;
-		this.name = name;
-	}
+    public Role(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
 
-	public Role(String name) {;
-		this.name = name;
-	}
+    public Role(String name) {
+        this.name = name;
+    }
 
-	public Role(String name, Set<Authority> authorities) {;
-		this.name = name;
-		this.authorities = authorities;
-	}
+    public Role(String name, Set<Authority> authorities) {
+        this.name = name;
+        this.authorities = authorities;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-		Role role = (Role) o;
-		return getId() != null && Objects.equals(getId(), role.getId());
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Role role = (Role) o;
+        return getId() != null && Objects.equals(getId(), role.getId());
+    }
 
-	@Override
-	public int hashCode() {
-		return getClass().hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

@@ -187,7 +187,7 @@ public class DefaultClassroomServiceTest {
     }
 
     @Test
-    public void findAllAsDTO_success(){
+    public void findAllAsDTO_success() {
         Classroom classroom = new Classroom();
         ClassroomDTO classroomDTO = new ClassroomDTO();
         when(classroomRepository.findAll()).thenReturn(List.of(classroom));

@@ -38,8 +38,7 @@ public class ClassroomEntityToClassroomDTOConverterTest {
     @Test
     public void convert_whenClassroomIsValid_success() {
         Building building = Building.builder().name("name").address("address").build();
-        Classroom classroom =
-            Classroom.builder().id(1L).name("name").building(building).build();
+        Classroom classroom = Classroom.builder().id(1L).name("name").building(building).build();
 
         BuildingDTO buildingDTO = BuildingDTO.builder().name("name").address("address").build();
         ClassroomDTO classroomDTO = ClassroomDTO.builder().id(1L).name("name").buildingDTO(buildingDTO).build();

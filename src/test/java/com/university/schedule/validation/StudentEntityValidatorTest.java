@@ -2,7 +2,6 @@ package com.university.schedule.validation;
 
 import com.university.schedule.exception.ValidationException;
 import com.university.schedule.model.Student;
-import jakarta.validation.OverridesAttribute;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,12 +20,10 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(SpringExtension.class)
 public class StudentEntityValidatorTest {
 
+    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
     private StudentEntityValidator validator;
-
     @Mock
     private UserEntityValidator userEntityValidator;
-
-    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @BeforeEach
     public void setUp() {

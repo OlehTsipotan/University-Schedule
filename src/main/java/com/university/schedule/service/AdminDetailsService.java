@@ -14,26 +14,26 @@ import org.springframework.util.StringUtils;
 @RequiredArgsConstructor
 public class AdminDetailsService implements UserDetailsService {
 
-	private final UserService userService;
+    private final UserService userService;
 
-	private final UserDetailsMapper userDetailsMapper;
+    private final UserDetailsMapper userDetailsMapper;
 
 
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        if (StringUtils.isEmpty(username)){
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        if (StringUtils.isEmpty(username)) {
             throw new UsernameNotFoundException("No user found with empty email");
         }
-		User user;
-		try {
-			user = userService.findByEmail(username);
-		} catch (ServiceException e) {
-			throw new UsernameNotFoundException("No user found with email = " + username, e);
-		}
-		if ("Admin".equals(user.getRole().getName())) {
-			return userDetailsMapper.convertToUserDetails(user);
-		}
-		throw new UsernameNotFoundException("User has not Admin role, " + username);
+        User user;
+        try {
+            user = userService.findByEmail(username);
+        } catch (ServiceException e) {
+            throw new UsernameNotFoundException("No user found with email = " + username, e);
+        }
+        if ("Admin".equals(user.getRole().getName())) {
+            return userDetailsMapper.convertToUserDetails(user);
+        }
+        throw new UsernameNotFoundException("User has not Admin role, " + username);
 
-	}
+    }
 }

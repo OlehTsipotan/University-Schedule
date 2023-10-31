@@ -30,9 +30,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class AuthorityRepositoryTest {
 
-    private static String DATABASE_NAME = "databaseName";
-    private static String DATABASE_USERNAME = "databaseName";
-    private static String DATABASE_USER_PASSWORD = "databaseName";
+    private static final String DATABASE_NAME = "databaseName";
+    private static final String DATABASE_USERNAME = "databaseName";
+    private static final String DATABASE_USER_PASSWORD = "databaseName";
 
     @Container
     public static PostgreSQLContainer<?> postgres =

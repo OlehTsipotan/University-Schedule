@@ -24,12 +24,10 @@ import static org.mockito.Mockito.when;
 public class BuildingEntityValidatorTest {
 
 
+    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
     private BuildingEntityValidator validator;
-
     @Mock
     private BuildingRepository buildingRepository;
-
-    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @BeforeEach
     public void setUp() {

@@ -8,19 +8,19 @@ import java.util.List;
 
 public interface StudentService {
 
-	List<Student> findAll();
+    List<Student> findAll();
 
-	List<StudentDTO> findAllAsDTO();
+    List<StudentDTO> findAllAsDTO();
 
-	List<StudentDTO> findAllAsDTO(Pageable pageable);
+    List<StudentDTO> findAllAsDTO(Pageable pageable);
 
-	List<StudentDTO> findAllAsDTO(String email, Pageable pageable);
+    List<StudentDTO> findAllAsDTO(String email, Pageable pageable);
 
-	Long save(Student student);
+    Long save(Student student);
 
-	Long update(StudentDTO studentDTO);
+    Long update(StudentDTO studentDTO);
 
-	StudentDTO findByIdAsDTO(Long id);
+    StudentDTO findByIdAsDTO(Long id);
 
-	void deleteById(Long id);
+    void deleteById(Long id);
 }

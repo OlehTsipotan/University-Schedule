@@ -10,11 +10,11 @@ import lombok.*;
 @Data
 public class DisciplineDTO {
 
-	private Long id;
+    private Long id;
 
-	@NonNull
-	@NotBlank(message = "Discipline name must not be blank")
-	@Size(max = 255)
-	private String name;
+    @NonNull
+    @NotBlank(message = "Discipline name must not be blank")
+    @Size(max = 255)
+    private String name;
 }
 

@@ -143,7 +143,7 @@ public class DefaultClassTypeServiceTest {
 
     @ParameterizedTest
     @NullSource
-    public void findByIdAsDTO_whenIdIsNull_throwServiceException(Long nullId){
+    public void findByIdAsDTO_whenIdIsNull_throwServiceException(Long nullId) {
         when(classTypeRepository.findById(nullId)).thenThrow(InvalidDataAccessApiUsageException.class);
         assertThrows(ServiceException.class, () -> defaultClassTypeService.findByIdAsDTO(nullId));
 
@@ -151,7 +151,7 @@ public class DefaultClassTypeServiceTest {
     }
 
     @Test
-    public void findByIdAsDTO_success(){
+    public void findByIdAsDTO_success() {
         ClassType classType = new ClassType();
         classType.setId(1L);
         ClassTypeDTO classTypeDTO = new ClassTypeDTO();
@@ -167,7 +167,7 @@ public class DefaultClassTypeServiceTest {
 
     @ParameterizedTest
     @NullSource
-    public void findByName_whenNameIsNull_throwServiceException(String nullName){
+    public void findByName_whenNameIsNull_throwServiceException(String nullName) {
         when(classTypeRepository.findByName(nullName)).thenThrow(InvalidDataAccessApiUsageException.class);
         assertThrows(ServiceException.class, () -> defaultClassTypeService.findByName(nullName));
 
@@ -189,7 +189,7 @@ public class DefaultClassTypeServiceTest {
     }
 
     @Test
-    public void findByName_success(){
+    public void findByName_success() {
         ClassType classType = new ClassType();
         classType.setId(1L);
         classType.setName("name");
@@ -210,7 +210,7 @@ public class DefaultClassTypeServiceTest {
     }
 
     @Test
-    public void findAllAsDTO_success(){
+    public void findAllAsDTO_success() {
         ClassType classType = new ClassType();
         classType.setId(1L);
         ClassTypeDTO classTypeDTO = new ClassTypeDTO();
@@ -226,7 +226,7 @@ public class DefaultClassTypeServiceTest {
 
 
     @Test
-    public void findAllAsDTO_whenPageableIsValid_success(){
+    public void findAllAsDTO_whenPageableIsValid_success() {
         ClassType classType = new ClassType();
         classType.setId(1L);
         ClassTypeDTO classTypeDTO = new ClassTypeDTO();
@@ -244,7 +244,7 @@ public class DefaultClassTypeServiceTest {
 
     @ParameterizedTest
     @NullSource
-    public void findAllAsDTO_whenPageableIsNull_success(Pageable nullPageable){
+    public void findAllAsDTO_whenPageableIsNull_success(Pageable nullPageable) {
         assertThrows(IllegalArgumentException.class, () -> defaultClassTypeService.findAllAsDTO(nullPageable));
     }
 

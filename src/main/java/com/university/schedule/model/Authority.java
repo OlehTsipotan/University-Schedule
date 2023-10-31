@@ -19,41 +19,41 @@ import java.util.Set;
 @Table(name = "authorities")
 public class Authority {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "authority_generator")
-	@SequenceGenerator(name = "authority_generator", sequenceName = "authorities_seq", allocationSize = 1)
-	@Column(name = "authority_id")
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "authority_generator")
+    @SequenceGenerator(name = "authority_generator", sequenceName = "authorities_seq", allocationSize = 1)
+    @Column(name = "authority_id")
+    private Long id;
 
-	@NotBlank(message = "Authority name must not be blank")
-	@Size(max = 255)
-	private String name;
+    @NotBlank(message = "Authority name must not be blank")
+    @Size(max = 255)
+    private String name;
 
-	@ManyToMany
-	@JoinTable(name = "roles_authorities", joinColumns = @JoinColumn(name = "authority_id"),
-	           inverseJoinColumns = @JoinColumn(name = "role_id"))
-	@ToString.Exclude
-	private Set<Role> roles;
+    @ManyToMany
+    @JoinTable(name = "roles_authorities", joinColumns = @JoinColumn(name = "authority_id"),
+               inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @ToString.Exclude
+    private Set<Role> roles;
 
-	public Authority(String name){
-		this.name = name;
-	}
+    public Authority(String name) {
+        this.name = name;
+    }
 
-    public Authority(String name, Set<Role> roles){
+    public Authority(String name, Set<Role> roles) {
         this.name = name;
         this.roles = roles;
     }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-		Authority authority = (Authority) o;
-		return getId() != null && Objects.equals(getId(), authority.getId());
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Authority authority = (Authority) o;
+        return getId() != null && Objects.equals(getId(), authority.getId());
+    }
 
-	@Override
-	public int hashCode() {
-		return getClass().hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

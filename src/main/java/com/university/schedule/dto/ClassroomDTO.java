@@ -11,14 +11,14 @@ import lombok.*;
 @Data
 public class ClassroomDTO {
 
-	private Long id;
+    private Long id;
 
-	@NonNull
-	@NotBlank(message = "Classroom name must not be blank")
-	@Size(max = 255)
-	private String name;
+    @NonNull
+    @NotBlank(message = "Classroom name must not be blank")
+    @Size(max = 255)
+    private String name;
 
     @NotNull(message = "Building must not be null")
-	private BuildingDTO buildingDTO;
+    private BuildingDTO buildingDTO;
 
 }

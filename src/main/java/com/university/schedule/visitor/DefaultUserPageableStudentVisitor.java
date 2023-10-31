@@ -12,20 +12,20 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DefaultUserPageableStudentVisitor implements UserPageableStudentVisitor {
 
-	private final StudentRepository studentRepository;
+    private final StudentRepository studentRepository;
 
-	@Override
-	public List<Student> performActionForTeacher(Pageable pageable) {
-		return studentRepository.findAll(pageable).toList();
-	}
+    @Override
+    public List<Student> performActionForTeacher(Pageable pageable) {
+        return studentRepository.findAll(pageable).toList();
+    }
 
-	@Override
-	public List<Student> performActionForStudent(Student student, Pageable pageable) {
-		return studentRepository.findByGroup(student.getGroup(), pageable).toList();
-	}
+    @Override
+    public List<Student> performActionForStudent(Student student, Pageable pageable) {
+        return studentRepository.findByGroup(student.getGroup(), pageable).toList();
+    }
 
-	@Override
-	public List<Student> performActionForUser(Pageable pageable) {
-		return studentRepository.findAll(pageable).toList();
-	}
+    @Override
+    public List<Student> performActionForUser(Pageable pageable) {
+        return studentRepository.findAll(pageable).toList();
+    }
 }

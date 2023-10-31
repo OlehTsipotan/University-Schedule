@@ -8,17 +8,17 @@ import java.util.List;
 
 public interface ClassTypeService {
 
-	Long save(ClassType classType);
+    Long save(ClassType classType);
 
-	Long save(ClassTypeDTO classTypeDTO);
+    Long save(ClassTypeDTO classTypeDTO);
 
-	ClassTypeDTO findByIdAsDTO(Long id);
+    ClassTypeDTO findByIdAsDTO(Long id);
 
-	ClassType findByName(String name);
+    ClassType findByName(String name);
 
-	List<ClassTypeDTO> findAllAsDTO();
+    List<ClassTypeDTO> findAllAsDTO();
 
-	List<ClassTypeDTO> findAllAsDTO(Pageable pageable);
+    List<ClassTypeDTO> findAllAsDTO(Pageable pageable);
 
-	void deleteById(Long id);
+    void deleteById(Long id);
 }

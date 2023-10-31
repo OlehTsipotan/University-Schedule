@@ -16,9 +16,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class UserRegisterDTOValidatorTest {
 
-    private UserRegisterDTOValidator validator;
-
     private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
+    private UserRegisterDTOValidator validator;
 
     @BeforeEach
     public void setUp() {
@@ -41,7 +40,7 @@ public class UserRegisterDTOValidatorTest {
 
     @ParameterizedTest
     @NullSource
-    public void validate_whenUserIsNull_throwIllegalArgumentException(UserRegisterDTO nullUser){
+    public void validate_whenUserIsNull_throwIllegalArgumentException(UserRegisterDTO nullUser) {
         assertThrows(IllegalArgumentException.class, () -> validator.validate(nullUser));
     }
 }

@@ -36,8 +36,7 @@ public class ClassTimeEntityToClassTimeDTOConverterTest {
     @ParameterizedTest
     @NullSource
     public void convert_whenClassTimeIsNull_throwIllegalArgumentException(ClassTime classTime) {
-        assertThrows(IllegalArgumentException.class,
-            () -> classTimeEntityToClassTimeDTOConverter.convert(classTime));
+        assertThrows(IllegalArgumentException.class, () -> classTimeEntityToClassTimeDTOConverter.convert(classTime));
     }
 
     @Test

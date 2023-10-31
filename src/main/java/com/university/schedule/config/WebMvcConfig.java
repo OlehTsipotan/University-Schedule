@@ -11,7 +11,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.List;
 import java.util.Set;
 
 @Configuration
@@ -20,20 +19,20 @@ import java.util.Set;
 @Profile("dev")
 public class WebMvcConfig implements WebMvcConfigurer {
 
-	private static final String[] CLASSPATH_RESOURCE_LOCATIONS =
-			{"classpath:/static/assets/", "classpath:/META-INF/resources/webjars/", "classpath:/static/styles/"};
+    private static final String[] CLASSPATH_RESOURCE_LOCATIONS =
+        {"classpath:/static/assets/", "classpath:/META-INF/resources/webjars/", "classpath:/static/styles/"};
 
-	@Autowired
-	private Set<Formatter<?>> formatters;
+    @Autowired
+    private Set<Formatter<?>> formatters;
 
-	@Override
-	public void addFormatters(FormatterRegistry registry) {
-		formatters.forEach(registry::addFormatter);
-	}
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+        formatters.forEach(registry::addFormatter);
+    }
 
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		registry.addResourceHandler("/webjars/**", "/assets/**", "/styles/**")
-				.addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
-	}
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/webjars/**", "/assets/**", "/styles/**")
+            .addResourceLocations(CLASSPATH_RESOURCE_LOCATIONS);
+    }
 }

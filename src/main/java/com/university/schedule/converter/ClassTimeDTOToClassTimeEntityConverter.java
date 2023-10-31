@@ -11,22 +11,23 @@ import java.time.Duration;
 @Component
 public class ClassTimeDTOToClassTimeEntityConverter implements Converter<ClassTimeDTO, ClassTime> {
 
-	private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
 
-	public ClassTimeDTOToClassTimeEntityConverter() {
-		this.modelMapper = new ModelMapper();
-		org.modelmapper.Converter<Integer, Duration> converter =
-				durationMinutes -> Duration.ofMinutes(durationMinutes.getSource());
+    public ClassTimeDTOToClassTimeEntityConverter() {
+        this.modelMapper = new ModelMapper();
+        org.modelmapper.Converter<Integer, Duration> converter =
+            durationMinutes -> Duration.ofMinutes(durationMinutes.getSource());
 
         org.modelmapper.Condition<Integer, Duration> nonNull = ctx -> ctx.getSource() != null;
 
-		modelMapper.typeMap(ClassTimeDTO.class, ClassTime.class).addMappings(modelMapper -> modelMapper.when(nonNull).using(converter)
-				.map(ClassTimeDTO::getDurationMinutes, ClassTime::setDuration));
-	}
+        modelMapper.typeMap(ClassTimeDTO.class, ClassTime.class).addMappings(
+            modelMapper -> modelMapper.when(nonNull).using(converter)
+                .map(ClassTimeDTO::getDurationMinutes, ClassTime::setDuration));
+    }
 
-	@Override
-	public ClassTime convert(ClassTimeDTO source) {
-		return modelMapper.map(source, ClassTime.class);
-	}
+    @Override
+    public ClassTime convert(ClassTimeDTO source) {
+        return modelMapper.map(source, ClassTime.class);
+    }
 }

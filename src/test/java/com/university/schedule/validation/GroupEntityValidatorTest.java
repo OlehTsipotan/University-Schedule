@@ -24,12 +24,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 public class GroupEntityValidatorTest {
 
+    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
     private GroupEntityValidator validator;
-
     @Mock
     private GroupRepository groupRepository;
-
-    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @BeforeEach
     public void setUp() {

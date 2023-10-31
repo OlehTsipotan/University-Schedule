@@ -8,22 +8,22 @@ import java.util.List;
 
 public interface UserService {
 
-	List<User> findAll();
+    List<User> findAll();
 
-	List<UserDTO> findAllAsDTO();
+    List<UserDTO> findAllAsDTO();
 
-	List<UserDTO> findAllAsDTO(Pageable pageable);
+    List<UserDTO> findAllAsDTO(Pageable pageable);
 
-	Long save(User user);
+    Long save(User user);
 
-	Long update(UserDTO userDTO);
+    Long update(UserDTO userDTO);
 
-	UserDTO findByIdAsDTO(Long id);
+    UserDTO findByIdAsDTO(Long id);
 
-	User findByEmail(String email);
+    User findByEmail(String email);
 
-	UserDTO findByEmailAsDTO(String email);
+    UserDTO findByEmailAsDTO(String email);
 
-	void deleteById(Long id);
+    void deleteById(Long id);
 
 }

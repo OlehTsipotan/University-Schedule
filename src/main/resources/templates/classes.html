@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <meta name="description" content="University schedule web-application "/>
-    <meta name="author" content="Oleh Tsipotan"/>
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+    <meta content="University schedule web-application " name="description"/>
+    <meta content="Oleh Tsipotan" name="author"/>
     <title>Classes Records</title>
 
-    <link th:href="@{/styles/main.css}" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/styles/main.css}"/>
 
-    <link th:href="@{/assets/calendar-days-solid.svg}" rel="icon" type="image/x-icon"/>
-    <link th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}" rel="stylesheet"/>
-    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}" rel="stylesheet"/>
-    <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
+    <link rel="icon" th:href="@{/assets/calendar-days-solid.svg}" type="image/x-icon"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}"/>
+    <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}"/>
 
 </head>
 <body>
@@ -36,7 +36,7 @@
             <th th:replace="~{fragments/sorting :: sorting('classes', 'classType','Type')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('classes', 'classroom','Classroom Name')}"></th>
             <th th:replace="~{fragments/sorting :: sorting('classes', 'classroomBuilding','Building Name')}"></th>
-            <th sec:authorize="hasAuthority('EDIT_CLASSES')" class="static-col">Actions</th>
+            <th class="static-col" sec:authorize="hasAuthority('EDIT_CLASSES')">Actions</th>
         </tr>
         </thead>
         <tbody>
@@ -46,25 +46,25 @@
             <td th:text="${entity.getTeacherDTO().getFullName()}"></td>
             <td>
                 <span th:each="groupDTO, iterStat : ${entity.getGroupDTOS()}"><span
-                        th:text="${groupDTO.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
+                    th:text="${groupDTO.getName()}"></span><span th:if="${!iterStat.last}">, </span></span>
             </td>
             <td th:text="${entity.getDate()}"></td>
             <td th:text="${entity.getClassTimeDTO().getOrderNumber()}"></td>
             <td th:text="${entity.getClassTypeDTO().getName()}"></td>
             <td th:text="${entity.getClassroomDTO().getName()}"></td>
             <td th:text="${entity.getClassroomDTO().getBuildingDTO().getName()}"></td>
-            <td sec:authorize="hasAuthority('EDIT_CLASSES')" class="static-col">
-                <a th:href="@{'/classes/update/' + ${entity.getId()}}" id="btnUpdate"
-                   title="Update this Class" class="fa-solid fa-pen-to-square icon-dark btn-delete"></a>
-                <a th:href="@{'/classes/delete/' + ${entity.getId()}}" id="btnDelete"
-                   title="Delete this Class" class="fa-regular fa-trash-can icon-dark btn-delete"></a>
+            <td class="static-col" sec:authorize="hasAuthority('EDIT_CLASSES')">
+                <a class="fa-solid fa-pen-to-square icon-dark btn-delete" id="btnUpdate"
+                   th:href="@{'/classes/update/' + ${entity.getId()}}" title="Update this Class"></a>
+                <a class="fa-regular fa-trash-can icon-dark btn-delete" id="btnDelete"
+                   th:href="@{'/classes/delete/' + ${entity.getId()}}" title="Delete this Class"></a>
             </td>
         </tr>
         </tbody>
     </table>
-    <div sec:authorize="hasAuthority('INSERT_CLASSES')" class="sticky-bottom bg-light p-3">
-        <button type="button"
-                class="btn btn-primary"><a class="nav-link" href="/classes/insert">Insert new</a></button>
+    <div class="sticky-bottom bg-light p-3" sec:authorize="hasAuthority('INSERT_CLASSES')">
+        <button class="btn btn-primary"
+                type="button"><a class="nav-link" href="/classes/insert">Insert new</a></button>
     </div>
 </div>
 <div class="" th:unless="${entities.size() > 0}">

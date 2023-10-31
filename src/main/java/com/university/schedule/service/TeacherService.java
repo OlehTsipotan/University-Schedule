@@ -9,19 +9,19 @@ import java.util.List;
 
 public interface TeacherService {
 
-	List<Teacher> findAll();
+    List<Teacher> findAll();
 
-	List<TeacherDTO> findAllAsDTO();
+    List<TeacherDTO> findAllAsDTO();
 
-	List<TeacherDTO> findAllAsDTO(Pageable pageable);
+    List<TeacherDTO> findAllAsDTO(Pageable pageable);
 
-	Long save(Teacher teacher);
+    Long save(Teacher teacher);
 
-	Long update(TeacherDTO teacherDTO);
+    Long update(TeacherDTO teacherDTO);
 
-	TeacherDTO findByIdAsDTO(Long id);
+    TeacherDTO findByIdAsDTO(Long id);
 
-	void deleteById(Long id);
+    void deleteById(Long id);
 
-	List<Teacher> findByCourses(Course course);
+    List<Teacher> findByCourses(Course course);
 }

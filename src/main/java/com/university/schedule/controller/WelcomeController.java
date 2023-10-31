@@ -16,14 +16,14 @@ import java.security.Principal;
 @RequiredArgsConstructor
 public class WelcomeController {
 
-	private final UserService userService;
+    private final UserService userService;
 
-	@Secured("VIEW_WELCOME")
-	@GetMapping("/welcome")
-	public String welcome(Model model, Principal principal) {
-		User user = userService.findByEmail(principal.getName());
-		model.addAttribute("userFullName", user.getFullName());
-		model.addAttribute("role", user.getRole().getName());
-		return "index/userIndex";
-	}
+    @Secured("VIEW_WELCOME")
+    @GetMapping("/welcome")
+    public String welcome(Model model, Principal principal) {
+        User user = userService.findByEmail(principal.getName());
+        model.addAttribute("userFullName", user.getFullName());
+        model.addAttribute("role", user.getRole().getName());
+        return "index/userIndex";
+    }
 }

@@ -1,7 +1,6 @@
 package com.university.schedule.repository;
 
 import com.university.schedule.model.*;
-import org.checkerframework.checker.units.qual.C;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -377,8 +376,6 @@ public class ScheduledClassRepositoryTest {
         assertTrue(allScheduledClasses.contains(scheduledClassToSave2));
         assertTrue(allScheduledClasses.contains(scheduledClassToSave3));
     }
-
-
 
 
     @ParameterizedTest

@@ -1,11 +1,9 @@
 package com.university.schedule.converter;
 
 import com.university.schedule.dto.CourseDTO;
-import com.university.schedule.dto.DisciplineDTO;
 import com.university.schedule.dto.RoleDTO;
 import com.university.schedule.dto.TeacherDTO;
 import com.university.schedule.model.Course;
-import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Role;
 import com.university.schedule.model.Teacher;
 import org.junit.jupiter.api.BeforeEach;

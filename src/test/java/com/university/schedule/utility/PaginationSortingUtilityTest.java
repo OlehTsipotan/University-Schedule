@@ -22,17 +22,20 @@ public class PaginationSortingUtilityTest {
 
     @Test
     public void getPageable_whenSortFieldIsNull_throwIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> PaginationSortingUtility.getPageable(0, 10, new String[]{null, "asc"}));
+        assertThrows(IllegalArgumentException.class,
+            () -> PaginationSortingUtility.getPageable(0, 10, new String[]{null, "asc"}));
     }
 
     @Test
     public void getPageable_whenSortDirectionIsNull_throwIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> PaginationSortingUtility.getPageable(0, 10, new String[]{"name", null}));
+        assertThrows(IllegalArgumentException.class,
+            () -> PaginationSortingUtility.getPageable(0, 10, new String[]{"name", null}));
     }
 
     @Test
     public void getPageable_whenSortFieldAndDirectionAreNull_throwIllegalArgumentException() {
-        assertThrows(IllegalArgumentException.class, () -> PaginationSortingUtility.getPageable(0, 10, new String[]{null, null}));
+        assertThrows(IllegalArgumentException.class,
+            () -> PaginationSortingUtility.getPageable(0, 10, new String[]{null, null}));
     }
 
 

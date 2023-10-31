@@ -1,11 +1,8 @@
 package com.university.schedule.repository;
 
-import com.university.schedule.model.Authority;
 import com.university.schedule.model.Discipline;
-import com.university.schedule.model.Role;
 import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +15,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -29,9 +23,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class DisciplineRepositoryTest {
 
-    private static String DATABASE_NAME = "databaseName";
-    private static String DATABASE_USERNAME = "databaseName";
-    private static String DATABASE_USER_PASSWORD = "databaseName";
+    private static final String DATABASE_NAME = "databaseName";
+    private static final String DATABASE_USERNAME = "databaseName";
+    private static final String DATABASE_USER_PASSWORD = "databaseName";
 
     @Container
     public static PostgreSQLContainer<?> postgres =

@@ -1,39 +1,39 @@
-<nav xmlns:th="http://www.thymeleaf.org" th:fragment="navbar(pageName)"
-     xmlns:sec="http://www.thymeleaf.org/extras/spring-security" class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" th:fragment="navbar(pageName)"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
     <div class="container">
-        <span th:text=${pageName} class="navbar-brand"></span>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-brand" th:text=${pageName}></span>
+        <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+                data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
             <span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li sec:authorize="hasAuthority('VIEW_WELCOME')" class="nav-item"><a class="nav-link"
-                                                                                     aria-current="page"
+                <li class="nav-item" sec:authorize="hasAuthority('VIEW_WELCOME')"><a aria-current="page"
+                                                                                     class="nav-link"
                                                                                      href="/welcome">Home</a></li>
-                <li sec:authorize="hasRole('ADMIN')" class="nav-item"><a class="nav-link" aria-current="page"
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a aria-current="page" class="nav-link"
                                                                          href="/admin/dashboard">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" aria-current="page" href="/logout">Logout</a></li>
+                <li class="nav-item"><a aria-current="page" class="nav-link" href="/logout">Logout</a></li>
             </ul>
         </div>
     </div>
 </nav>
-<nav xmlns:th="http://www.thymeleaf.org" th:fragment="navbarWithBackPage(pageName, backPageUrl)"
-     xmlns:sec="http://www.thymeleaf.org/extras/spring-security" class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <a th:href=${backPageUrl} id="" title="Update this Teacher" class="ms-4 fa-solid fa-arrow-left nav-link"
-       style="color: #ffffff"></a>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" th:fragment="navbarWithBackPage(pageName, backPageUrl)"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security" xmlns:th="http://www.thymeleaf.org">
+    <a class="ms-4 fa-solid fa-arrow-left nav-link" id="" style="color: #ffffff" th:href=${backPageUrl}
+       title="Update this Teacher"></a>
     <div class="container">
-        <span th:text=${pageName} class="navbar-brand"></span>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-brand" th:text=${pageName}></span>
+        <button aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"
+                data-bs-target="#navbarSupportedContent" data-bs-toggle="collapse" type="button">
             <span class="navbar-toggler-icon"></span></button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <li sec:authorize="hasAuthority('VIEW_WELCOME')" class="nav-item"><a class="nav-link"
-                                                                                     aria-current="page"
+                <li class="nav-item" sec:authorize="hasAuthority('VIEW_WELCOME')"><a aria-current="page"
+                                                                                     class="nav-link"
                                                                                      href="/welcome">Home</a></li>
-                <li sec:authorize="hasRole('ADMIN')" class="nav-item"><a class="nav-link" aria-current="page"
+                <li class="nav-item" sec:authorize="hasRole('ADMIN')"><a aria-current="page" class="nav-link"
                                                                          href="/admin/dashboard">Dashboard</a></li>
-                <li class="nav-item"><a class="nav-link" aria-current="page" href="/logout">Logout</a></li>
+                <li class="nav-item"><a aria-current="page" class="nav-link" href="/logout">Logout</a></li>
             </ul>
         </div>
     </div>

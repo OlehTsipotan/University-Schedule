@@ -12,14 +12,14 @@ import java.util.Set;
 @RequiredArgsConstructor
 public abstract class EntityValidator<T> {
 
-	private final Validator validator;
+    private final Validator validator;
 
-	public void validate(T t) {
-		Set<ConstraintViolation<Object>> violations = validator.validate(t);
-		if (!violations.isEmpty()) {
-			throw new ValidationException(String.format("Validation error with %s", t.toString()),
-					violations.stream().map(ConstraintViolation::getMessage).toList());
-		}
+    public void validate(T t) {
+        Set<ConstraintViolation<Object>> violations = validator.validate(t);
+        if (!violations.isEmpty()) {
+            throw new ValidationException(String.format("Validation error with %s", t.toString()),
+                violations.stream().map(ConstraintViolation::getMessage).toList());
+        }
 
-	}
+    }
 }

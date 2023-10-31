@@ -30,9 +30,8 @@ import static org.junit.Assert.assertNull;
 public class ClassTypeRepositoryTest {
 
     @Container
-    public static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:latest")
-            .withDatabaseName("databaseName")
-            .withUsername("username")
+    public static PostgreSQLContainer<?> postgres =
+        new PostgreSQLContainer<>("postgres:latest").withDatabaseName("databaseName").withUsername("username")
             .withPassword("password");
     @Autowired
     ClassTypeRepository classTypeRepository;

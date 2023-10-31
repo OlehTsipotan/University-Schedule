@@ -21,51 +21,51 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class DefaultUserRegistrationService implements UserRegistrationService {
 
-	private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-	private final TeacherService teacherService;
+    private final TeacherService teacherService;
 
-	private final StudentService studentService;
+    private final StudentService studentService;
 
-	private final ConverterService converterService;
+    private final ConverterService converterService;
 
-	private final RoleService roleService;
+    private final RoleService roleService;
 
-	private final UserRegisterDTOValidator userRegisterDTOValidator;
+    private final UserRegisterDTOValidator userRegisterDTOValidator;
 
 
-	@Transactional
-	public Long register(UserRegisterDTO userRegisterDTO) {
-		userRegisterDTOValidator.validate(userRegisterDTO);
+    @Transactional
+    public Long register(UserRegisterDTO userRegisterDTO) {
+        userRegisterDTOValidator.validate(userRegisterDTO);
 
-		User user = convertToEntity(userRegisterDTO);
-		user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User user = convertToEntity(userRegisterDTO);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-		Role userRole = roleService.findById(user.getRole().getId());
+        Role userRole = roleService.findById(user.getRole().getId());
 
-		if ("Teacher".equals(userRole.getName())) {
-			return execute(() -> teacherService.save(new Teacher(user)));
-		} else if ("Student".equals(userRole.getName())) {
-			return execute(() -> studentService.save(new Student(user)));
-		}
-		throw new RegistrationFailedException("Can`t register user with role = " + user.getRole().getName());
+        if ("Teacher".equals(userRole.getName())) {
+            return execute(() -> teacherService.save(new Teacher(user)));
+        } else if ("Student".equals(userRole.getName())) {
+            return execute(() -> studentService.save(new Student(user)));
+        }
+        throw new RegistrationFailedException("Can`t register user with role = " + user.getRole().getName());
 
-	}
+    }
 
-	private User convertToEntity(UserRegisterDTO source) {
-		return converterService.convert(source, User.class);
-	}
+    private User convertToEntity(UserRegisterDTO source) {
+        return converterService.convert(source, User.class);
+    }
 
-	private <T> T execute(DaoSupplier<T> supplier) {
-		try {
-			return supplier.get();
-		} catch (ServiceException e) {
-			throw new RegistrationFailedException("User registration failed", e);
-		}
-	}
+    private <T> T execute(DaoSupplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (ServiceException e) {
+            throw new RegistrationFailedException("User registration failed", e);
+        }
+    }
 
-	@FunctionalInterface
-	public interface DaoSupplier<T> {
-		T get();
-	}
+    @FunctionalInterface
+    public interface DaoSupplier<T> {
+        T get();
+    }
 }

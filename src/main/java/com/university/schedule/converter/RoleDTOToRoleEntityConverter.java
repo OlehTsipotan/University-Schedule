@@ -16,29 +16,29 @@ import java.util.stream.Collectors;
 @Component
 public class RoleDTOToRoleEntityConverter implements Converter<RoleDTO, Role> {
 
-	private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-	private final AuthorityDTOToAuthorityEntityConverter authorityDTOToAuthorityEntityConverter;
+    private final AuthorityDTOToAuthorityEntityConverter authorityDTOToAuthorityEntityConverter;
 
 
-	public RoleDTOToRoleEntityConverter() {
-		this.modelMapper = new ModelMapper();
-		this.authorityDTOToAuthorityEntityConverter = new AuthorityDTOToAuthorityEntityConverter();
+    public RoleDTOToRoleEntityConverter() {
+        this.modelMapper = new ModelMapper();
+        this.authorityDTOToAuthorityEntityConverter = new AuthorityDTOToAuthorityEntityConverter();
 
-		org.modelmapper.Converter<List<AuthorityDTO>, Set<Authority>> authoritiesListConverter =
-				courseList -> courseList.getSource().stream().map(authorityDTOToAuthorityEntityConverter::convert)
-						.collect(Collectors.toSet());
+        org.modelmapper.Converter<List<AuthorityDTO>, Set<Authority>> authoritiesListConverter =
+            courseList -> courseList.getSource().stream().map(authorityDTOToAuthorityEntityConverter::convert)
+                .collect(Collectors.toSet());
 
         Condition notNull = ctx -> ctx.getSource() != null;
 
-		modelMapper.typeMap(RoleDTO.class, Role.class).addMappings(modelMapper -> {
-			modelMapper.when(notNull).using(authoritiesListConverter).map(RoleDTO::getAuthorityDTOS,
-                Role::setAuthorities);
-		});
-	}
+        modelMapper.typeMap(RoleDTO.class, Role.class).addMappings(modelMapper -> {
+            modelMapper.when(notNull).using(authoritiesListConverter)
+                .map(RoleDTO::getAuthorityDTOS, Role::setAuthorities);
+        });
+    }
 
-	@Override
-	public Role convert(RoleDTO source) {
-		return modelMapper.map(source, Role.class);
-	}
+    @Override
+    public Role convert(RoleDTO source) {
+        return modelMapper.map(source, Role.class);
+    }
 }

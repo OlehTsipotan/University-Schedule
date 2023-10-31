@@ -56,8 +56,7 @@ public class DefaultScheduledClassServiceTest {
     public void save_whenScheduledClassIsNull_throwIllegalArgumentException(ScheduledClass nullScheduledClass) {
         doThrow(IllegalArgumentException.class).when(scheduledClassEntityValidator).validate(nullScheduledClass);
 
-        assertThrows(IllegalArgumentException.class,
-            () -> defaultScheduledClassService.save(nullScheduledClass));
+        assertThrows(IllegalArgumentException.class, () -> defaultScheduledClassService.save(nullScheduledClass));
 
         verify(scheduledClassEntityValidator).validate(nullScheduledClass);
     }
@@ -100,8 +99,7 @@ public class DefaultScheduledClassServiceTest {
         when(converterService.convert(nullScheduledClassDTO, ScheduledClass.class)).thenThrow(
             IllegalArgumentException.class);
 
-        assertThrows(IllegalArgumentException.class,
-            () -> defaultScheduledClassService.save(nullScheduledClassDTO));
+        assertThrows(IllegalArgumentException.class, () -> defaultScheduledClassService.save(nullScheduledClassDTO));
 
         verify(converterService).convert(nullScheduledClassDTO, ScheduledClass.class);
     }
@@ -192,8 +190,7 @@ public class DefaultScheduledClassServiceTest {
     @ParameterizedTest
     @NullSource
     public void findAllAsDTO_whenPageableIsNull_throwIllegalArgumentException(Pageable nullPageable) {
-        assertThrows(IllegalArgumentException.class,
-            () -> defaultScheduledClassService.findAllAsDTO(nullPageable));
+        assertThrows(IllegalArgumentException.class, () -> defaultScheduledClassService.findAllAsDTO(nullPageable));
     }
 
     @Test

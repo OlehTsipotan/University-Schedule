@@ -16,9 +16,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface ClassDuration {
 
-	String message() default "{ClassDuration.invalid}";
+    String message() default "{ClassDuration.invalid}";
 
-	Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-	Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 }

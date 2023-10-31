@@ -9,21 +9,21 @@ import java.util.List;
 
 public interface GroupService {
 
-	List<Group> findAll();
+    List<Group> findAll();
 
-	List<GroupDTO> findAllAsDTO();
+    List<GroupDTO> findAllAsDTO();
 
-	List<GroupDTO> findAllAsDTO(Pageable pageable);
+    List<GroupDTO> findAllAsDTO(Pageable pageable);
 
-	Long save(Group group);
+    Long save(Group group);
 
-	Long save(GroupDTO groupDTO);
+    Long save(GroupDTO groupDTO);
 
-	List<Group> findByDiscipline(Discipline discipline);
+    List<Group> findByDiscipline(Discipline discipline);
 
-	GroupDTO findByIdAsDTO(Long id);
+    GroupDTO findByIdAsDTO(Long id);
 
-	void deleteById(Long id);
+    void deleteById(Long id);
 
 
 }

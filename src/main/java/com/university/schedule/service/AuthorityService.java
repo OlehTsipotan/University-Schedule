@@ -9,21 +9,21 @@ import java.util.List;
 
 public interface AuthorityService {
 
-	Long save(Authority authority);
+    Long save(Authority authority);
 
-	Authority findById(Long id);
+    Authority findById(Long id);
 
-	AuthorityDTO findByIdAsDTO(Long id);
+    AuthorityDTO findByIdAsDTO(Long id);
 
-	Authority findByName(String name);
+    Authority findByName(String name);
 
-	List<Authority> findByRole(Role role);
+    List<Authority> findByRole(Role role);
 
-	List<Authority> findAll();
+    List<Authority> findAll();
 
-	List<AuthorityDTO> findAllAsDTO();
+    List<AuthorityDTO> findAllAsDTO();
 
-	List<AuthorityDTO> findAllAsDTO(Pageable pageable);
+    List<AuthorityDTO> findAllAsDTO(Pageable pageable);
 
-	void deleteById(Long id);
+    void deleteById(Long id);
 }

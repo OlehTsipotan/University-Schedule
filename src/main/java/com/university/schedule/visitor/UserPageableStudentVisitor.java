@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface UserPageableStudentVisitor {
 
-	List<Student> performActionForTeacher(Pageable pageable);
+    List<Student> performActionForTeacher(Pageable pageable);
 
-	List<Student> performActionForStudent(Student student, Pageable pageable);
+    List<Student> performActionForStudent(Student student, Pageable pageable);
 
-	List<Student> performActionForUser(Pageable pageable);
+    List<Student> performActionForUser(Pageable pageable);
 }

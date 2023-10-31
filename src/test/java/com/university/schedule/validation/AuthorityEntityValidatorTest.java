@@ -23,12 +23,10 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 public class AuthorityEntityValidatorTest {
 
+    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
     private AuthorityEntityValidator validator;
-
     @Mock
     private AuthorityRepository authorityRepository;
-
-    private final Validator jakartaValidator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @BeforeEach
     public void setUp() {

@@ -22,111 +22,111 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class DefaultClassTimeService implements ClassTimeService {
 
-	private final ClassTimeRepository classTimeRepository;
+    private final ClassTimeRepository classTimeRepository;
 
-	private final ClassTimeEntityValidator classTimeValidationService;
+    private final ClassTimeEntityValidator classTimeValidationService;
 
-	private final ConverterService converterService;
+    private final ConverterService converterService;
 
-	@Override
-	@Transactional
-	public Long save(ClassTime classTime) {
-		execute(() -> {
-			classTimeValidationService.validate(classTime);
-			classTimeRepository.save(classTime);
-		});
-		log.info("saved {}", classTime);
-		return classTime.getId();
-	}
+    @Override
+    @Transactional
+    public Long save(ClassTime classTime) {
+        execute(() -> {
+            classTimeValidationService.validate(classTime);
+            classTimeRepository.save(classTime);
+        });
+        log.info("saved {}", classTime);
+        return classTime.getId();
+    }
 
-	@Override
-	@Transactional
-	public Long save(ClassTimeDTO classTimeDTO) {
-		ClassTime classTime = convertToEntity(classTimeDTO);
-		execute(() -> {
-			classTimeValidationService.validate(classTime);
-			classTimeRepository.save(classTime);
-		});
-		log.info("saved {}", classTime);
-		return classTime.getId();
-	}
+    @Override
+    @Transactional
+    public Long save(ClassTimeDTO classTimeDTO) {
+        ClassTime classTime = convertToEntity(classTimeDTO);
+        execute(() -> {
+            classTimeValidationService.validate(classTime);
+            classTimeRepository.save(classTime);
+        });
+        log.info("saved {}", classTime);
+        return classTime.getId();
+    }
 
-	@Override
-	public ClassTimeDTO findByIdAsDTO(Long id) {
-		ClassTime classTime = execute(() -> classTimeRepository.findById(id)).orElseThrow(
-				() -> new ServiceException("ClassTime not found"));
-		log.debug("Retrieved {}", classTime);
-		return convertToDTO(classTime);
-	}
+    @Override
+    public ClassTimeDTO findByIdAsDTO(Long id) {
+        ClassTime classTime = execute(() -> classTimeRepository.findById(id)).orElseThrow(
+            () -> new ServiceException("ClassTime not found"));
+        log.debug("Retrieved {}", classTime);
+        return convertToDTO(classTime);
+    }
 
-	@Override
-	public ClassTime findByOrderNumber(Integer order) {
-		ClassTime classTime = execute(() -> classTimeRepository.findByOrderNumber(order)).orElseThrow(
-				() -> new ServiceException("ClassTime not found"));
-		log.debug("Retrieved {}", classTime);
-		return classTime;
-	}
+    @Override
+    public ClassTime findByOrderNumber(Integer order) {
+        ClassTime classTime = execute(() -> classTimeRepository.findByOrderNumber(order)).orElseThrow(
+            () -> new ServiceException("ClassTime not found"));
+        log.debug("Retrieved {}", classTime);
+        return classTime;
+    }
 
-	public List<ClassTimeDTO> findAllAsDTO(Pageable pageable) {
+    public List<ClassTimeDTO> findAllAsDTO(Pageable pageable) {
         if (pageable == null) {
             throw new IllegalArgumentException("Pageable is null");
         }
-		List<ClassTimeDTO> classTimeDTOList =
-				execute(() -> classTimeRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} ClassTimes", classTimeDTOList.size());
-		return classTimeDTOList;
-	}
+        List<ClassTimeDTO> classTimeDTOList =
+            execute(() -> classTimeRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+        log.debug("Retrieved All {} ClassTimes", classTimeDTOList.size());
+        return classTimeDTOList;
+    }
 
-	public List<ClassTimeDTO> findAllAsDTO() {
-		List<ClassTimeDTO> classTimeDTOList =
-				execute(() -> classTimeRepository.findAll()).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} ClassTimes", classTimeDTOList.size());
-		return classTimeDTOList;
-	}
+    public List<ClassTimeDTO> findAllAsDTO() {
+        List<ClassTimeDTO> classTimeDTOList =
+            execute(() -> classTimeRepository.findAll()).stream().map(this::convertToDTO).toList();
+        log.debug("Retrieved All {} ClassTimes", classTimeDTOList.size());
+        return classTimeDTOList;
+    }
 
-	@Override
-	@Transactional
-	public void deleteById(Long id) {
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
         execute(() -> {
             if (!classTimeRepository.existsById(id)) {
                 throw new DeletionFailedException("There is no ClassTime to delete with id = " + id);
             }
             classTimeRepository.deleteById(id);
         });
-		log.info("Deleted id = {}", id);
-	}
+        log.info("Deleted id = {}", id);
+    }
 
-	private ClassTimeDTO convertToDTO(ClassTime classTime) {
-		return converterService.convert(classTime, ClassTimeDTO.class);
-	}
+    private ClassTimeDTO convertToDTO(ClassTime classTime) {
+        return converterService.convert(classTime, ClassTimeDTO.class);
+    }
 
-	private ClassTime convertToEntity(ClassTimeDTO classTimeDTO) {
-		return converterService.convert(classTimeDTO, ClassTime.class);
-	}
+    private ClassTime convertToEntity(ClassTimeDTO classTimeDTO) {
+        return converterService.convert(classTimeDTO, ClassTime.class);
+    }
 
-	private <T> T execute(DaoSupplier<T> supplier) {
-		try {
-			return supplier.get();
-		} catch (DataAccessException e) {
-			throw new ServiceException("DAO operation failed", e);
-		}
-	}
+    private <T> T execute(DaoSupplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (DataAccessException e) {
+            throw new ServiceException("DAO operation failed", e);
+        }
+    }
 
-	private void execute(DaoProcessor processor) {
-		try {
-			processor.process();
-		} catch (DataAccessException e) {
-			throw new ServiceException("DAO operation failed", e);
-		}
-	}
+    private void execute(DaoProcessor processor) {
+        try {
+            processor.process();
+        } catch (DataAccessException e) {
+            throw new ServiceException("DAO operation failed", e);
+        }
+    }
 
-	@FunctionalInterface
-	public interface DaoSupplier<T> {
-		T get();
-	}
+    @FunctionalInterface
+    public interface DaoSupplier<T> {
+        T get();
+    }
 
-	@FunctionalInterface
-	public interface DaoProcessor {
-		void process();
-	}
+    @FunctionalInterface
+    public interface DaoProcessor {
+        void process();
+    }
 }

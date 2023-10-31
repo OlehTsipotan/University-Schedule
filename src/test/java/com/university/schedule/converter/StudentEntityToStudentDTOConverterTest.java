@@ -58,7 +58,7 @@ public class StudentEntityToStudentDTOConverterTest {
     }
 
     @Test
-    public void convert_whenStudentNullFields_success(){
+    public void convert_whenStudentNullFields_success() {
         Student student = new Student();
 
         StudentDTO studentDTO = new StudentDTO();

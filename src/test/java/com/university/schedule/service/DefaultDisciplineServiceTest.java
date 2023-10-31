@@ -202,7 +202,7 @@ public class DefaultDisciplineServiceTest {
     }
 
     @Test
-    public void findByIdAsDTO_success(){
+    public void findByIdAsDTO_success() {
         Discipline discipline = new Discipline();
         DisciplineDTO disciplineDTO = new DisciplineDTO();
         when(disciplineRepository.findById(anyLong())).thenReturn(java.util.Optional.of(discipline));
@@ -215,7 +215,7 @@ public class DefaultDisciplineServiceTest {
     }
 
     @Test
-    public void findByIdAsDTO_whenNoDisciplineFound_throwServiceException(){
+    public void findByIdAsDTO_whenNoDisciplineFound_throwServiceException() {
         when(disciplineRepository.findById(anyLong())).thenReturn(java.util.Optional.empty());
 
         assertThrows(ServiceException.class, () -> defaultDisciplineService.findByIdAsDTO(anyLong()));
@@ -233,7 +233,7 @@ public class DefaultDisciplineServiceTest {
     }
 
     @Test
-    public void deleteById_whenNoDisciplineFound_throwDeletionFailedException(){
+    public void deleteById_whenNoDisciplineFound_throwDeletionFailedException() {
         when(disciplineRepository.existsById(anyLong())).thenReturn(false);
 
         assertThrows(DeletionFailedException.class, () -> defaultDisciplineService.deleteById(anyLong()));
@@ -243,7 +243,7 @@ public class DefaultDisciplineServiceTest {
     }
 
     @Test
-    public void deleteById_success(){
+    public void deleteById_success() {
         when(disciplineRepository.existsById(anyLong())).thenReturn(true);
         assertDoesNotThrow(() -> defaultDisciplineService.deleteById(1L));
 

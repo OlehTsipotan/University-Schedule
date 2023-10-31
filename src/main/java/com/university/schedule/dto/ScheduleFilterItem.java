@@ -14,15 +14,15 @@ import java.util.List;
 @Data
 public class ScheduleFilterItem {
 
-	private String email;
+    private String email;
 
-	private Long teacherId;
+    private Long teacherId;
 
-	private List<Long> groupIdList;
+    private List<Long> groupIdList;
 
-	private LocalDate startDate;
+    private LocalDate startDate;
 
-	private LocalDate endDate;
+    private LocalDate endDate;
 
-	private Long classTypeId;
+    private Long classTypeId;
 }

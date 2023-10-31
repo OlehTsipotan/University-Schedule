@@ -1,6 +1,5 @@
 package com.university.schedule.repository;
 
-import com.university.schedule.model.Authority;
 import com.university.schedule.model.Discipline;
 import com.university.schedule.model.Role;
 import org.flywaydb.core.Flyway;
@@ -25,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 public class RoleRepositoryTest {
 
-    private static String DATABASE_NAME = "databaseName";
-    private static String DATABASE_USERNAME = "databaseName";
-    private static String DATABASE_USER_PASSWORD = "databaseName";
+    private static final String DATABASE_NAME = "databaseName";
+    private static final String DATABASE_USERNAME = "databaseName";
+    private static final String DATABASE_USER_PASSWORD = "databaseName";
 
     @Container
     public static PostgreSQLContainer<?> postgres =

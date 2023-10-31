@@ -1,7 +1,6 @@
 package com.university.schedule.controller;
 
 import com.university.schedule.config.WebTestConfig;
-import com.university.schedule.dto.CourseDTO;
 import com.university.schedule.dto.RoleDTO;
 import com.university.schedule.dto.TeacherDTO;
 import com.university.schedule.exception.DeletionFailedException;
@@ -19,7 +18,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,183 +32,189 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 public class TeacherRecordsControllerTest {
 
-	public static final String USERNAME = "testUsername";
-	public static final String VIEW_AUTHORITY = "VIEW_TEACHERS";
-	public static final String EDIT_AUTHORITY = "EDIT_TEACHERS";
+    public static final String USERNAME = "testUsername";
+    public static final String VIEW_AUTHORITY = "VIEW_TEACHERS";
+    public static final String EDIT_AUTHORITY = "EDIT_TEACHERS";
 
-	@Autowired
-	private MockMvc mockMvc;
+    @Autowired
+    private MockMvc mockMvc;
 
-	@MockBean
-	private TeacherService teacherService;
+    @MockBean
+    private TeacherService teacherService;
 
-	@MockBean
-	private RoleService roleService;
+    @MockBean
+    private RoleService roleService;
 
-	@MockBean
-	private CourseService courseService;
-	@Test
-	@WithMockUser(username = USERNAME, authorities = VIEW_AUTHORITY)
-	public void getAll_whenNoArgs_happyPath() throws Exception {
-		List<TeacherDTO> teacherDTOList = new ArrayList<>();
-		teacherDTOList.add(
-				new TeacherDTO(1L, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>()));
-		teacherDTOList.add(
-				new TeacherDTO(2L, "teacher2@example.com", "Jane", "Doe", new RoleDTO(), true, new ArrayList<>()));
+    @MockBean
+    private CourseService courseService;
 
-		when(teacherService.findAllAsDTO(any())).thenReturn(teacherDTOList);
+    @Test
+    @WithMockUser(username = USERNAME, authorities = VIEW_AUTHORITY)
+    public void getAll_whenNoArgs_happyPath() throws Exception {
+        List<TeacherDTO> teacherDTOList = new ArrayList<>();
+        teacherDTOList.add(
+            new TeacherDTO(1L, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>()));
+        teacherDTOList.add(
+            new TeacherDTO(2L, "teacher2@example.com", "Jane", "Doe", new RoleDTO(), true, new ArrayList<>()));
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/teachers?offset=5")).andExpect(status().is2xxSuccessful())
-				.andExpect(view().name("teachers")).andExpect(
-						model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
-								"reverseSortDirection")).andExpect(model().attribute("entities", teacherDTOList));
+        when(teacherService.findAllAsDTO(any())).thenReturn(teacherDTOList);
 
-		verify(teacherService, times(1)).findAllAsDTO(any());
-	}
+        mockMvc.perform(MockMvcRequestBuilders.get("/teachers?offset=5")).andExpect(status().is2xxSuccessful())
+            .andExpect(view().name("teachers")).andExpect(
+                model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
+                    "reverseSortDirection")).andExpect(model().attribute("entities", teacherDTOList));
 
-	@Test
-	@WithMockUser(username = USERNAME, authorities = VIEW_AUTHORITY)
-	public void getAll_whenLimitAndOffsetArgs_happyPath() throws Exception {
-		List<TeacherDTO> teacherDTOList = new ArrayList<>();
-		teacherDTOList.add(
-				new TeacherDTO(1L, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>()));
-		teacherDTOList.add(
-				new TeacherDTO(2L, "teacher2@example.com", "Jane", "Doe", new RoleDTO(), true, new ArrayList<>()));
+        verify(teacherService, times(1)).findAllAsDTO(any());
+    }
 
-		when(teacherService.findAllAsDTO(any())).thenReturn(teacherDTOList);
+    @Test
+    @WithMockUser(username = USERNAME, authorities = VIEW_AUTHORITY)
+    public void getAll_whenLimitAndOffsetArgs_happyPath() throws Exception {
+        List<TeacherDTO> teacherDTOList = new ArrayList<>();
+        teacherDTOList.add(
+            new TeacherDTO(1L, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>()));
+        teacherDTOList.add(
+            new TeacherDTO(2L, "teacher2@example.com", "Jane", "Doe", new RoleDTO(), true, new ArrayList<>()));
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/teachers?offset=10&limit=5"))
-				.andExpect(status().is2xxSuccessful()).andExpect(view().name("teachers")).andExpect(
-						model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
-								"reverseSortDirection")).andExpect(model().attribute("entities", teacherDTOList));
+        when(teacherService.findAllAsDTO(any())).thenReturn(teacherDTOList);
 
-		verify(teacherService, times(1)).findAllAsDTO(any());
-	}
+        mockMvc.perform(MockMvcRequestBuilders.get("/teachers?offset=10&limit=5")).andExpect(status().is2xxSuccessful())
+            .andExpect(view().name("teachers")).andExpect(
+                model().attributeExists("entities", "currentLimit", "currentOffset", "sortField", "sortDirection",
+                    "reverseSortDirection")).andExpect(model().attribute("entities", teacherDTOList));
 
-	@Test
-	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
-	public void delete_happyPath() throws Exception {
-		Long teacherId = 1L;
+        verify(teacherService, times(1)).findAllAsDTO(any());
+    }
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/teachers/delete/{id}", teacherId))
-				.andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/teachers"));
+    @Test
+    @WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+    public void delete_happyPath() throws Exception {
+        Long teacherId = 1L;
 
-		verify(teacherService, times(1)).deleteById(teacherId);
-	}
+        mockMvc.perform(MockMvcRequestBuilders.get("/teachers/delete/{id}", teacherId))
+            .andExpect(status().is3xxRedirection()).andExpect(redirectedUrl("/teachers"));
 
-	@Test
-	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
-	public void delete_whenTeacherServiceThrowsDeletionFailedException_thenProcessError() throws Exception {
-		Long teacherId = 1L;
-		String exceptionMessage = "Delete Error";
+        verify(teacherService, times(1)).deleteById(teacherId);
+    }
 
-		doThrow(new DeletionFailedException(exceptionMessage)).when(teacherService).deleteById(teacherId);
+    @Test
+    @WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+    public void delete_whenTeacherServiceThrowsDeletionFailedException_thenProcessError() throws Exception {
+        Long teacherId = 1L;
+        String exceptionMessage = "Delete Error";
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/teachers/delete/{id}", teacherId))
-				.andExpect(status().is2xxSuccessful()).andExpect(view().name("error"))
-				.andExpect(model().attribute("exceptionMessage", exceptionMessage));
+        doThrow(new DeletionFailedException(exceptionMessage)).when(teacherService).deleteById(teacherId);
 
-		verify(teacherService, times(1)).deleteById(teacherId);
-	}
+        mockMvc.perform(MockMvcRequestBuilders.get("/teachers/delete/{id}", teacherId))
+            .andExpect(status().is2xxSuccessful()).andExpect(view().name("error"))
+            .andExpect(model().attribute("exceptionMessage", exceptionMessage));
 
-	@Test
-	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
-	public void getUpdateForm_happyPath() throws Exception {
-		Long teacherId = 1L;
-		TeacherDTO teacherDTO = new TeacherDTO(1L, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>());
+        verify(teacherService, times(1)).deleteById(teacherId);
+    }
 
-		when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
+    @Test
+    @WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+    public void getUpdateForm_happyPath() throws Exception {
+        Long teacherId = 1L;
+        TeacherDTO teacherDTO =
+            new TeacherDTO(1L, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>());
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/teachers/update/{id}", teacherId)).andExpect(status().isOk())
-				.andExpect(model().attributeExists("entity")).andExpect(view().name("teachersUpdateForm"))
-				.andExpect(model().attribute("entity", teacherDTO));
+        when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
 
-		verify(teacherService, times(1)).findByIdAsDTO(teacherId);
-	}
+        mockMvc.perform(MockMvcRequestBuilders.get("/teachers/update/{id}", teacherId)).andExpect(status().isOk())
+            .andExpect(model().attributeExists("entity")).andExpect(view().name("teachersUpdateForm"))
+            .andExpect(model().attribute("entity", teacherDTO));
 
-	@Test
-	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
-	public void getUpdateForm_whenTeacherNotFoundTeacherServiceThrowsServiceException_thenProcessError()
-			throws Exception {
-		Long teacherId = 1L;
-		String exceptionMessage = "Not found";
+        verify(teacherService, times(1)).findByIdAsDTO(teacherId);
+    }
 
-		when(teacherService.findByIdAsDTO(teacherId)).thenThrow(new ServiceException(exceptionMessage));
+    @Test
+    @WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+    public void getUpdateForm_whenTeacherNotFoundTeacherServiceThrowsServiceException_thenProcessError()
+        throws Exception {
+        Long teacherId = 1L;
+        String exceptionMessage = "Not found";
 
-		mockMvc.perform(MockMvcRequestBuilders.get("/teachers/update/{id}", teacherId))
-				.andExpect(status().is2xxSuccessful()).andExpect(view().name("error"))
-				.andExpect(model().attribute("exceptionMessage", exceptionMessage));
+        when(teacherService.findByIdAsDTO(teacherId)).thenThrow(new ServiceException(exceptionMessage));
 
-		verify(teacherService, times(1)).findByIdAsDTO(teacherId);
-	}
+        mockMvc.perform(MockMvcRequestBuilders.get("/teachers/update/{id}", teacherId))
+            .andExpect(status().is2xxSuccessful()).andExpect(view().name("error"))
+            .andExpect(model().attribute("exceptionMessage", exceptionMessage));
 
-	@Test
-	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
-	public void update_whenValidTeacher_thenRedirectSuccess() throws Exception {
-		Long teacherId = 1L;
-		TeacherDTO teacherDTO = new TeacherDTO(teacherId, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>());
+        verify(teacherService, times(1)).findByIdAsDTO(teacherId);
+    }
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/teachers/update/{id}", teacherId).with(csrf())
-						.flashAttr("teacherDTO", teacherDTO)).andExpect(status().is3xxRedirection())
-				.andExpect(view().name("redirect:/teachers/update/" + teacherId));
+    @Test
+    @WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+    public void update_whenValidTeacher_thenRedirectSuccess() throws Exception {
+        Long teacherId = 1L;
+        TeacherDTO teacherDTO =
+            new TeacherDTO(teacherId, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>());
 
-		verify(teacherService, times(1)).update(teacherDTO);
-		verify(teacherService, times(0)).findByIdAsDTO(anyLong());
-	}
+        mockMvc.perform(MockMvcRequestBuilders.post("/teachers/update/{id}", teacherId).with(csrf())
+                .flashAttr("teacherDTO", teacherDTO)).andExpect(status().is3xxRedirection())
+            .andExpect(view().name("redirect:/teachers/update/" + teacherId));
 
-	@Test
-	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
-	public void update_whenNotValidTeacherByEmptyField_thenProcessForm() throws Exception {
-		Long teacherId = 1L;
-		TeacherDTO teacherDTO = new TeacherDTO(teacherId, "teacher1@example.com", "", "Doe", new RoleDTO(), true, new ArrayList<>());
+        verify(teacherService, times(1)).update(teacherDTO);
+        verify(teacherService, times(0)).findByIdAsDTO(anyLong());
+    }
 
-		when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
+    @Test
+    @WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+    public void update_whenNotValidTeacherByEmptyField_thenProcessForm() throws Exception {
+        Long teacherId = 1L;
+        TeacherDTO teacherDTO =
+            new TeacherDTO(teacherId, "teacher1@example.com", "", "Doe", new RoleDTO(), true, new ArrayList<>());
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/teachers/update/{id}", teacherId).with(csrf())
-						.flashAttr("teacherDTO", teacherDTO)).andExpect(status().is2xxSuccessful())
-				.andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", teacherDTO))
-				.andExpect(view().name("teachersUpdateForm"));
+        when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
 
-		verify(teacherService, times(0)).update(any());
-		verify(teacherService, times(1)).findByIdAsDTO(teacherId);
-	}
+        mockMvc.perform(MockMvcRequestBuilders.post("/teachers/update/{id}", teacherId).with(csrf())
+                .flashAttr("teacherDTO", teacherDTO)).andExpect(status().is2xxSuccessful())
+            .andExpect(model().attributeExists("entity")).andExpect(model().attribute("entity", teacherDTO))
+            .andExpect(view().name("teachersUpdateForm"));
 
-	@Test
-	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
-	public void update_whenTeacherServiceThrowValidationException_thenProcessForm() throws Exception {
-		Long teacherId = 1L;
-		TeacherDTO teacherDTO = new TeacherDTO(teacherId, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>());
+        verify(teacherService, times(0)).update(any());
+        verify(teacherService, times(1)).findByIdAsDTO(teacherId);
+    }
 
-		ValidationException validationException = new ValidationException("testException", List.of("myError"));
+    @Test
+    @WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+    public void update_whenTeacherServiceThrowValidationException_thenProcessForm() throws Exception {
+        Long teacherId = 1L;
+        TeacherDTO teacherDTO =
+            new TeacherDTO(teacherId, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>());
 
-		when(teacherService.update(teacherDTO)).thenThrow(validationException);
-		when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
+        ValidationException validationException = new ValidationException("testException", List.of("myError"));
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/teachers/update/{id}", teacherId).with(csrf())
-				.flashAttr("teacherDTO", teacherDTO)).andExpect(status().is3xxRedirection());
+        when(teacherService.update(teacherDTO)).thenThrow(validationException);
+        when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
 
-		verify(teacherService, times(1)).update(teacherDTO);
-		verifyNoMoreInteractions(teacherService);
-	}
+        mockMvc.perform(MockMvcRequestBuilders.post("/teachers/update/{id}", teacherId).with(csrf())
+            .flashAttr("teacherDTO", teacherDTO)).andExpect(status().is3xxRedirection());
 
-	@Test
-	@WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
-	public void update_whenTeacherServiceThrowServiceException_thenProcessError() throws Exception {
-		Long teacherId = 1L;
-		TeacherDTO teacherDTO = new TeacherDTO(teacherId, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>());
+        verify(teacherService, times(1)).update(teacherDTO);
+        verifyNoMoreInteractions(teacherService);
+    }
 
-		String exceptionMessage = "Service Exception";
-		ServiceException serviceException = new ServiceException(exceptionMessage);
+    @Test
+    @WithMockUser(username = USERNAME, authorities = EDIT_AUTHORITY)
+    public void update_whenTeacherServiceThrowServiceException_thenProcessError() throws Exception {
+        Long teacherId = 1L;
+        TeacherDTO teacherDTO =
+            new TeacherDTO(teacherId, "teacher1@example.com", "John", "Doe", new RoleDTO(), true, new ArrayList<>());
 
-		when(teacherService.update(teacherDTO)).thenThrow(serviceException);
-		when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
+        String exceptionMessage = "Service Exception";
+        ServiceException serviceException = new ServiceException(exceptionMessage);
 
-		mockMvc.perform(MockMvcRequestBuilders.post("/teachers/update/{id}", teacherId).with(csrf())
-						.flashAttr("teacherDTO", teacherDTO)).andExpect(status().is2xxSuccessful())
-				.andExpect(model().attribute("exceptionMessage", exceptionMessage));
+        when(teacherService.update(teacherDTO)).thenThrow(serviceException);
+        when(teacherService.findByIdAsDTO(teacherId)).thenReturn(teacherDTO);
 
-		verify(teacherService, times(1)).update(teacherDTO);
-		verifyNoMoreInteractions(teacherService);
-	}
+        mockMvc.perform(MockMvcRequestBuilders.post("/teachers/update/{id}", teacherId).with(csrf())
+                .flashAttr("teacherDTO", teacherDTO)).andExpect(status().is2xxSuccessful())
+            .andExpect(model().attribute("exceptionMessage", exceptionMessage));
+
+        verify(teacherService, times(1)).update(teacherDTO);
+        verifyNoMoreInteractions(teacherService);
+    }
 }
 

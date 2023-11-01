@@ -10,16 +10,16 @@ import lombok.*;
 @Data
 public class BuildingDTO {
 
-	private Long id;
+    private Long id;
 
-	@NonNull
-	@NotBlank(message = "Building name must not be blank")
-	@Size(max = 255)
-	private String name;
+    @NonNull
+    @NotBlank(message = "Building name must not be blank")
+    @Size(max = 255)
+    private String name;
 
-	@NonNull
-	@NotBlank(message = "Building address must not be blank")
-	@Size(max = 255)
-	private String address;
+    @NonNull
+    @NotBlank(message = "Building address must not be blank")
+    @Size(max = 255)
+    private String address;
 
 }

@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class DisciplineEntityToDisciplineDTOConverter implements Converter<Discipline, DisciplineDTO> {
 
-	private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
 
-	public DisciplineEntityToDisciplineDTOConverter() {
-		this.modelMapper = new ModelMapper();
-	}
+    public DisciplineEntityToDisciplineDTOConverter() {
+        this.modelMapper = new ModelMapper();
+    }
 
-	@Override
-	public DisciplineDTO convert(Discipline source) {
-		return modelMapper.map(source, DisciplineDTO.class);
-	}
+    @Override
+    public DisciplineDTO convert(Discipline source) {
+        return modelMapper.map(source, DisciplineDTO.class);
+    }
 }

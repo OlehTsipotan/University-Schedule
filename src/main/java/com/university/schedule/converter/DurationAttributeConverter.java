@@ -11,14 +11,14 @@ import java.time.Duration;
 @Converter
 public class DurationAttributeConverter implements AttributeConverter<Duration, Long> {
 
-	@Override
-	public Long convertToDatabaseColumn(Duration duration) {
-		return duration.toMinutes();
-	}
+    @Override
+    public Long convertToDatabaseColumn(Duration duration) {
+        return duration.toMinutes();
+    }
 
-	@Override
-	public Duration convertToEntityAttribute(Long minutes) {
-		return Duration.ofMinutes(minutes);
-	}
+    @Override
+    public Duration convertToEntityAttribute(Long minutes) {
+        return Duration.ofMinutes(minutes);
+    }
 
 }

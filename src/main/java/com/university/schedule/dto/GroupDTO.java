@@ -12,15 +12,15 @@ import java.util.List;
 @Data
 public class GroupDTO {
 
-	private Long id;
+    private Long id;
 
-	@NotBlank(message = "Group name must not be blank")
-	@Size(max = 255)
-	private String name;
+    @NotBlank(message = "Group name must not be blank")
+    @Size(max = 255)
+    private String name;
 
-	@EqualsAndHashCode.Exclude
-	private DisciplineDTO disciplineDTO;
+    @EqualsAndHashCode.Exclude
+    private DisciplineDTO disciplineDTO;
 
-	@EqualsAndHashCode.Exclude
-	private List<CourseDTO> courseDTOS;
+    @EqualsAndHashCode.Exclude
+    private List<CourseDTO> courseDTOS;
 }

@@ -8,21 +8,21 @@ import java.util.List;
 
 public interface BuildingService {
 
-	Long save(Building building);
+    Long save(Building building);
 
-	Long save(BuildingDTO buildingDTO);
+    Long save(BuildingDTO buildingDTO);
 
-	BuildingDTO findByIdAsDTO(Long id);
+    BuildingDTO findByIdAsDTO(Long id);
 
-	BuildingDTO findByNameAsDTO(String name);
+    BuildingDTO findByNameAsDTO(String name);
 
-	BuildingDTO findByAddressAsDTO(String address);
+    BuildingDTO findByAddressAsDTO(String address);
 
-	List<Building> findAll();
+    List<Building> findAll();
 
-	List<BuildingDTO> findAllAsDTO();
+    List<BuildingDTO> findAllAsDTO();
 
-	List<BuildingDTO> findAllAsDTO(Pageable pageable);
+    List<BuildingDTO> findAllAsDTO(Pageable pageable);
 
-	void deleteById(Long id);
+    void deleteById(Long id);
 }

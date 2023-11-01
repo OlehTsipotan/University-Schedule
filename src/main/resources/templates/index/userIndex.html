@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<html xmlns:sec="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <meta name="description" content="University schedule web-application "/>
-    <meta name="author" content="Oleh Tsipotan"/>
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+    <meta content="University schedule web-application " name="description"/>
+    <meta content="Oleh Tsipotan" name="author"/>
     <title>University Schedule</title>
 
-    <link th:href="@{/styles/main.css}" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/styles/main.css}"/>
 
-    <link th:href="@{/assets/calendar-days-solid.svg}" rel="icon" type="image/x-icon"/>
-    <link th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}" rel="stylesheet"/>
-    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}" rel="stylesheet"/>
-    <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
+    <link rel="icon" th:href="@{/assets/calendar-days-solid.svg}" type="image/x-icon"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}"/>
+    <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}"/>
 </head>
 <body>
 <!-- Responsive navbar-->
@@ -37,60 +37,60 @@
     <div class="container px-lg-5">
         <!-- Page Features-->
         <div class="row gx-lg-5">
-            <div sec:authorize="hasAuthority('VIEW_SCHEDULE')" class="col-lg-6 col-xxl-12 mb-5">
+            <div class="col-lg-6 col-xxl-12 mb-5" sec:authorize="hasAuthority('VIEW_SCHEDULE')">
                 <a class="nav-link hoverable" href="/schedule">
                     <div class="card bg-light border-0 h-100">
                         <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
                             <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i
-                                    class="fa-solid fa-calendar-days"></i></div>
+                                class="fa-solid fa-calendar-days"></i></div>
                             <h2 class="fs-4 fw-bold">My Schedule</h2>
                             <p class="mb-0">Representing of real-world university schedule. Only Relative to you.</p>
                         </div>
                     </div>
                 </a>
             </div>
-            <div sec:authorize="hasAuthority('VIEW_COURSES')" class="col-lg-6 col-xxl-4 mb-5">
+            <div class="col-lg-6 col-xxl-4 mb-5" sec:authorize="hasAuthority('VIEW_COURSES')">
                 <a class="nav-link hoverable" href="/courses">
                     <div class="card bg-light border-0 h-100">
                         <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
                             <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i
-                                    class="fa-solid fa-chalkboard-user"></i></div>
+                                class="fa-solid fa-chalkboard-user"></i></div>
                             <h2 class="fs-4 fw-bold">Courses</h2>
                             <p class="mb-0">Display all relative to you Courses</p>
                         </div>
                     </div>
                 </a>
             </div>
-            <div sec:authorize="hasAuthority('VIEW_CLASSTIMES')" class="col-lg-6 col-xxl-4 mb-5">
+            <div class="col-lg-6 col-xxl-4 mb-5" sec:authorize="hasAuthority('VIEW_CLASSTIMES')">
                 <a class="nav-link hoverable" href="/classtimes">
                     <div class="card bg-light border-0 h-100">
                         <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
                             <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i
-                                    class="fa-solid fa-clock"></i></div>
+                                class="fa-solid fa-clock"></i></div>
                             <h2 class="fs-4 fw-bold">Time Order</h2>
                             <p class="mb-0">Display when classes starts.</p>
                         </div>
                     </div>
                 </a>
             </div>
-            <div sec:authorize="hasAuthority('VIEW_BUILDINGS')" class="col-lg-6 col-xxl-4 mb-5">
+            <div class="col-lg-6 col-xxl-4 mb-5" sec:authorize="hasAuthority('VIEW_BUILDINGS')">
                 <a class="nav-link hoverable" href="/buildings">
                     <div class="card bg-light border-0 h-100">
                         <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
                             <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i
-                                    class="fa-solid fa-building-columns"></i></div>
+                                class="fa-solid fa-building-columns"></i></div>
                             <h2 class="fs-4 fw-bold">Buildings</h2>
                             <p class="mb-0">Representing of real-world university Buildings.</p>
                         </div>
                     </div>
                 </a>
             </div>
-            <div sec:authorize="hasAuthority('VIEW_STUDENTS')" class="col-lg-6 col-xxl-12 mb-5">
+            <div class="col-lg-6 col-xxl-12 mb-5" sec:authorize="hasAuthority('VIEW_STUDENTS')">
                 <a class="nav-link hoverable" href="/students">
                     <div class="card bg-light border-0 h-100">
                         <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
                             <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i
-                                    class="fa-solid fa-people-group"></i></div>
+                                class="fa-solid fa-people-group"></i></div>
                             <h2 class="fs-4 fw-bold">My Group</h2>
                             <p class="mb-0">Display all students that have the same group with you.</p>
                         </div>

@@ -12,13 +12,13 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class StringToGroupDTOFormatter implements Formatter<GroupDTO> {
 
-	@Override
-	public GroupDTO parse(String text, Locale locale) throws ParseException {
-		return GroupDTO.builder().id(Long.parseLong(text)).build();
-	}
+    @Override
+    public GroupDTO parse(String text, Locale locale) throws ParseException {
+        return GroupDTO.builder().id(Long.parseLong(text)).build();
+    }
 
-	@Override
-	public String print(GroupDTO object, Locale locale) {
-		return null;
-	}
+    @Override
+    public String print(GroupDTO object, Locale locale) {
+        return null;
+    }
 }

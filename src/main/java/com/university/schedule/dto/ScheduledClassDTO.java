@@ -1,7 +1,10 @@
 package com.university.schedule.dto;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,28 +15,28 @@ import java.util.List;
 @Data
 public class ScheduledClassDTO {
 
-	private Long id;
+    private Long id;
 
-	@NotNull
-	private CourseDTO courseDTO;
+    @NotNull
+    private CourseDTO courseDTO;
 
-	@NotNull
-	private TeacherDTO teacherDTO;
+    @NotNull
+    private TeacherDTO teacherDTO;
 
-	@NotNull
-	private ClassroomDTO classroomDTO;
+    @NotNull
+    private ClassroomDTO classroomDTO;
 
-	@NotNull
-	private ClassTimeDTO classTimeDTO;
+    @NotNull
+    private ClassTimeDTO classTimeDTO;
 
-	@NotNull
-	private LocalDate date;
+    @NotNull
+    private LocalDate date;
 
-	@NotNull
-	private ClassTypeDTO classTypeDTO;
+    @NotNull
+    private ClassTypeDTO classTypeDTO;
 
-	@NotNull
-	private List<GroupDTO> groupDTOS;
+    @NotNull
+    private List<GroupDTO> groupDTOS;
 
 }
 

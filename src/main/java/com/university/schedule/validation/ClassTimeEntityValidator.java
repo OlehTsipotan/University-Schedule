@@ -13,33 +13,33 @@ import java.util.Optional;
 @Component
 public class ClassTimeEntityValidator extends EntityValidator<ClassTime> {
 
-	private final ClassTimeRepository classTimeRepository;
+    private final ClassTimeRepository classTimeRepository;
 
-	public ClassTimeEntityValidator(ClassTimeRepository classTimeRepository, Validator validator) {
-		super(validator);
-		this.classTimeRepository = classTimeRepository;
-	}
+    public ClassTimeEntityValidator(ClassTimeRepository classTimeRepository, Validator validator) {
+        super(validator);
+        this.classTimeRepository = classTimeRepository;
+    }
 
-	@Override
-	public void validate(ClassTime classTime) {
-		List<String> violations = new ArrayList<>();
-		try {
-			super.validate(classTime);
-		} catch (ValidationException e) {
-			violations = e.getViolations();
-		}
+    @Override
+    public void validate(ClassTime classTime) {
+        List<String> violations = new ArrayList<>();
+        try {
+            super.validate(classTime);
+        } catch (ValidationException e) {
+            violations = e.getViolations();
+        }
 
-		Optional<ClassTime> classTimeToCheck = classTimeRepository.findByOrderNumber(classTime.getOrderNumber());
+        Optional<ClassTime> classTimeToCheck = classTimeRepository.findByOrderNumber(classTime.getOrderNumber());
 
-		if (classTimeToCheck.isPresent() && !classTime.equals(classTimeToCheck.get())) {
-			violations.add(
-					String.format("ClassTime with Order Number = %d, already exists.", classTime.getOrderNumber()));
-		}
+        if (classTimeToCheck.isPresent() && !classTime.equals(classTimeToCheck.get())) {
+            violations.add(
+                String.format("ClassTime with Order Number = %d, already exists.", classTime.getOrderNumber()));
+        }
 
 
-		if (!violations.isEmpty()) {
-			throw new ValidationException("ClassTime is not valid", violations);
-		}
+        if (!violations.isEmpty()) {
+            throw new ValidationException("ClassTime is not valid", violations);
+        }
 
-	}
+    }
 }

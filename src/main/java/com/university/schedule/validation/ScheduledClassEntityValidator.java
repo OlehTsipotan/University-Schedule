@@ -14,50 +14,52 @@ import java.util.Optional;
 @Component
 public class ScheduledClassEntityValidator extends EntityValidator<ScheduledClass> {
 
-	private final ScheduledClassRepository scheduledClassRepository;
+    private final ScheduledClassRepository scheduledClassRepository;
 
-	private final CourseService courseService;
-
-
-	public ScheduledClassEntityValidator(ScheduledClassRepository scheduledClassRepository, CourseService courseService,
-	                                     Validator validator) {
-		super(validator);
-		this.scheduledClassRepository = scheduledClassRepository;
-		this.courseService = courseService;
-	}
-
-	@Override
-	public void validate(ScheduledClass scheduledClass) {
-		List<String> violations = new ArrayList<>();
-		try {
-			super.validate(scheduledClass);
-		} catch (ValidationException e) {
-			violations = e.getViolations();
-		}
-
-		Optional<ScheduledClass> scheduledClassToCheck =
-				scheduledClassRepository.findByDateAndClassTimeAndTeacher(scheduledClass.getDate(),
-						scheduledClass.getClassTime(), scheduledClass.getTeacher());
-		if (scheduledClassToCheck.isPresent() && !scheduledClass.equals(scheduledClassToCheck.get())) {
-			violations.add(String.format("ScheduledClass with %s, %s, %s, already exists", scheduledClass.getTeacher(),
-					scheduledClass.getDate(), scheduledClass.getClassTime()));
-		}
-		// Teacher and Course
-		if (!courseService.findByTeacher(scheduledClass.getTeacher()).contains(scheduledClass.getCourse())) {
-			violations.add(String.format("%s can`t be assigned to class with %s", scheduledClass.getTeacher(),
-					scheduledClass.getCourse()));
-		}
-		// Groups and Course
-		if (!scheduledClass.getGroups().stream()
-				.allMatch(group -> courseService.findByGroup(group).contains(scheduledClass.getCourse()))) {
-			violations.add(String.format("%s can`t be assigned to class with %s", scheduledClass.getGroups(),
-					scheduledClass.getCourse()));
-		}
+    private final CourseService courseService;
 
 
-		if (!violations.isEmpty()) {
-			throw new ValidationException("Group is not valid", violations);
-		}
+    public ScheduledClassEntityValidator(ScheduledClassRepository scheduledClassRepository, CourseService courseService,
+                                         Validator validator) {
+        super(validator);
+        this.scheduledClassRepository = scheduledClassRepository;
+        this.courseService = courseService;
+    }
 
-	}
+    @Override
+    public void validate(ScheduledClass scheduledClass) {
+        List<String> violations = new ArrayList<>();
+        try {
+            super.validate(scheduledClass);
+        } catch (ValidationException e) {
+            violations = e.getViolations();
+        }
+
+        // Teacher, Date, ClassTime
+        Optional<ScheduledClass> scheduledClassToCheck =
+            scheduledClassRepository.findByDateAndClassTimeAndTeacher(scheduledClass.getDate(),
+                scheduledClass.getClassTime(), scheduledClass.getTeacher());
+        if (scheduledClassToCheck.isPresent() && !scheduledClass.equals(scheduledClassToCheck.get())) {
+            violations.add(String.format("ScheduledClass with %s, %s, %s, already exists", scheduledClass.getTeacher(),
+                scheduledClass.getDate(), scheduledClass.getClassTime()));
+        }
+        if (scheduledClass.getCourse() != null) {
+            // Teacher can`t be assigned to class with this Course
+            if (!courseService.findByTeacher(scheduledClass.getTeacher()).contains(scheduledClass.getCourse())) {
+                violations.add(String.format("%s can`t be assigned to class with %s", scheduledClass.getTeacher(),
+                    scheduledClass.getCourse()));
+            }
+            // Group can`t be assigned to class with this Course
+            if (!scheduledClass.getGroups().stream()
+                .allMatch(group -> courseService.findByGroup(group).contains(scheduledClass.getCourse()))) {
+                violations.add(String.format("%s can`t be assigned to class with %s", scheduledClass.getGroups(),
+                    scheduledClass.getCourse()));
+            }
+        }
+
+        if (!violations.isEmpty()) {
+            throw new ValidationException("ScheduleClass is not valid", violations);
+        }
+
+    }
 }

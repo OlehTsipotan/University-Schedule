@@ -10,26 +10,26 @@ import java.util.List;
 @Component
 public class UserRegisterDTOValidator extends EntityValidator<UserRegisterDTO> {
 
-	public UserRegisterDTOValidator(jakarta.validation.Validator validator) {
-		super(validator);
-	}
+    public UserRegisterDTOValidator(jakarta.validation.Validator validator) {
+        super(validator);
+    }
 
-	@Override
-	public void validate(UserRegisterDTO userRegisterDTO) {
-		List<String> violations = new ArrayList<>();
-		try {
-			super.validate(userRegisterDTO);
-		} catch (ValidationException e) {
-			violations = e.getViolations();
-		}
+    @Override
+    public void validate(UserRegisterDTO userRegisterDTO) {
+        List<String> violations = new ArrayList<>();
+        try {
+            super.validate(userRegisterDTO);
+        } catch (ValidationException e) {
+            violations = e.getViolations();
+        }
 
-		if (!userRegisterDTO.getPassword().equals(userRegisterDTO.getConfirmationPassword())) {
-			violations.add("Password and Confirmation password should be equals");
-		}
+        if (!userRegisterDTO.getPassword().equals(userRegisterDTO.getConfirmationPassword())) {
+            violations.add("Password and Confirmation password should be equals");
+        }
 
-		if (!violations.isEmpty()) {
-			throw new ValidationException("User is not valid", violations);
-		}
+        if (!violations.isEmpty()) {
+            throw new ValidationException("User is not valid", violations);
+        }
 
-	}
+    }
 }

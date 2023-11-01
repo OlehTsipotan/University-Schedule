@@ -4,6 +4,7 @@ import com.university.schedule.dto.AuthorityDTO;
 import com.university.schedule.dto.RoleDTO;
 import com.university.schedule.model.Authority;
 import com.university.schedule.model.Role;
+import org.modelmapper.Condition;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -14,26 +15,28 @@ import java.util.Set;
 @Component
 public class RoleEntityToRoleDTOConverter implements Converter<Role, RoleDTO> {
 
-	private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-	private final AuthorityEntityToAuthorityDTOConverter authorityEntityToAuthorityDTOConverter;
+    private final AuthorityEntityToAuthorityDTOConverter authorityEntityToAuthorityDTOConverter;
 
 
-	public RoleEntityToRoleDTOConverter() {
-		this.modelMapper = new ModelMapper();
-		this.authorityEntityToAuthorityDTOConverter = new AuthorityEntityToAuthorityDTOConverter();
+    public RoleEntityToRoleDTOConverter() {
+        this.modelMapper = new ModelMapper();
+        this.authorityEntityToAuthorityDTOConverter = new AuthorityEntityToAuthorityDTOConverter();
 
-		org.modelmapper.Converter<Set<Authority>, List<AuthorityDTO>> authoritiesListConverter =
-				courseList -> courseList.getSource().stream().map(authorityEntityToAuthorityDTOConverter::convert)
-						.toList();
+        org.modelmapper.Converter<Set<Authority>, List<AuthorityDTO>> authoritiesListConverter =
+            courseList -> courseList.getSource().stream().map(authorityEntityToAuthorityDTOConverter::convert).toList();
 
-		modelMapper.typeMap(Role.class, RoleDTO.class).addMappings(modelMapper -> {
-			modelMapper.using(authoritiesListConverter).map(Role::getAuthorities, RoleDTO::setAuthorityDTOS);
-		});
-	}
+        Condition notNull = ctx -> ctx.getSource() != null;
 
-	@Override
-	public RoleDTO convert(Role source) {
-		return modelMapper.map(source, RoleDTO.class);
-	}
+        modelMapper.typeMap(Role.class, RoleDTO.class).addMappings(modelMapper -> {
+            modelMapper.when(notNull).using(authoritiesListConverter)
+                .map(Role::getAuthorities, RoleDTO::setAuthorityDTOS);
+        });
+    }
+
+    @Override
+    public RoleDTO convert(Role source) {
+        return modelMapper.map(source, RoleDTO.class);
+    }
 }

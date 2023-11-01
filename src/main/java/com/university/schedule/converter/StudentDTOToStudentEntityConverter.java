@@ -9,16 +9,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class StudentDTOToStudentEntityConverter implements Converter<StudentDTO, Student> {
 
-	private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-	public StudentDTOToStudentEntityConverter() {
-		this.modelMapper = new ModelMapper();
-		modelMapper.typeMap(StudentDTO.class, Student.class)
-				.addMappings(modelMapper -> modelMapper.map(StudentDTO::isEnable, Student::setIsEnable));
-	}
+    public StudentDTOToStudentEntityConverter() {
+        this.modelMapper = new ModelMapper();
+        modelMapper.typeMap(StudentDTO.class, Student.class)
+            .addMappings(modelMapper -> modelMapper.map(StudentDTO::isEnable, Student::setIsEnable));
+    }
 
-	@Override
-	public Student convert(StudentDTO source) {
-		return modelMapper.map(source, Student.class);
-	}
+    @Override
+    public Student convert(StudentDTO source) {
+        return modelMapper.map(source, Student.class);
+    }
 }

@@ -24,165 +24,165 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class DefaultUserService implements UserService {
 
-	private final UserRepository userRepository;
+    private final UserRepository userRepository;
 
-	private final UserEntityValidator userEntityValidator;
+    private final UserEntityValidator userEntityValidator;
 
-	private final ConverterService converterService;
+    private final ConverterService converterService;
 
-	private final RoleService roleService;
+    private final RoleService roleService;
 
-	@Override
-	public List<User> findAll() {
-		List<User> users = execute(() -> userRepository.findAll());
-		log.debug("Retrieved All {} Users", users.size());
-		return users;
-	}
+    @Override
+    public List<User> findAll() {
+        List<User> users = execute(() -> userRepository.findAll());
+        log.debug("Retrieved All {} Users", users.size());
+        return users;
+    }
 
-	@Override
-	public List<UserDTO> findAllAsDTO() {
-		List<UserDTO> userDTOList = execute(() -> userRepository.findAll()).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Users", userDTOList.size());
-		return userDTOList;
-	}
+    @Override
+    public List<UserDTO> findAllAsDTO() {
+        List<UserDTO> userDTOList = execute(() -> userRepository.findAll()).stream().map(this::convertToDTO).toList();
+        log.debug("Retrieved All {} Users", userDTOList.size());
+        return userDTOList;
+    }
 
-	@Override
-	public List<UserDTO> findAllAsDTO(Pageable pageable) {
-		List<UserDTO> userDTOList =
-				execute(() -> userRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
-		log.debug("Retrieved All {} Users", userDTOList.size());
-		return userDTOList;
-	}
+    @Override
+    public List<UserDTO> findAllAsDTO(Pageable pageable) {
+        List<UserDTO> userDTOList =
+            execute(() -> userRepository.findAll(pageable)).stream().map(this::convertToDTO).toList();
+        log.debug("Retrieved All {} Users", userDTOList.size());
+        return userDTOList;
+    }
 
-	@Override
-	@Transactional
-	public Long save(User user) {
-		execute(() -> {
-			userEntityValidator.validate(user);
-			userRepository.save(user);
-		});
-		log.info("saved {}", user);
-		return user.getId();
-	}
+    @Override
+    @Transactional
+    public Long save(User user) {
+        execute(() -> {
+            userEntityValidator.validate(user);
+            userRepository.save(user);
+        });
+        log.info("saved {}", user);
+        return user.getId();
+    }
 
-	@Override
-	@Transactional
-	public Long update(UserDTO userDTO) {
-		User userToSave = convertToExistingEntity(userDTO);
-		execute(() -> {
-			userEntityValidator.validate(userToSave);
-			userRepository.save(userToSave);
-		});
-		log.info("saved {}", userToSave);
-		return userToSave.getId();
-	}
+    @Override
+    @Transactional
+    public Long update(UserDTO userDTO) {
+        User userToSave = convertToExistingEntity(userDTO);
+        execute(() -> {
+            userEntityValidator.validate(userToSave);
+            userRepository.save(userToSave);
+        });
+        log.info("saved {}", userToSave);
+        return userToSave.getId();
+    }
 
-	@Override
-	public UserDTO findByIdAsDTO(Long id) {
-		User user =
-				execute(() -> userRepository.findById(id)).orElseThrow(() -> new ServiceException("User not found"));
-		log.debug("Retrieved {}", user);
-		return convertToDTO(user);
-	}
+    @Override
+    public UserDTO findByIdAsDTO(Long id) {
+        User user =
+            execute(() -> userRepository.findById(id)).orElseThrow(() -> new ServiceException("User not found"));
+        log.debug("Retrieved {}", user);
+        return convertToDTO(user);
+    }
 
-	private User findById(Long id) {
-		User user =
-				execute(() -> userRepository.findById(id)).orElseThrow(() -> new ServiceException("User not found"));
-		log.debug("Retrieved {}", user);
-		return user;
-	}
+    private User findById(Long id) {
+        User user =
+            execute(() -> userRepository.findById(id)).orElseThrow(() -> new ServiceException("User not found"));
+        log.debug("Retrieved {}", user);
+        return user;
+    }
 
-	@Override
-	public User findByEmail(String email) {
-		User user = execute(() -> userRepository.findByEmail(email)).orElseThrow(
-				() -> new ServiceException("User not found"));
-		log.debug("Retrieved {}", user);
-		return user;
-	}
+    @Override
+    public User findByEmail(String email) {
+        User user =
+            execute(() -> userRepository.findByEmail(email)).orElseThrow(() -> new ServiceException("User not found"));
+        log.debug("Retrieved {}", user);
+        return user;
+    }
 
-	@Override
-	public UserDTO findByEmailAsDTO(String email) {
-		User user = execute(() -> userRepository.findByEmail(email)).orElseThrow(
-				() -> new ServiceException("User not found"));
-		log.debug("Retrieved {}", user);
-		return convertToDTO(user);
-	}
+    @Override
+    public UserDTO findByEmailAsDTO(String email) {
+        User user =
+            execute(() -> userRepository.findByEmail(email)).orElseThrow(() -> new ServiceException("User not found"));
+        log.debug("Retrieved {}", user);
+        return convertToDTO(user);
+    }
 
-	@Override
-	@Transactional
-	public void deleteById(Long id) {
-		try {
-			findById(id);
-		} catch (ServiceException e) {
-			throw new DeletionFailedException("There is no User to delete with id = " + id);
-		}
-		execute(() -> userRepository.deleteById(id));
-		log.info("Deleted id = {}", id);
-	}
+    @Override
+    @Transactional
+    public void deleteById(Long id) {
+        try {
+            findById(id);
+        } catch (ServiceException e) {
+            throw new DeletionFailedException("There is no User to delete with id = " + id);
+        }
+        execute(() -> userRepository.deleteById(id));
+        log.info("Deleted id = {}", id);
+    }
 
-	private UserDTO convertToDTO(User source) {
-		return converterService.convert(source, UserDTO.class);
-	}
+    private UserDTO convertToDTO(User source) {
+        return converterService.convert(source, UserDTO.class);
+    }
 
-	private User convertToExistingEntity(UserDTO source) {
-		User foundedUser = findById(source.getId());
+    private User convertToExistingEntity(UserDTO source) {
+        User foundedUser = findById(source.getId());
 
-		User userToSave = convertToEntity(source);
+        User userToSave = convertToEntity(source);
 
-		if (foundedUser instanceof Student) {
-			Student student = convertToStudentEntity(source);
-			student.setGroup(((Student) foundedUser).getGroup());
-			userToSave = student;
-		} else if (foundedUser instanceof Teacher) {
-			Teacher teacher = convertToTeacherEntity(source);
-			teacher.setCourses(((Teacher) foundedUser).getCourses());
-			userToSave = teacher;
-		}
-		userToSave.setPassword(foundedUser.getPassword());
+        if (foundedUser instanceof Student) {
+            Student student = convertToStudentEntity(source);
+            student.setGroup(((Student) foundedUser).getGroup());
+            userToSave = student;
+        } else if (foundedUser instanceof Teacher) {
+            Teacher teacher = convertToTeacherEntity(source);
+            teacher.setCourses(((Teacher) foundedUser).getCourses());
+            userToSave = teacher;
+        }
+        userToSave.setPassword(foundedUser.getPassword());
 
-		return userToSave;
-	}
+        return userToSave;
+    }
 
-	private User convertToEntity(UserDTO source) {
-		assignFields(source);
-		return converterService.convert(source, User.class);
-	}
+    private User convertToEntity(UserDTO source) {
+        assignFields(source);
+        return converterService.convert(source, User.class);
+    }
 
-	private void assignFields(UserDTO userDTO) {
-		userDTO.setRoleDTO(roleService.findByIdAsDTO(userDTO.getRoleDTO().getId()));
-	}
+    private void assignFields(UserDTO userDTO) {
+        userDTO.setRoleDTO(roleService.findByIdAsDTO(userDTO.getRoleDTO().getId()));
+    }
 
-	private Student convertToStudentEntity(UserDTO source) {
-		return converterService.convert(source, Student.class);
-	}
+    private Student convertToStudentEntity(UserDTO source) {
+        return converterService.convert(source, Student.class);
+    }
 
-	private Teacher convertToTeacherEntity(UserDTO source) {
-		return converterService.convert(source, Teacher.class);
-	}
+    private Teacher convertToTeacherEntity(UserDTO source) {
+        return converterService.convert(source, Teacher.class);
+    }
 
-	private <T> T execute(DaoSupplier<T> supplier) {
-		try {
-			return supplier.get();
-		} catch (DataAccessException e) {
-			throw new ServiceException("DAO operation failed", e);
-		}
-	}
+    private <T> T execute(DaoSupplier<T> supplier) {
+        try {
+            return supplier.get();
+        } catch (DataAccessException e) {
+            throw new ServiceException("DAO operation failed", e);
+        }
+    }
 
-	private void execute(DaoProcessor processor) {
-		try {
-			processor.process();
-		} catch (DataAccessException e) {
-			throw new ServiceException("DAO operation failed", e);
-		}
-	}
+    private void execute(DaoProcessor processor) {
+        try {
+            processor.process();
+        } catch (DataAccessException e) {
+            throw new ServiceException("DAO operation failed", e);
+        }
+    }
 
-	@FunctionalInterface
-	public interface DaoSupplier<T> {
-		T get();
-	}
+    @FunctionalInterface
+    public interface DaoSupplier<T> {
+        T get();
+    }
 
-	@FunctionalInterface
-	public interface DaoProcessor {
-		void process();
-	}
+    @FunctionalInterface
+    public interface DaoProcessor {
+        void process();
+    }
 }

@@ -10,10 +10,10 @@ import lombok.*;
 @Data
 public class ClassTypeDTO {
 
-	private Long id;
+    private Long id;
 
-	@NonNull
-	@NotBlank(message = "ClassType name must not be blank")
-	@Size(max = 255)
-	private String name;
+    @NonNull
+    @NotBlank(message = "ClassType name must not be blank")
+    @Size(max = 255)
+    private String name;
 }

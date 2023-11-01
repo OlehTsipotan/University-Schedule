@@ -13,23 +13,23 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DefaultUserDetailsService implements UserDetailsService {
 
-	private final UserService userService;
+    private final UserService userService;
 
-	private final UserDetailsMapper userDetailsMapper;
+    private final UserDetailsMapper userDetailsMapper;
 
 
-	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		User user;
-		try {
-			user = userService.findByEmail(username);
-		} catch (ServiceException e) {
-			throw new UsernameNotFoundException("No user found with email = " + username, e);
-		}
-		if ("Admin".equals(user.getRole().getName())) {
-			throw new UsernameNotFoundException("User has Admin role, " + username);
-		}
-		return userDetailsMapper.convertToUserDetails(user);
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user;
+        try {
+            user = userService.findByEmail(username);
+        } catch (ServiceException e) {
+            throw new UsernameNotFoundException("No user found with email = " + username, e);
+        }
+        if ("Admin".equals(user.getRole().getName())) {
+            throw new UsernameNotFoundException("User has Admin role, " + username);
+        }
+        return userDetailsMapper.convertToUserDetails(user);
 
-	}
+    }
 }

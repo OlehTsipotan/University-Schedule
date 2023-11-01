@@ -9,19 +9,19 @@ import java.util.List;
 
 public interface ScheduledClassService {
 
-	Long save(ScheduledClass ScheduledClass);
+    Long save(ScheduledClass ScheduledClass);
 
-	Long save(ScheduledClassDTO ScheduledClassDTO);
+    Long save(ScheduledClassDTO ScheduledClassDTO);
 
-	ScheduledClassDTO findByIdAsDTO(Long id);
+    ScheduledClassDTO findByIdAsDTO(Long id);
 
-	List<ScheduledClass> findAll();
+    List<ScheduledClass> findAll();
 
-	List<ScheduledClassDTO> findAllAsDTO();
+    List<ScheduledClassDTO> findAllAsDTO();
 
-	List<ScheduledClassDTO> findAllAsDTO(Pageable pageable);
+    List<ScheduledClassDTO> findAllAsDTO(Pageable pageable);
 
-	List<ScheduledClassDTO> findAllAsDTOByScheduleFilterItem(ScheduleFilterItem scheduleFilterItem);
+    List<ScheduledClassDTO> findAllAsDTOByScheduleFilterItem(ScheduleFilterItem scheduleFilterItem);
 
-	void deleteById(Long id);
+    void deleteById(Long id);
 }

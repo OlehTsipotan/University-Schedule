@@ -1,9 +1,7 @@
 package com.university.schedule.converter;
 
 import com.university.schedule.dto.ClassroomDTO;
-import com.university.schedule.dto.TeacherDTO;
 import com.university.schedule.model.Classroom;
-import com.university.schedule.model.Teacher;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
@@ -11,16 +9,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClassroomDTOToClassroomEntityConverter implements Converter<ClassroomDTO, Classroom> {
 
-	private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
 
-	public ClassroomDTOToClassroomEntityConverter() {
-		this.modelMapper = new ModelMapper();
+    public ClassroomDTOToClassroomEntityConverter() {
+        this.modelMapper = new ModelMapper();
+    }
 
-	}
-
-	@Override
-	public Classroom convert(ClassroomDTO source) {
-		return modelMapper.map(source, Classroom.class);
-	}
+    @Override
+    public Classroom convert(ClassroomDTO source) {
+        return modelMapper.map(source, Classroom.class);
+    }
 }

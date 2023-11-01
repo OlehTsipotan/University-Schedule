@@ -19,36 +19,36 @@ import java.util.Objects;
 @Table(name = "classrooms", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "building_id"})})
 public class Classroom {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "classroom_generator")
-	@SequenceGenerator(name = "classroom_generator", sequenceName = "classrooms_seq", allocationSize = 1)
-	@Column(name = "classroom_id")
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "classroom_generator")
+    @SequenceGenerator(name = "classroom_generator", sequenceName = "classrooms_seq", allocationSize = 1)
+    @Column(name = "classroom_id")
+    private Long id;
 
-	@NotBlank(message = "Classroom name must not be blank")
-	@Size(max = 255)
-	private String name;
+    @NotBlank(message = "Classroom name must not be blank")
+    @Size(max = 255)
+    private String name;
 
-	@ManyToOne
-	@JoinColumn(name = "building_id")
-	@NotNull(message = "Classroom building must not be null")
-	private Building building;
+    @ManyToOne
+    @JoinColumn(name = "building_id")
+    @NotNull(message = "Classroom building must not be null")
+    private Building building;
 
-	public Classroom(String name, Building building){
-		this.name = name;
-		this.building = building;
-	}
+    public Classroom(String name, Building building) {
+        this.name = name;
+        this.building = building;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-		Classroom classroom = (Classroom) o;
-		return getId() != null && Objects.equals(getId(), classroom.getId());
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        Classroom classroom = (Classroom) o;
+        return getId() != null && Objects.equals(getId(), classroom.getId());
+    }
 
-	@Override
-	public int hashCode() {
-		return getClass().hashCode();
-	}
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

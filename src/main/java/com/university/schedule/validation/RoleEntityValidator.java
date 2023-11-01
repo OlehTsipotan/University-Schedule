@@ -13,31 +13,31 @@ import java.util.Optional;
 @Component
 public class RoleEntityValidator extends EntityValidator<Role> {
 
-	private final RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-	public RoleEntityValidator(RoleRepository roleRepository, Validator validator) {
-		super(validator);
-		this.roleRepository = roleRepository;
-	}
+    public RoleEntityValidator(RoleRepository roleRepository, Validator validator) {
+        super(validator);
+        this.roleRepository = roleRepository;
+    }
 
-	@Override
-	public void validate(Role role) {
-		List<String> violations = new ArrayList<>();
-		try {
-			super.validate(role);
-		} catch (ValidationException e) {
-			violations = e.getViolations();
-		}
+    @Override
+    public void validate(Role role) {
+        List<String> violations = new ArrayList<>();
+        try {
+            super.validate(role);
+        } catch (ValidationException e) {
+            violations = e.getViolations();
+        }
 
-		Optional<Role> roleToCheck = roleRepository.findByName(role.getName());
-		if (roleToCheck.isPresent() && !role.equals(roleToCheck.get())) {
-			violations.add(String.format("Role with name = %s, already exists.", role.getName()));
-		}
+        Optional<Role> roleToCheck = roleRepository.findByName(role.getName());
+        if (roleToCheck.isPresent() && !role.equals(roleToCheck.get())) {
+            violations.add(String.format("Role with name = %s, already exists.", role.getName()));
+        }
 
-		if (!violations.isEmpty()) {
-			throw new ValidationException("Role is not valid", violations);
-		}
+        if (!violations.isEmpty()) {
+            throw new ValidationException("Role is not valid", violations);
+        }
 
-	}
+    }
 }
 

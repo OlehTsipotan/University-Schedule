@@ -9,16 +9,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserDTOToUserEntityConverter implements Converter<UserDTO, User> {
 
-	private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
-	public UserDTOToUserEntityConverter() {
-		this.modelMapper = new ModelMapper();
-		modelMapper.typeMap(UserDTO.class, User.class)
-				.addMappings(modelMapper -> modelMapper.map(UserDTO::isEnable, User::setIsEnable));
-	}
+    public UserDTOToUserEntityConverter() {
+        this.modelMapper = new ModelMapper();
+        modelMapper.typeMap(UserDTO.class, User.class)
+            .addMappings(modelMapper -> modelMapper.map(UserDTO::isEnable, User::setIsEnable));
+    }
 
-	@Override
-	public User convert(UserDTO source) {
-		return modelMapper.map(source, User.class);
-	}
+    @Override
+    public User convert(UserDTO source) {
+        return modelMapper.map(source, User.class);
+    }
 }

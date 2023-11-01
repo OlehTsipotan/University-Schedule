@@ -10,31 +10,31 @@ import java.util.List;
 
 @Component
 public class TeacherEntityValidator extends EntityValidator<Teacher> {
-	private final UserEntityValidator userEntityValidator;
+    private final UserEntityValidator userEntityValidator;
 
-	public TeacherEntityValidator(UserEntityValidator userEntityValidator, Validator validator) {
-		super(validator);
-		this.userEntityValidator = userEntityValidator;
-	}
+    public TeacherEntityValidator(UserEntityValidator userEntityValidator, Validator validator) {
+        super(validator);
+        this.userEntityValidator = userEntityValidator;
+    }
 
-	@Override
-	public void validate(Teacher teacher) {
-		List<String> violations = new ArrayList<>();
-		try {
-			super.validate(teacher);
-		} catch (ValidationException e) {
-			violations = e.getViolations();
-		}
+    @Override
+    public void validate(Teacher teacher) {
+        List<String> violations = new ArrayList<>();
+        try {
+            super.validate(teacher);
+        } catch (ValidationException e) {
+            violations = e.getViolations();
+        }
 
-		try {
-			userEntityValidator.validate(teacher);
-		} catch (ValidationException e) {
-			violations.addAll(e.getViolations());
-		}
+        try {
+            userEntityValidator.validate(teacher);
+        } catch (ValidationException e) {
+            violations.addAll(e.getViolations());
+        }
 
-		if (!violations.isEmpty()) {
-			throw new ValidationException("Teacher is not valid", violations);
-		}
+        if (!violations.isEmpty()) {
+            throw new ValidationException("Teacher is not valid", violations);
+        }
 
-	}
+    }
 }

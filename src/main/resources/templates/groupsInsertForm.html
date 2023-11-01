@@ -2,46 +2,46 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
-    <meta name="description" content="University schedule web-application "/>
-    <meta name="author" content="Oleh Tsipotan"/>
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+    <meta content="University schedule web-application " name="description"/>
+    <meta content="Oleh Tsipotan" name="author"/>
     <title>Group insert</title>
 
-    <link th:href="@{/styles/main.css}" rel="stylesheet"/>
+    <link rel="stylesheet" th:href="@{/styles/main.css}"/>
 
-    <link th:href="@{/assets/calendar-days-solid.svg}" rel="icon" type="image/x-icon"/>
-    <link th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}" rel="stylesheet"/>
-    <link th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}" rel="stylesheet"/>
-    <link th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}" rel="stylesheet"/>
+    <link rel="icon" th:href="@{/assets/calendar-days-solid.svg}" type="image/x-icon"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/5.3.1/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" th:href="@{https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css}"/>
+    <link rel="stylesheet" th:href="@{https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css}"/>
 </head>
 <body>
 <div th:replace="~{fragments/navbar :: navbarWithBackPage('Group Insert', '/groups')}"></div>
 <div class="container">
     <div class="row">
         <div th:if="${validationServiceErrors != null}">
-            <div th:each="violation : ${validationServiceErrors}" class="alert alert-warning mt-3"
+            <div class="alert alert-warning mt-3" th:each="violation : ${validationServiceErrors}"
                  th:text="${violation}"></div>
         </div>
 
         <form
-                method="post"
-                role="form"
-                th:action="@{'/groups/insert'}"
-                class="form-horizontal mt-3"
-                th:object="${groupDTO}">
+            class="form-horizontal mt-3"
+            method="post"
+            role="form"
+            th:action="@{'/groups/insert'}"
+            th:object="${groupDTO}">
 
             <!-- Name input -->
             <div class="form-group row mb-2">
-                <label for="inputName" class="col-sm-2 col-form-label fw-bold">Name</label>
+                <label class="col-sm-2 col-form-label fw-bold" for="inputName">Name</label>
                 <div class="col-sm-10">
-                    <input type="text" name="name" id="inputName" placeholder="Name"
+                    <input id="inputName" name="name" placeholder="Name" required
                            th:class="${success != null ? 'is-valid form-control' : (#fields.hasErrors('name') ? 'is-invalid form-control' : 'form-control')}"
-                           required>
-                    <div th:if="${success}" class="valid-feedback">
+                           type="text">
+                    <div class="valid-feedback" th:if="${success}">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('name')}"
-                         class="invalid-feedback"
+                    <div class="invalid-feedback"
+                         th:each="error : ${#fields.errors('name')}"
                          th:text=${error}>
                     </div>
                 </div>
@@ -49,18 +49,18 @@
 
             <!-- Discipline input -->
             <div class="form-group row mb-2">
-                <label for="inputDiscipline" class="col-sm-2 col-form-label fw-bold">Discipline</label>
+                <label class="col-sm-2 col-form-label fw-bold" for="inputDiscipline">Discipline</label>
                 <div class="col-sm-10">
-                    <select name="disciplineDTO.id" id="inputDiscipline" required
+                    <select id="inputDiscipline" name="disciplineDTO.id" required
                             th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('disciplineDTO') ? 'is-invalid form-select' : 'form-select')}">
-                        <option th:each="disciplineDTO : ${disciplineDTOList}" th:value="${disciplineDTO.getId()}"
-                                th:text="${disciplineDTO.getName()}"></option>
+                        <option th:each="disciplineDTO : ${disciplineDTOList}" th:text="${disciplineDTO.getName()}"
+                                th:value="${disciplineDTO.getId()}"></option>
                     </select>
-                    <div th:if="${success}" class="valid-feedback">
+                    <div class="valid-feedback" th:if="${success}">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('disciplineDTO')}"
-                         class="invalid-feedback"
+                    <div class="invalid-feedback"
+                         th:each="error : ${#fields.errors('disciplineDTO')}"
                          th:text=${error}>
                     </div>
                 </div>
@@ -68,24 +68,24 @@
 
             <!-- Courses multiple select -->
             <div class="form-group row mb-2">
-                <label for="inputCourses" class="col-sm-2 col-form-label fw-bold">Courses</label>
+                <label class="col-sm-2 col-form-label fw-bold" for="inputCourses">Courses</label>
                 <div class="col-sm-10">
-                    <select multiple name="courseDTOS" id="inputCourses" required
+                    <select id="inputCourses" multiple name="courseDTOS" required
                             th:class="${success != null ? 'is-valid form-select' : (#fields.hasErrors('courseDTOS') ? 'is-invalid form-select' : 'form-select')}">
-                        <option th:each="courseDTO : ${courseDTOList}" th:value="${courseDTO.getId()}"
-                                th:text="${courseDTO.getName()}"></option>
+                        <option th:each="courseDTO : ${courseDTOList}" th:text="${courseDTO.getName()}"
+                                th:value="${courseDTO.getId()}"></option>
                     </select>
-                    <div th:if="${success}" class="valid-feedback">
+                    <div class="valid-feedback" th:if="${success}">
                         Looks good!
                     </div>
-                    <div th:each="error : ${#fields.errors('courseDTOS')}"
-                         class="invalid-feedback"
+                    <div class="invalid-feedback"
+                         th:each="error : ${#fields.errors('courseDTOS')}"
                          th:text=${error}>
                     </div>
                 </div>
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button class="btn btn-primary" type="submit">Submit</button>
             </div>
         </form>
     </div>

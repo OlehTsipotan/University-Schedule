@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class AuthorityDTOToAuthorityEntityConverter implements Converter<AuthorityDTO, Authority> {
 
-	private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
 
-	public AuthorityDTOToAuthorityEntityConverter() {
-		this.modelMapper = new ModelMapper();
-	}
+    public AuthorityDTOToAuthorityEntityConverter() {
+        this.modelMapper = new ModelMapper();
+    }
 
-	@Override
-	public Authority convert(AuthorityDTO source) {
-		return modelMapper.map(source, Authority.class);
-	}
+    @Override
+    public Authority convert(AuthorityDTO source) {
+        return modelMapper.map(source, Authority.class);
+    }
 }

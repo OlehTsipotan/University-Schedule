@@ -22,39 +22,39 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-	private final String REGISTER_FORM_TEMPLATE = "login/userRegister";
-	private final String LOGIN_FORM_TEMPLATE = "login/userLogin";
+    private final String REGISTER_FORM_TEMPLATE = "login/userRegister";
+    private final String LOGIN_FORM_TEMPLATE = "login/userLogin";
 
-	private final UserRegistrationService userRegistrationService;
-	private final RoleService roleService;
+    private final UserRegistrationService userRegistrationService;
+    private final RoleService roleService;
 
-	@GetMapping("/user/login")
-	public String getLoginForm() {
-		return LOGIN_FORM_TEMPLATE;
-	}
+    @GetMapping("/user/login")
+    public String getLoginForm() {
+        return LOGIN_FORM_TEMPLATE;
+    }
 
-	@GetMapping("/user/register")
-	public String getRegistrationForm(Model model, RedirectAttributes redirectAttributes,
-	                                  UserRegisterDTO userRegisterDTO) {
-		List<RoleDTO> roleDTOList = roleService.findAllForRegistrationAsDTO();
-		model.addAttribute("roleDTOList", roleDTOList);
+    @GetMapping("/user/register")
+    public String getRegistrationForm(Model model, RedirectAttributes redirectAttributes,
+                                      UserRegisterDTO userRegisterDTO) {
+        List<RoleDTO> roleDTOList = roleService.findAllForRegistrationAsDTO();
+        model.addAttribute("roleDTOList", roleDTOList);
 
-		return REGISTER_FORM_TEMPLATE;
-	}
+        return REGISTER_FORM_TEMPLATE;
+    }
 
-	@PostMapping("/user/register")
-	public String register(@Valid @ModelAttribute UserRegisterDTO userRegisterDTO, BindingResult result, Model model,
-	                       RedirectAttributes redirectAttributes) {
-		if (!result.hasErrors()) {
-			userRegistrationService.register(userRegisterDTO);
-			redirectAttributes.addFlashAttribute("registerSuccess", true);
-			return "redirect:/user/login";
-		}
+    @PostMapping("/user/register")
+    public String register(@Valid @ModelAttribute UserRegisterDTO userRegisterDTO, BindingResult result, Model model,
+                           RedirectAttributes redirectAttributes) {
+        if (!result.hasErrors()) {
+            userRegistrationService.register(userRegisterDTO);
+            redirectAttributes.addFlashAttribute("registerSuccess", true);
+            return "redirect:/user/login";
+        }
 
-		List<RoleDTO> roleDTOList = roleService.findAllForRegistrationAsDTO();
-		model.addAttribute("roleDTOList", roleDTOList);
+        List<RoleDTO> roleDTOList = roleService.findAllForRegistrationAsDTO();
+        model.addAttribute("roleDTOList", roleDTOList);
 
-		return REGISTER_FORM_TEMPLATE;
-	}
+        return REGISTER_FORM_TEMPLATE;
+    }
 
 }

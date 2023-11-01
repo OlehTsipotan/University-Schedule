@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class BuildingEntityToBuildingDTOConverter implements Converter<Building, BuildingDTO> {
 
-	private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
 
-	public BuildingEntityToBuildingDTOConverter() {
-		this.modelMapper = new ModelMapper();
-	}
+    public BuildingEntityToBuildingDTOConverter() {
+        this.modelMapper = new ModelMapper();
+    }
 
-	@Override
-	public BuildingDTO convert(Building source) {
-		return modelMapper.map(source, BuildingDTO.class);
-	}
+    @Override
+    public BuildingDTO convert(Building source) {
+        return modelMapper.map(source, BuildingDTO.class);
+    }
 }

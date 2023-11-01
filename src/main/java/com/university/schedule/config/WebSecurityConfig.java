@@ -28,64 +28,63 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 public class WebSecurityConfig {
 
 
-	private final DefaultUserDetailsService defaultUserDetailsService;
-	private final AdminDetailsService adminDetailsService;
-	private final CustomUserAuthenticationSuccessHandler customUserAuthenticationSuccessHandler;
-	private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
+    private final DefaultUserDetailsService defaultUserDetailsService;
+    private final AdminDetailsService adminDetailsService;
+    private final CustomUserAuthenticationSuccessHandler customUserAuthenticationSuccessHandler;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Bean
-	public AuthenticationSuccessHandler adminAuthenticationSuccessHandler() {
-		return new CustomAdminAuthenticationSuccessHandler();
-	}
+    @Bean
+    public AuthenticationSuccessHandler adminAuthenticationSuccessHandler() {
+        return new CustomAdminAuthenticationSuccessHandler();
+    }
 
-	@Bean
-	public DaoAuthenticationProvider userAuthenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(defaultUserDetailsService);
-		authProvider.setPasswordEncoder(passwordEncoder());
+    @Bean
+    public DaoAuthenticationProvider userAuthenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(defaultUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
 
-		return authProvider;
-	}
+        return authProvider;
+    }
 
-	@Bean
-	public DaoAuthenticationProvider adminAuthenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-		authProvider.setUserDetailsService(adminDetailsService);
-		authProvider.setPasswordEncoder(passwordEncoder());
+    @Bean
+    public DaoAuthenticationProvider adminAuthenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(adminDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
 
-		return authProvider;
-	}
+        return authProvider;
+    }
 
 
-	@Bean
-	@Order(2)
-	public SecurityFilterChain userFilterChain(HttpSecurity http) throws Exception {
-		return http.csrf(AbstractHttpConfigurer::disable).authenticationProvider(userAuthenticationProvider())
-				.authorizeHttpRequests(
-						authorizeRequests -> authorizeRequests.requestMatchers("/css/**", "/js/**", "/webjars/**",
-										"/styles/**", "/assets/**").permitAll().requestMatchers("/admin/login").permitAll()
-								.requestMatchers("/user/register").permitAll().anyRequest().authenticated())
-				.securityMatcher("/**").formLogin(login -> login.loginPage("/user/login").usernameParameter("email")
-						.loginProcessingUrl("/user/login").successHandler(customUserAuthenticationSuccessHandler)
-						.permitAll())
-				.logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(customLogoutSuccessHandler)).build();
-	}
+    @Bean
+    @Order(2)
+    public SecurityFilterChain userFilterChain(HttpSecurity http) throws Exception {
+        return http.csrf(AbstractHttpConfigurer::disable).authenticationProvider(userAuthenticationProvider())
+            .authorizeHttpRequests(
+                authorizeRequests -> authorizeRequests.requestMatchers("/css/**", "/js/**", "/webjars/**", "/styles/**",
+                        "/assets/**").permitAll().requestMatchers("/admin/login").permitAll()
+                    .requestMatchers("/user/register").permitAll().anyRequest().authenticated()).securityMatcher("/**")
+            .formLogin(
+                login -> login.loginPage("/user/login").usernameParameter("email").loginProcessingUrl("/user/login")
+                    .successHandler(customUserAuthenticationSuccessHandler).permitAll())
+            .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(customLogoutSuccessHandler)).build();
+    }
 
-	@Bean
-	@Order(1)
-	public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
-		return http.csrf(AbstractHttpConfigurer::disable).authenticationProvider(adminAuthenticationProvider())
-				.authorizeHttpRequests(
-						authorizeRequests -> authorizeRequests.requestMatchers("/css/**", "/js/**", "/webjars/**",
-								"/styles/**", "/assets/**").permitAll().requestMatchers("/admin/**").hasRole("ADMIN"))
-				.securityMatcher("/admin/**").formLogin(
-						login -> login.loginPage("/admin/login").usernameParameter("email")
-								.loginProcessingUrl("/admin/login").successHandler(adminAuthenticationSuccessHandler())
-								.permitAll()).build();
-	}
+    @Bean
+    @Order(1)
+    public SecurityFilterChain adminFilterChain(HttpSecurity http) throws Exception {
+        return http.csrf(AbstractHttpConfigurer::disable).authenticationProvider(adminAuthenticationProvider())
+            .authorizeHttpRequests(
+                authorizeRequests -> authorizeRequests.requestMatchers("/css/**", "/js/**", "/webjars/**", "/styles/**",
+                    "/assets/**").permitAll().requestMatchers("/admin/**").hasRole("ADMIN"))
+            .securityMatcher("/admin/**").formLogin(
+                login -> login.loginPage("/admin/login").usernameParameter("email").loginProcessingUrl("/admin/login")
+                    .successHandler(adminAuthenticationSuccessHandler()).permitAll()).build();
+    }
 }

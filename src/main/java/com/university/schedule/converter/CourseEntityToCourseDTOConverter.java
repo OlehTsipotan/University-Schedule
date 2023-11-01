@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class CourseEntityToCourseDTOConverter implements Converter<Course, CourseDTO> {
 
-	private final ModelMapper modelMapper;
+    private final ModelMapper modelMapper;
 
 
-	public CourseEntityToCourseDTOConverter() {
-		this.modelMapper = new ModelMapper();
-	}
+    public CourseEntityToCourseDTOConverter() {
+        this.modelMapper = new ModelMapper();
+    }
 
-	@Override
-	public CourseDTO convert(Course source) {
-		return modelMapper.map(source, CourseDTO.class);
-	}
+    @Override
+    public CourseDTO convert(Course source) {
+        return modelMapper.map(source, CourseDTO.class);
+    }
 }

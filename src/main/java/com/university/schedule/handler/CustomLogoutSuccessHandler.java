@@ -18,14 +18,14 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
-	private final UserService userService;
+    private final UserService userService;
 
-	@Override
-	public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
-			throws IOException, ServletException {
-		UserDTO userDTO = userService.findByEmailAsDTO(authentication.getName());
-		log.debug("Logout {}: {}", userDTO.getRoleDTO().getName(), authentication.getName());
+    @Override
+    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+        throws IOException, ServletException {
+        UserDTO userDTO = userService.findByEmailAsDTO(authentication.getName());
+        log.debug("Logout {}: {}", userDTO.getRoleDTO().getName(), authentication.getName());
 
-		response.sendRedirect("/user/login");
-	}
+        response.sendRedirect("/user/login");
+    }
 }

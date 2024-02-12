@@ -76,13 +76,19 @@ cd university-schedule-app
 The application will be accessible at http://localhost:8080.
 
 ## How to Use the Project
-#### **User**
-Register or Login (Student, Teacher) --> http://localhost:8080/user/login,
+### **User**
+Register or Login `(Student, Teacher)`
+```
+http://localhost:8080/user/login
+```
 
-#### **Admin**
-Login as Admin -->  http://localhost:8080/admin/login 
-- email: admin@admin.com
-- password: adminPassword
+### **Admin**
+Login as `Admin`
+```
+http://localhost:8080/admin/login 
+```
+- Email: admin@admin.com
+- Password: adminPassword
 
 <u>Change in properties file and turn on data generation</u>
 
